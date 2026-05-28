@@ -9,24 +9,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Layout
 
-The React Native app lives in `arokia/arokia/` (double-nested from scaffold). All `npm` commands and file references below are relative to that directory.
+The repo root and the Expo app root are the same directory. All `npm` commands run from the repo root.
 
 ```
-arokia/                          ← repo root
-  arokia/                        ← app root (run all commands here)
-    app/                         ← Expo Router file-based routes
-    components/                  ← Feature-scoped UI (scripture/, audio/, home/, donation/, shared/)
-    lib/                         ← Singleton services: supabase.ts, i18n.ts, audio.ts (Story 1.6)
-    store/                       ← Zustand stores (audioStore, prefsStore, contentStore — Story 1.4)
-    constants/                   ← Design tokens: colors.ts, theme.ts
-    locales/                     ← i18n strings: ta.json (Tamil only in MVP)
-    types/                       ← Shared domain types (Story 1.4)
-    _bmad-output/                ← Planning artifacts: PRD, architecture, epics, sprint-status.yaml
+arokia/                  ← repo root = app root
+  app/                   ← Expo Router file-based routes
+  components/            ← Feature-scoped UI (scripture/, audio/, home/, donation/, shared/)
+  lib/                   ← Singleton services: supabase.ts, i18n.ts, audio.ts (Story 1.6)
+  store/                 ← Zustand stores (audioStore, prefsStore, contentStore — Story 1.4)
+  constants/             ← Design tokens: colors.ts, theme.ts
+  locales/               ← i18n strings: ta.json (Tamil only in MVP)
+  types/                 ← Shared domain types (Story 1.4)
+  _bmad/                 ← BMAD workflow tooling
+  _bmad-output/          ← Planning artifacts: PRD, architecture, epics, sprint-status.yaml
 ```
 
 ## Commands
 
-Run all commands from `arokia/arokia/`:
+Run all commands from the repo root:
 
 ```bash
 npx expo start --ios        # Start Metro + open iOS simulator
@@ -87,7 +87,7 @@ react-native-track-player (Story 1.6) — background audio with lockscreen contr
 
 ### Path Alias
 
-`@/*` resolves to the project root (`arokia/arokia/`). Configured in `tsconfig.json` + `app.json` (`tsconfigPaths: true`). Always import via `@/` — no relative `../../` imports.
+`@/*` resolves to the repo root. Configured in `tsconfig.json` + `app.json` (`tsconfigPaths: true`). Always import via `@/` — no relative `../../` imports.
 
 ### Component Barrel Pattern
 
