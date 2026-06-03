@@ -1,0 +1,118 @@
+# generated: 2026-04-26
+# last_updated: 2026-04-26
+# project: arokia
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: _bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-04-26
+last_updated: 2026-04-26
+project: arokia
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+
+development_status:
+  # ─────────────────────────────────────────────────────────────────
+  # Epic 1: Foundation, Developer Tooling & Technical Spikes
+  # ─────────────────────────────────────────────────────────────────
+  epic-1: in-progress
+  1-1-project-scaffold-and-developer-experience-setup: done
+  1-2-supabase-schema-and-database-migrations: backlog
+  1-3-expo-sqlite-and-tamil-ov-bible-data-bundle: backlog
+  1-4-service-layer-domain-types-and-zustand-store-skeletons: backlog
+  1-5-github-actions-ci-eas-build-profiles-and-sentry: backlog
+  1-6-react-native-track-player-background-audio-spike: backlog
+  1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes: backlog
+  1-8-elevenlabs-audio-generation-script: backlog
+  epic-1-retrospective: optional
+
+  # ─────────────────────────────────────────────────────────────────
+  # Epic 2: Opening Vow, Integrity Layer & About
+  # ─────────────────────────────────────────────────────────────────
+  epic-2: backlog
+  2-1-opening-vow-first-launch-gate: backlog
+  2-2-returning-user-re-acknowledgment-and-vow-state-management: backlog
+  2-3-about-page-and-privacy-policy: backlog
+  2-4-theological-concern-submission-form: backlog
+  epic-2-retrospective: optional
+
+  # ─────────────────────────────────────────────────────────────────
+  # Epic 3: Scripture — The Word
+  # ─────────────────────────────────────────────────────────────────
+  epic-3: backlog
+  3-1-versetext-component-and-scripture-attribution-invariant: backlog
+  3-2-jesus-quotes-browser: backlog
+  3-3-scripture-content-search: backlog
+  3-4-content-seeding-50-jesus-quotes: backlog
+  epic-3-retrospective: optional
+
+  # ─────────────────────────────────────────────────────────────────
+  # Epic 4: Triune Daily Practice — The Walk
+  # ─────────────────────────────────────────────────────────────────
+  epic-4: backlog
+  4-1-triune-home-screen-mind-body-soul-navigation: backlog
+  4-2-meditation-library-browse-by-practice-path-and-emotional-state: backlog
+  4-3-audio-player-core-playback-with-background-and-lockscreen-controls: backlog
+  4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off: backlog
+  4-5-offline-content-download-progressive-cache-and-manual-download: backlog
+  4-6-meditation-content-seeding-21-tracks: backlog
+  4-7-app-launch-performance-and-cold-start-validation: backlog
+  epic-4-retrospective: optional
+
+  # ─────────────────────────────────────────────────────────────────
+  # Epic 5: Share & Community Seed
+  # ─────────────────────────────────────────────────────────────────
+  epic-5: backlog
+  5-1-verse-card-generation-versecardview-component: backlog
+  5-2-share-to-whatsapp-and-system-share-sheet: backlog
+  5-3-optional-sunday-church-attendance-tracker: backlog
+  epic-5-retrospective: optional
+
+  # ─────────────────────────────────────────────────────────────────
+  # Epic 6: Glass-Wall Donations & Pay-It-Forward
+  # ─────────────────────────────────────────────────────────────────
+  epic-6: backlog
+  6-1-razorpay-donation-flow-one-time-and-recurring: backlog
+  6-2-razorpay-webhook-atomic-donation-record-and-pay-it-forward-allocation: backlog
+  6-3-glass-wall-budget-generation-script-and-in-app-display: backlog
+  6-4-donation-summary-and-pay-it-forward-beneficiary-management: backlog
+  epic-6-retrospective: optional
+
+  # ─────────────────────────────────────────────────────────────────
+  # Epic 7: Operator Tools & Content Governance
+  # ─────────────────────────────────────────────────────────────────
+  epic-7: backlog
+  7-1-content-management-via-supabase-admin-full-review-pipeline: backlog
+  7-2-theological-correction-per-track-audio-regeneration-and-public-disclosure: backlog
+  7-3-operator-weekly-operations-workflow-validation: backlog
+  epic-7-retrospective: optional

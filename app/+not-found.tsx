@@ -1,26 +1,16 @@
-import { Link, Stack } from 'expo-router';
-
-import { Text, View } from 'react-native';
-
-import { Container } from '@/components/Container';
+import { View, Text } from 'react-native';
+import { Link } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 
 export default function NotFoundScreen() {
+  const { t } = useTranslation();
+
   return (
-    <View className={styles.container}>
-      <Stack.Screen options={{ title: 'Oops!' }} />
-      <Container>
-        <Text className={styles.title}>{"This screen doesn't exist."}</Text>
-        <Link href="/" className={styles.link}>
-          <Text className={styles.linkText}>Go to home screen!</Text>
-        </Link>
-      </Container>
+    <View className="flex-1 items-center justify-center bg-background">
+      <Text className="text-text-secondary">{t('errors.notFound')}</Text>
+      <Link href="/" replace className="text-primary mt-4">
+        {t('errors.backHome')}
+      </Link>
     </View>
   );
 }
-
-const styles = {
-  container: `flex flex-1 bg-white`,
-  title: `text-xl font-bold`,
-  link: `mt-4 pt-4`,
-  linkText: `text-base text-[#2e78b7]`,
-};
