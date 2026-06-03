@@ -1,14 +1,11 @@
-// Arokia NativeWind Theme Extension
-// Merge into tailwind.config.js → theme.extend after scaffold:
-//
-//   const { arokiaTheme } = require('./constants/theme');
-//   module.exports = { theme: { extend: arokiaTheme }, ... };
+// Arokia design tokens — JS-side access.
+// Keep in sync with tailwind.config.js (same keys, same values).
+// tailwind.config.js is the Tailwind source; this file is for StyleSheet / inline style use.
 
 import { colors } from './colors';
 
 export const arokiaTheme = {
   colors: {
-    // Semantic aliases — use these in className, not raw hex
     background: colors.background,
     surface: colors.surface,
     'surface-warm': colors.surfaceWarm,
@@ -33,6 +30,9 @@ export const arokiaTheme = {
 
     border: colors.border,
     'border-light': colors.borderLight,
+    'icon-inactive': colors.iconInactive,
+    'icon-active': colors.iconActive,
+    'nav-background': colors.navBackground,
 
     'path-mind': colors.pathMind,
     'path-body': colors.pathBody,
@@ -42,9 +42,11 @@ export const arokiaTheme = {
     error: colors.error,
     warning: colors.warning,
     offline: colors.offline,
+
+    'card-overlay': colors.cardOverlay,
+    'card-overlay-light': colors.cardOverlayLight,
   },
   borderRadius: {
-    // Card rounding — matches the reference design's generous curves
     card: '20px',
     pill: '9999px',
     modal: '28px',
@@ -56,9 +58,8 @@ export const arokiaTheme = {
     sans: ['System', 'ui-sans-serif'],
   },
   spacing: {
-    // Consistent screen padding from the reference layout
     screen: '20px',
     card: '16px',
-    cardLg: '24px',
+    'card-lg': '24px',
   },
 } as const;

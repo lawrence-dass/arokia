@@ -42,7 +42,7 @@ There is no test suite yet (Story 1.5 adds CI; testing stories follow in Epic 1)
 
 ### Routing
 
-Expo Router v4 — file-based. Every file under `app/` becomes a route. `app/_layout.tsx` is the root shell; it imports `@/lib/i18n` as its very first line (before any component import) to guarantee i18next is initialized before rendering.
+Expo Router v6 — file-based. Every file under `app/` becomes a route. `app/_layout.tsx` is the root shell; it imports `@/lib/i18n` as its very first line (before any component import) to guarantee i18next is initialized before rendering.
 
 ### Styling
 

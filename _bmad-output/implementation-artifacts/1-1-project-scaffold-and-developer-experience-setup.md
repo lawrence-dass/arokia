@@ -38,7 +38,7 @@ so that every subsequent story builds on a consistent, type-safe foundation with
 
 - [x] **Scaffold project** (AC: 1)
   - [x] Run `npx create-expo-stack@latest arokia --expo-router --nativewind --supabase` — Zustand installed manually post-scaffold
-  - [ ] Verify `npx expo start` runs clean on iOS + Android simulators ← Lawrence to verify on device
+  - [x] Verify `npx expo start` runs clean on iOS + Android simulators ← verified 2026-05-28 on iPhone 17 Pro simulator
 
 - [x] **Enable TypeScript strict mode** (AC: 2)
   - [x] `"strict": true` already enabled by create-expo-stack — confirmed in tsconfig.json
@@ -81,7 +81,7 @@ so that every subsequent story builds on a consistent, type-safe foundation with
 
 - [x] **Run final checks** (AC: 2)
   - [x] `tsc --noEmit` → 0 errors ✅
-  - [ ] `npx expo start` → Lawrence to verify on simulator
+  - [x] `npx expo start` → verified 2026-05-28 on iPhone 17 Pro simulator
   - [x] All 8 directories present ✅
 
 ## Dev Notes

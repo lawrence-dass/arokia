@@ -1,3 +1,5 @@
+// Keep in sync with constants/theme.ts (same keys, same values).
+// constants/colors.ts is the hex source of truth for both files.
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -5,6 +7,7 @@ module.exports = {
     './components/**/*.{js,ts,tsx}',
     './lib/**/*.{js,ts,tsx}',
     './store/**/*.{js,ts,tsx}',
+    './constants/**/*.{js,ts,tsx}',
   ],
 
   presets: [require('nativewind/preset')],
@@ -38,6 +41,7 @@ module.exports = {
         'border-light': '#F0EAE2',
         'icon-inactive': '#A8A29E',
         'icon-active': '#E07058',
+        'nav-background': '#FFFFFF',
 
         'path-mind': '#F0C040',
         'path-body': '#E07058',
@@ -47,6 +51,9 @@ module.exports = {
         error: '#D05050',
         warning: '#E8A040',
         offline: '#A8A29E',
+
+        'card-overlay': 'rgba(28, 25, 23, 0.50)',
+        'card-overlay-light': 'rgba(28, 25, 23, 0.25)',
       },
       borderRadius: {
         card: '20px',
