@@ -36,35 +36,56 @@ const { error: connError } = await anon.from('content_items').select('id').limit
 if (connError) fail('AC5 connection', connError.message);
 else ok('AC5 — connection successful, content_items reachable');
 
-// AC3 — RLS: anon must NOT see draft rows (requires service role to seed a draft row)
-console.log('\nAC3: RLS hides non-published rows from anon');
+// AC3 — RLS: anon must NOT see draft rows, MUST see published rows
+// Tests both negative and positive cases using targeted ID queries so pre-existing
+// rows in the DB cannot cause false failures or false passes.
+console.log('\nAC3: RLS hides non-published rows / shows published rows to anon');
 if (!admin) {
   warn('AC3 deep test skipped — add SUPABASE_SERVICE_ROLE_KEY to .env.local for full verification');
 } else {
-  const { data: draft, error: insertDraftErr } = await admin
+  const baseItem = {
+    practice_path: 'mind',
+    product_pillar: 'word',
+    content_type: 'quote',
+    language_code: 'ta',
+    verse_reference: 'Matthew 11:28',
+    scripture_text: 'வருத்தப்பட்டவர்களே',
+  };
+
+  const { data: draftRow, error: draftInsertErr } = await admin
     .from('content_items')
-    .insert({
-      practice_path: 'mind',
-      product_pillar: 'word',
-      content_type: 'quote',
-      language_code: 'ta',
-      verse_reference: 'Matthew 11:28',
-      scripture_text: 'வருத்தப்பட்டவர்களே',
-      review_status: 'draft',
-    })
+    .insert({ ...baseItem, review_status: 'draft' })
     .select('id')
     .single();
 
-  if (insertDraftErr) {
-    fail('AC3 seed draft row', insertDraftErr.message);
-  } else {
-    const { data: anonRows, error: anonErr } = await anon.from('content_items').select('id');
-    if (anonErr) fail('AC3 anon SELECT', anonErr.message);
-    else if (anonRows.length === 0) ok('AC3 — anon SELECT returns 0 rows for draft content (RLS active)');
-    else fail('AC3', `Expected 0 rows but got ${anonRows.length} — RLS policy may be broken`);
+  const { data: pubRow, error: pubInsertErr } = await admin
+    .from('content_items')
+    .insert({ ...baseItem, review_status: 'published', published_at: new Date().toISOString() })
+    .select('id')
+    .single();
 
-    await admin.from('content_items').delete().eq('id', draft.id);
+  if (draftInsertErr) fail('AC3 seed draft row', draftInsertErr.message);
+  if (pubInsertErr) fail('AC3 seed published row', pubInsertErr.message);
+
+  if (!draftInsertErr && !pubInsertErr) {
+    // Negative case: draft row must NOT be visible to anon
+    const { data: draftCheck, error: draftCheckErr } = await anon
+      .from('content_items').select('id').eq('id', draftRow.id).maybeSingle();
+    if (draftCheckErr) fail('AC3 draft visibility', draftCheckErr.message);
+    else if (draftCheck === null) ok('AC3 — draft row hidden from anon client (RLS active)');
+    else fail('AC3', 'Draft row is visible to anon — review_status filter not enforced');
+
+    // Positive case: published row MUST be visible to anon
+    const { data: pubCheck, error: pubCheckErr } = await anon
+      .from('content_items').select('id').eq('id', pubRow.id).maybeSingle();
+    if (pubCheckErr) fail('AC3 published visibility', pubCheckErr.message);
+    else if (pubCheck !== null) ok('AC3 — published row visible to anon client (positive case confirmed)');
+    else fail('AC3', 'Published row NOT visible to anon — RLS policy may be too restrictive');
   }
+
+  // Cleanup seeded rows by ID (best-effort)
+  if (draftRow) await admin.from('content_items').delete().eq('id', draftRow.id);
+  if (pubRow) await admin.from('content_items').delete().eq('id', pubRow.id);
 }
 
 // AC4 — theological_concerns: anon INSERT succeeds, anon SELECT returns 0 rows
@@ -76,10 +97,10 @@ const { error: tcInsertErr } = await anon
 if (tcInsertErr) fail('AC4 INSERT', tcInsertErr.message);
 else ok('AC4 — anon INSERT into theological_concerns succeeded');
 
-const { data: tcRows, error: tcSelectErr } = await anon.from('theological_concerns').select('id');
+const { data: tcRows, error: tcSelectErr } = await anon.from('theological_concerns').select('id').limit(1);
 if (tcSelectErr) fail('AC4 SELECT error', tcSelectErr.message);
 else if (tcRows.length === 0) ok('AC4 — anon SELECT returns 0 rows (no SELECT policy for anon)');
-else fail('AC4 SELECT', `Expected 0 rows but got ${tcRows.length} — anon SELECT policy too permissive`);
+else fail('AC4 SELECT', `Expected 0 rows visible to anon but got ${tcRows.length}+ — SELECT policy too permissive`);
 
 // analytics_events — anon INSERT should succeed
 console.log('\nAC4b: analytics_events anon INSERT policy');
@@ -94,7 +115,9 @@ else ok('analytics_events — anon INSERT succeeded');
 console.log('\nCleanup: removing test rows');
 if (!admin) {
   warn('Cleanup skipped — add SUPABASE_SERVICE_ROLE_KEY to .env.local to auto-delete test rows');
-  console.warn('         Manually delete from theological_concerns and analytics_events if needed');
+  console.warn('  Run in Supabase SQL Editor to clean up manually:');
+  console.warn("    DELETE FROM theological_concerns WHERE description = 'Verification test concern (auto-deleted)';");
+  console.warn("    DELETE FROM analytics_events WHERE install_id = 'verify-script-test';");
 } else {
   const { error: tcCleanErr } = await admin
     .from('theological_concerns')
