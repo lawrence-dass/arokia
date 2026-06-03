@@ -4,19 +4,13 @@
     "slug": "arokia",
     "version": "1.0.0",
     "scheme": "arokia",
-    "platforms": [
-      "ios",
-      "android"
-    ],
+    "platforms": ["ios", "android"],
     "web": {
       "bundler": "metro",
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-localization"
-    ],
+    "plugins": ["expo-router", "expo-localization"],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true
@@ -29,9 +23,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#F5EFE6"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
