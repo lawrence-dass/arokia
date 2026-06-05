@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-04-26
+last_updated: 2026-06-04
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -47,8 +47,8 @@ development_status:
   # ─────────────────────────────────────────────────────────────────
   epic-1: in-progress
   1-1-project-scaffold-and-developer-experience-setup: done
-  1-2-supabase-schema-and-database-migrations: backlog
-  1-3-expo-sqlite-and-tamil-ov-bible-data-bundle: backlog
+  1-2-supabase-schema-and-database-migrations: done
+  1-3-expo-sqlite-and-tamil-ov-bible-data-bundle: review
   1-4-service-layer-domain-types-and-zustand-store-skeletons: backlog
   1-5-github-actions-ci-eas-build-profiles-and-sentry: backlog
   1-6-react-native-track-player-background-audio-spike: backlog

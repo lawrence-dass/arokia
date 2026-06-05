@@ -53,9 +53,9 @@ export const colors = {
 
   // ─── Practice Path Colors (Mind / Body / Soul) ─────────────────
   // Used to tint path cards and navigation items
-  pathMind: '#F0C040',   // golden — intellect, clarity
-  pathBody: '#E07058',   // coral — movement, vitality
-  pathSoul: '#A8C8C4',   // teal — stillness, spirit
+  pathMind: '#F0C040', // golden — intellect, clarity
+  pathBody: '#E07058', // coral — movement, vitality
+  pathSoul: '#A8C8C4', // teal — stillness, spirit
 
   // ─── Semantic ──────────────────────────────────────────────────
   success: '#6BAF7A',

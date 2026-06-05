@@ -1,0 +1,3 @@
+-- Seed file for local development (supabase db reset)
+-- Production data is loaded via admin scripts in scripts/ — not here.
+-- Add development fixtures below as needed during future stories.
