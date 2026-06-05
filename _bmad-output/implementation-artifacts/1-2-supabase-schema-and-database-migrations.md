@@ -1,6 +1,6 @@
 # Story 1.2: Supabase Schema & Database Migrations
 
-Status: review
+Status: done
 
 ## Story
 
@@ -445,6 +445,12 @@ claude-sonnet-4-6
 - 3 composite indexes on `content_items` for the content query patterns (path, mood, type).
 - AC3 verified: anon SELECT on `content_items` returns 0 rows (no published items). AC4 verified: anon INSERT into `theological_concerns` succeeded; anon SELECT returns 0 rows. AC5 verified: connection test passed. AC6 verified: no hardcoded credentials in source.
 - `scripts/verify-schema.mjs` added as a reusable connection/RLS smoke-test (5/5 passing).
+- Code review (high effort, 2026-06-03): 10 findings — 3 confirmed, 7 plausible. 5 fixes applied in commit da63c00.
+- AC3 verify test rewritten: queries by seeded row ID (not total count); now tests both negative (draft hidden) and positive (published visible) cases — was false-passable on disabled RLS and false-faileable on pre-existing published rows.
+- AC4 SELECT: added `.limit(1)`.
+- Cleanup warning now prints ready-to-run DELETE SQL for runs without service role key.
+- Migration 20260603000002 applied to remote: enforces `published_at IS NOT NULL` when `review_status = 'published'`; changes `theological_concerns.content_item_id` FK to `ON DELETE SET NULL`.
+- Intentionally left: `correction_log` FK as RESTRICT (immutable audit trail — correct by design).
 
 ### File List
 
@@ -452,8 +458,10 @@ claude-sonnet-4-6
 - `supabase/config.toml` — project config; linked to ref `irwmewqshlliidlbhupn`
 - `supabase/.temp/` — CLI linkage metadata (not committed)
 - `supabase/migrations/20260603000000_initial_schema.sql` — all 9 tables, RLS policies, indexes
+- `supabase/migrations/20260603000001_add_check_constraints.sql` — enum check constraints, audio FK ON DELETE SET NULL
+- `supabase/migrations/20260603000002_schema_integrity_fixes.sql` — published_at constraint + theological_concerns FK cascade
 - `.gitignore` — added `.env.local` entry
-- `scripts/verify-schema.mjs` — smoke-test for AC3/AC4/AC5 (run: `node scripts/verify-schema.mjs`)
+- `scripts/verify-schema.mjs` — smoke-test for AC3/AC4/AC5 (run: `node --env-file=.env.local scripts/verify-schema.mjs`)
 - `.env.local` — NOT committed; real credentials for local dev
 
 ### Change Log

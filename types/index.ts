@@ -1,3 +1,2 @@
-// Domain types — populated in Story 1.4.
-// ContentItem, PracticePath, ProductPillar, Donation, AnalyticsEvent, etc. are defined there.
-export {};
+// Domain types — ContentItem, PracticePath, etc. populated in Story 1.4.
+export type { ScriptureVerse } from './content';
