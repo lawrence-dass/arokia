@@ -8,7 +8,7 @@ export default function NotFoundScreen() {
   return (
     <View className="flex-1 items-center justify-center bg-background">
       <Text className="text-text-secondary">{t('errors.notFound')}</Text>
-      <Link href="/" replace className="text-primary mt-4">
+      <Link href="/" replace className="mt-4 text-primary">
         {t('errors.backHome')}
       </Link>
     </View>
