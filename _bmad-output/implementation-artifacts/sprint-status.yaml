@@ -48,8 +48,8 @@ development_status:
   epic-1: in-progress
   1-1-project-scaffold-and-developer-experience-setup: done
   1-2-supabase-schema-and-database-migrations: done
-  1-3-expo-sqlite-and-tamil-ov-bible-data-bundle: review
-  1-4-service-layer-domain-types-and-zustand-store-skeletons: backlog
+  1-3-expo-sqlite-and-tamil-ov-bible-data-bundle: done
+  1-4-service-layer-domain-types-and-zustand-store-skeletons: ready-for-dev
   1-5-github-actions-ci-eas-build-profiles-and-sentry: backlog
   1-6-react-native-track-player-background-audio-spike: backlog
   1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes: backlog

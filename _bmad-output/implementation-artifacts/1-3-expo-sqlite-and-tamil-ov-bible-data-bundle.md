@@ -1,6 +1,6 @@
 # Story 1.3: Expo SQLite + Tamil OV Bible Data Bundle
 
-Status: review
+Status: done
 
 ## Story
 
@@ -351,6 +351,9 @@ claude-sonnet-4-6
 - `metro.config.js`: `.db` added to `assetExts` so Metro bundles the database file.
 - `.gitattributes`: `assets/db/*.db binary` prevents line-ending conversion.
 - `tsc --noEmit`: 0 errors. `npm run lint`: 0 errors (1 pre-existing warning in `lib/i18n.ts` from Story 1.1).
+- Code review (high effort, 2026-06-04): 8 findings — 2 confirmed crashes (assetSource bare require(), no onError on SQLiteProvider), 1 UX regression (SafeAreaProvider ordering), 5 correctness/cleanup. All fixed in commit 80470a7.
+- PR #3 merged: feat/story-1-2-supabase-schema → main (covers Story 1.2 + 1.3).
+- Known deferred: SQLiteProvider null-renders during DB load; Stack unmounted during asset copy on first install. Accepted for MVP — address with route-scoped provider in Story 3.x.
 
 ### File List
 
