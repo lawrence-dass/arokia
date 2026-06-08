@@ -30,3 +30,6 @@ android
 
 # Cursor IDE tooling
 .cursor/
+
+# Review pipeline — ephemeral sentinel state (review reports in _bmad-output/reviews/ are committed)
+.claude/review-sentinels/

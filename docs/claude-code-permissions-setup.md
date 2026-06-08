@@ -85,11 +85,11 @@ Create `.claude/settings.local.json`. This is your personal friction-reducer and
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash(git commit*)",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "cd /path/to/project && npx tsc --noEmit"
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/tsc-precommit-guard.sh\""
           }
         ]
       }
@@ -121,19 +121,36 @@ Add this to `.gitignore`:
 
 ## Step 4 — Pre-commit Hook (optional but recommended)
 
-The hook in `settings.local.json` above runs `npx tsc --noEmit` before every `git commit`. If TypeScript reports errors, the commit is blocked and Claude sees the output.
+A Claude Code hook `matcher` matches the **tool name** (`Bash`, `Edit`, `Write`), not a permission-style `Bash(git commit*)` pattern. A matcher like `Bash(git commit*)` matches nothing, so the gate never fires. Match `Bash` and filter the command inside the hook instead.
 
-Update the `command` path for each project:
+Create `.claude/hooks/tsc-precommit-guard.sh`:
 
-```json
-"command": "cd /path/to/your/project && npx tsc --noEmit"
+```bash
+#!/bin/bash
+# PreToolUse(Bash) guard — runs `tsc --noEmit` only when the Bash command
+# is a git commit, and blocks the commit (exit 2) if TypeScript fails.
+set -uo pipefail
+INPUT=$(cat)
+CMD=$(echo "$INPUT" | python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)
+    print(d.get('tool_input', {}).get('command', ''))
+except Exception:
+    print('')
+" 2>/dev/null || echo "")
+[[ "$CMD" == *"git commit"* ]] || exit 0
+ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+cd "$ROOT" || exit 0
+if ! OUT=$(npx tsc --noEmit 2>&1); then
+  echo "TypeScript errors — commit blocked:" >&2
+  echo "$OUT" >&2
+  exit 2
+fi
+exit 0
 ```
 
-For projects without TypeScript, swap for your equivalent gate:
-
-```json
-"command": "cd /path/to/your/project && npm run lint"
-```
+Exit code 2 is what blocks the tool and feeds the error back to Claude. Because the hook reads `$CLAUDE_PROJECT_DIR` (injected by Claude Code at runtime), the same file works in any project with no path edits. For projects without TypeScript, swap the `npx tsc --noEmit` line for your gate, e.g. `npm run lint`.
 
 ---
 
@@ -168,10 +185,10 @@ Start a focused dev session with `cca` instead of `claude`. Your default `claude
 ## Applying to a New Project
 
 1. Copy `.claude/settings.json` as-is — the deny floor is universal.
-2. Copy `.claude/settings.local.json`, then:
-   - Update `Read(/Users/<you>/*)` to your home path
-   - Update the pre-commit hook `command` path
+2. Copy `.claude/settings.local.json` and `.claude/hooks/`, then:
+   - Update `Read(/Users/<you>/**)` to your home path
    - Add or remove stack-specific `Bash(*)` allows
+   - No hook path edits needed — hooks read `$CLAUDE_PROJECT_DIR` at runtime
 3. Add `.claude/settings.local.json` to `.gitignore`.
 4. Commit `.claude/settings.json` only.
 
