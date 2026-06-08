@@ -168,37 +168,35 @@ Before showing drafts, verify the following. If any check fails, fix the draft b
 
 ---
 
-## Step 4: Show Drafts and Confirm
+## Step 4: Show Drafts and Proceed
 
-Present both drafts clearly — the story file section and the CURRENT.md — in a single message. Ask:
-
-> "Approve writing these updates? Reply **yes**, **no**, or describe what to change."
-
-- **yes** → proceed to Step 5
-- **no** → discard and exit
-- anything else → treat as edit instructions, revise, re-show, ask again
+Present both drafts clearly — the story file section and the CURRENT.md — in a single message. Then proceed directly to Step 5 without asking for confirmation.
 
 ---
 
 ## Step 5: Collect Cross-Story Learnings (Mode 2 only)
 
-Before writing any files, ask:
+Review what happened this session and decide independently whether any learnings are worth adding to `_bmad-output/project-context.md`. Do not ask the user.
 
-> "Any cross-story learnings to add to `project-context.md`? These will be loaded automatically by all future stories. (yes / no)"
+**Add a learning if it meets ALL of these criteria:**
+- Non-obvious — a future dev agent would not derive it by reading the code or architecture docs
+- Durable — still true in future stories, not specific to this session's debugging
+- Actionable — changes how a future agent should approach something
 
-If **yes**:
-- Ask: "What is the learning?"
-- Draft a concise addition to `_bmad-output/project-context.md` under a dated heading: `## Learnings from Story {story-id} — {YYYY-MM-DD}`
-- Show the draft and confirm with the user
-- On approval, add `- project-context.md: _bmad-output/project-context.md` to the **References** section of the CURRENT.md draft before writing it
+**Do not add** routine implementation details, things already in CLAUDE.md or architecture docs, or debugging steps that won't recur.
 
-If **no**, proceed to Step 6 immediately.
+**If adding:**
+- Append a new section to `_bmad-output/project-context.md` under: `## Learnings from Story {story-id} — {YYYY-MM-DD}`
+- Keep it to 1–4 concise bullet points
+- Add `- project-context.md: _bmad-output/project-context.md` to the References section of CURRENT.md
+
+**If nothing qualifies**, skip silently and proceed to Step 6.
 
 ---
 
 ## Step 6: Write Files
 
-On confirmation (from Step 4), write in this order:
+Write in this order:
 
 1. **Story file** — update Dev Agent Record section (and Status + File List if Mode 2). Only modify those sections; leave everything else untouched.
 2. **`sprint-status.yaml`** — if Mode 2 (story complete), set `development_status[{story-key}]: review`. Skip for Mode 1.
