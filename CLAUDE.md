@@ -99,4 +99,4 @@ Content moves through a mandatory review workflow before it appears in the app. 
 
 ## Sprint Tracking
 
-`_bmad-output/implementation-artifacts/sprint-status.yaml` is the authoritative source of story status. Story files live in `_bmad-output/implementation-artifacts/`. The current sprint state: Story 1.1 (`review`), Stories 1.2–1.8 (`backlog`), all subsequent epics (`backlog`).
+`_bmad-output/implementation-artifacts/sprint-status.yaml` is the authoritative source of story status — always re-read it rather than trusting this summary. Story files live in `_bmad-output/implementation-artifacts/`. Current sprint state: Epic 1 (`in-progress`) — Stories 1.1–1.5 (`done`), Story 1.6 RNTP audio spike (`in-progress`, awaiting physical-device testing), Stories 1.7–1.8 (`backlog`); Epics 2–7 (`backlog`).
