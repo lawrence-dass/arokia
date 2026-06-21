@@ -62,10 +62,14 @@ So that no unresolved architectural assumption remains before UI development beg
   - [ ] Switch device to airplane mode
   - [ ] Play cached local URI through RNTP and document start time / network behavior
 
+- [x] **Create Razorpay webhook simulation helper** (AC: 4)
+  - [x] Add `scripts/simulate-razorpay-webhook.ts` with dry-run by default
+  - [x] Require explicit `--execute` and `SUPABASE_SERVICE_ROLE_KEY` before inserting a spike donation row
+
 - [ ] **Run Razorpay test-mode spike** (AC: 4)
   - [ ] Initiate a test-mode payment through external webview
   - [ ] Verify success in Razorpay dashboard
-  - [ ] Simulate webhook and verify `donations.status = 'confirmed'`
+  - [ ] Simulate webhook with `scripts/simulate-razorpay-webhook.ts` and verify `donations.status = 'confirmed'`
 
 - [ ] **Type-check and lint** (AC: all)
   - [ ] `npx tsc --noEmit`

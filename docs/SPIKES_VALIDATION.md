@@ -73,6 +73,12 @@ npx tsx scripts/validate-aac.ts <path-to-file.m4a> --duration-sec 420
 - Razorpay mode: Test
 - Payment method: _____________________
 - Razorpay dashboard shows success: PASS / FAIL
+- Manual webhook simulation command:
+
+```bash
+npx tsx scripts/simulate-razorpay-webhook.ts --payment-id pay_test_<id> --amount-paise 10000 --execute
+```
+
 - Manual webhook simulation performed: PASS / FAIL
 - `donations` row inserted with `status = 'confirmed'`: PASS / FAIL
 - No payment PII stored in Arokia DB: PASS / FAIL
