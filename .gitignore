@@ -24,3 +24,12 @@ android
 
 # Temporary files created by Metro to check the health of the file watcher
 .metro-health-check*
+
+# Claude Code — personal convenience settings (deny floor in settings.json is committed)
+.claude/settings.local.json
+
+# Cursor IDE tooling
+.cursor/
+
+# Review pipeline — ephemeral sentinel state (review reports in _bmad-output/reviews/ are committed)
+.claude/review-sentinels/

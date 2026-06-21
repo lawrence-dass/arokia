@@ -47,28 +47,28 @@ Compare with handover:
 Read `_bmad-output/implementation-artifacts/sprint-status.yaml`.
 
 **If handover Mode is Mid-story:**
-- Load the story file referenced in the handover
-- Read the resume point from the story file's existing completion-notes section:
-  - `### Completion Notes List`, if present
-  - otherwise `### Completion Notes`, if present
-  - do not create or rename sections during session-start
+- Do NOT load the full story file — read only two targeted sections:
+  1. **Tasks/Subtasks section** — scan checkboxes to count completed vs. remaining tasks
+  2. **Dev Agent Record completion-notes section** (`### Completion Notes List` or `### Completion Notes`) — extract the resume point verbatim
+- Store the story file path for display in the resume brief; it will be fully loaded by `/bmad-dev-story`
 
 **If handover Mode is Story complete:**
 - Read the completed story's current status from sprint-status.yaml (this is the authoritative source)
-- If status is `review` → load the completed story file; next action is code review
-- If status is `done` → find the next story in sprint-status.yaml with status `ready-for-dev`; load that story file; next action is dev-story
+- If status is `review` → note the story file path; next action is code review (full file loaded by code-review workflow)
+- If status is `done` → find the next story in sprint-status.yaml with status `ready-for-dev`; note that story file path; next action is dev-story (full file loaded by dev-story workflow)
 
 Read `_bmad-output/project-context.md` if it exists. Note any entries added in the last session (check the handover's References section for whether it was updated).
 
-Also load each file listed in the handover's **References** section and **Context Needed** section. These are the files the previous agent explicitly flagged as required for continuation.
+For files listed in the handover's **Context Needed** section: load only files explicitly flagged as non-story context (e.g. config files, migration files). Do not load story files or architecture docs — those are loaded by the workflow that needs them.
 
 ### Context Loading Strategy
 
 | When | What to load |
 |------|--------------|
 | Always | `CURRENT.md`, `sprint-status.yaml`, `project-context.md` |
-| If active story exists | Active story file (full Dev Agent Record + Tasks) |
-| If Context Needed section lists files | Each file named there |
+| If mid-story | Tasks/Subtasks + completion-notes sections only (not full story file) |
+| If Context Needed lists non-story files | Load those specific files |
+| On workflow invocation | Full story file loaded by `/bmad-dev-story` or `/bmad-code-review` |
 | On user request only | PRD, full architecture docs, epic files |
 
 ---
@@ -120,12 +120,13 @@ Decisions to carry forward:
 
 Context loaded:
   ✓ project-context.md
-  ✓ {story-file-path}
-  {✓ each additional file from References / Context Needed}
+  ✓ Tasks/Subtasks + completion-notes from {story-file-path}
+  {✓ each non-story file from Context Needed}
+  📄 Full story file deferred → loaded automatically by /bmad-dev-story
 
 ⚡ Next Action
 Run dev-story on the story file above, or ask a question.
-  Claude:  /bmad:bmm:workflows:dev-story
+  Claude:  /bmad-dev-story
   Codex:   use dev-story prompt
 ```
 
@@ -153,12 +154,11 @@ Cross-story context added last session:
 
 Context loaded:
   ✓ project-context.md
-  ✓ {completed-story-file-path}
-  {✓ each additional file from References / Context Needed}
+  📄 Story file deferred → loaded automatically by /bmad-code-review
 
 ⚡ Next Action
 Run code review on the completed story before starting the next one.
-  Claude:  /bmad:bmm:workflows:code-review
+  Claude:  /bmad-code-review
   Codex:   use code-review prompt
 ```
 
@@ -186,11 +186,10 @@ Cross-story context added last session:
 
 Context loaded:
   ✓ project-context.md
-  ✓ {next-story-file-path}
-  {✓ each additional file from References / Context Needed}
+  📄 Next story file deferred → loaded automatically by /bmad-dev-story
 
 ⚡ Next Action
-  Claude:  /bmad:bmm:workflows:dev-story
+  Claude:  /bmad-dev-story
   Codex:   use dev-story prompt
 ```
 
@@ -228,4 +227,4 @@ Current sprint state:
 - If sprint-status.yaml and CURRENT.md contradict each other on story status, trust sprint-status.yaml (it is the authoritative source) and note the discrepancy
 - session-start is orientation only — do not begin implementation, do not edit files
 - The agent that wrote the handover may differ from the current agent; that is expected and fine
-- Load files eagerly — it's better to have too much context than too little at session start
+- Load lean at session-start — orientation needs CURRENT.md, sprint-status, project-context, and targeted story sections (tasks + completion notes) only; full story files are loaded by the workflow that needs them
