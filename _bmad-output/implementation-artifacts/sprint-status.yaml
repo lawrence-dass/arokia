@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-06-14 # story 1-6 in-progress
+last_updated: 2026-06-21 # story 1-7 started; story 1-6 paused for device validation
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -51,8 +51,8 @@ development_status:
   1-3-expo-sqlite-and-tamil-ov-bible-data-bundle: done
   1-4-service-layer-domain-types-and-zustand-store-skeletons: done
   1-5-github-actions-ci-eas-build-profiles-and-sentry: done
-  1-6-react-native-track-player-background-audio-spike: in-progress
-  1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes: backlog
+  1-6-react-native-track-player-background-audio-spike: in-progress # paused: awaiting physical-device validation
+  1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes: in-progress
   1-8-elevenlabs-audio-generation-script: backlog
   epic-1-retrospective: optional
 
