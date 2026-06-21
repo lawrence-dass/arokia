@@ -1,3 +1,5 @@
+import * as Sentry from '@sentry/react-native';
+
 import { supabase } from '@/lib/supabase';
 import type {
   ContentItem,
@@ -65,7 +67,8 @@ export async function getQuotes(
 
   const { data, error } = await query;
   if (error) {
-    console.error('[content] getQuotes error:', error); // TODO: Sentry.captureException(error) in Story 1.5
+    console.error('[content] getQuotes error:', error);
+    Sentry.captureException(error);
     throw error;
   }
   return ((data ?? []) as ContentItemRow[]).map(transformContentItem);
@@ -86,7 +89,8 @@ export async function getMeditations(
 
   const { data, error } = await query;
   if (error) {
-    console.error('[content] getMeditations error:', error); // TODO: Sentry.captureException(error) in Story 1.5
+    console.error('[content] getMeditations error:', error);
+    Sentry.captureException(error);
     throw error;
   }
   return ((data ?? []) as ContentItemRow[]).map(transformContentItem);
@@ -103,7 +107,8 @@ export async function searchContent(lang: LanguageCode, query: string): Promise<
     .ilike('title', `%${escaped}%`);
 
   if (error) {
-    console.error('[content] searchContent error:', error); // TODO: Sentry.captureException(error) in Story 1.5
+    console.error('[content] searchContent error:', error);
+    Sentry.captureException(error);
     throw error;
   }
   return ((data ?? []) as ContentItemRow[]).map(transformContentItem);
