@@ -71,9 +71,9 @@ So that no unresolved architectural assumption remains before UI development beg
   - [ ] Verify success in Razorpay dashboard
   - [ ] Simulate webhook with `scripts/simulate-razorpay-webhook.ts` and verify `donations.status = 'confirmed'`
 
-- [ ] **Type-check and lint** (AC: all)
-  - [ ] `npx tsc --noEmit`
-  - [ ] `npm run lint`
+- [x] **Type-check and lint** (AC: all)
+  - [x] `npx tsc --noEmit` — 0 errors (verified 2026-06-21)
+  - [x] `npm run lint` — 0 errors (1 pre-existing warning in `lib/i18n.ts`, unrelated to spike; Prettier clean)
 
 ## Dev Notes
 
