@@ -1,6 +1,8 @@
 import * as Sentry from '@sentry/react-native';
+import type { SQLiteDatabase } from 'expo-sqlite';
 
 import { supabase } from '@/lib/supabase';
+import { searchScripture, searchScriptureByBook } from '@/lib/sqlite';
 import type {
   ContentItem,
   LanguageCode,
@@ -10,6 +12,7 @@ import type {
   ContentType,
   TimeOfDay,
   ReviewStatus,
+  ScriptureVerse,
 } from '@/types';
 
 interface ContentItemRow {
@@ -96,20 +99,20 @@ export async function getMeditations(
   return ((data ?? []) as ContentItemRow[]).map(transformContentItem);
 }
 
-export async function searchContent(lang: LanguageCode, query: string): Promise<ContentItem[]> {
+// Searches the full bundled scripture text (Expo SQLite FTS), not the curated content_items
+// catalog — see Story 3.3's Scope Note. Tamil FTS is tried first and wins if it returns
+// anything; an English-looking query (Latin characters) that gets zero Tamil matches falls back
+// to a book-name match, since no English scripture text is bundled to search directly.
+export async function searchContent(
+  db: SQLiteDatabase,
+  lang: LanguageCode,
+  query: string
+): Promise<ScriptureVerse[]> {
   if (!query.trim()) return [];
-  const escaped = query.replace(/%/g, '\\%').replace(/_/g, '\\_');
-  const { data, error } = await supabase
-    .from('content_items')
-    .select('*')
-    .eq('language_code', lang)
-    .eq('review_status', 'published')
-    .ilike('title', `%${escaped}%`);
 
-  if (error) {
-    console.error('[content] searchContent error:', error);
-    Sentry.captureException(error);
-    throw error;
+  const tamilResults = await searchScripture(db, query, lang);
+  if (tamilResults.length > 0 || !/[a-zA-Z]/.test(query)) {
+    return tamilResults;
   }
-  return ((data ?? []) as ContentItemRow[]).map(transformContentItem);
+  return searchScriptureByBook(db, query, lang);
 }

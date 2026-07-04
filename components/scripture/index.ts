@@ -2,3 +2,4 @@
 export { VerseText } from './VerseText';
 export { ScriptureCard } from './ScriptureCard';
 export { VerseCardView } from './VerseCardView';
+export { QuoteList } from './QuoteList';

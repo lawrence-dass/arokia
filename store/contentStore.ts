@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { create } from 'zustand';
 import type { ContentItem, LanguageCode, PracticePath, MoodTag } from '@/types';
 import { getQuotes, getMeditations } from '@/lib/content';
@@ -57,3 +58,18 @@ export const useContentStore = create<ContentState>()((set, get) => ({
     })),
   clearFilters: () => set({ activeFilters: { practicePath: null, moodTag: null } }),
 }));
+
+// Triggers fetchQuotes on mount and reports a single "pending" flag that also covers the gap
+// before the fetch actually starts — `isLoading` alone is false for one frame on mount, which
+// would otherwise flash the empty state before the fetch begins.
+export function useQuotesFetch(lang: LanguageCode) {
+  const fetchQuotes = useContentStore((state) => state.fetchQuotes);
+  const isLoading = useContentStore((state) => state.isLoading);
+  const [hasFetched, setHasFetched] = useState(false);
+
+  useEffect(() => {
+    fetchQuotes(lang).finally(() => setHasFetched(true));
+  }, [fetchQuotes, lang]);
+
+  return { isPending: isLoading || !hasFetched };
+}

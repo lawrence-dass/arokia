@@ -34,3 +34,18 @@ export async function searchScripture(
     [escaped, languageCode]
   );
 }
+
+// Fallback for an English-language query (e.g. a book name) that won't match Tamil-only FTS
+// content — no English scripture text is bundled, so `book` is the only English-language field.
+export async function searchScriptureByBook(
+  db: SQLiteDatabase,
+  bookQuery: string,
+  languageCode = 'ta'
+): Promise<ScriptureVerse[]> {
+  return db.getAllAsync<ScriptureVerse>(
+    `SELECT id, book, chapter, verse, text, language_code AS "languageCode"
+     FROM scripture WHERE book LIKE ? AND language_code = ?
+     LIMIT 20`,
+    [`%${bookQuery}%`, languageCode]
+  );
+}

@@ -99,6 +99,7 @@ export default function Layout() {
             <Stack.Screen name="report-concern" />
             <Stack.Screen name="word" />
             <Stack.Screen name="verse/[id]" />
+            <Stack.Screen name="search" />
           </Stack.Protected>
         </Stack>
       </SQLiteProvider>
