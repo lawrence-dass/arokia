@@ -50,6 +50,9 @@ export default function AboutScreen() {
         <Text className="text-base leading-7 text-text-secondary">
           {t('about.correctionProcess.body')}
         </Text>
+        <Link href="/report-concern" className="text-base font-semibold text-primary">
+          {t('concern.linkLabel')}
+        </Link>
       </View>
 
       <View className="gap-2">
