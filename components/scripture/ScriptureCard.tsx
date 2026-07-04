@@ -13,7 +13,7 @@ export function ScriptureCard({ text, reference, languageCode, onPress }: Script
   return (
     <Pressable
       onPress={onPress}
-      accessibilityRole="button"
+      accessibilityRole={onPress ? 'button' : undefined}
       className="rounded-card border border-border-light bg-surface p-4">
       <VerseText text={text} reference={reference} languageCode={languageCode} />
     </Pressable>

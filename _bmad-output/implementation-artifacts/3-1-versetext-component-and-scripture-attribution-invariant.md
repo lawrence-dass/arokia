@@ -149,9 +149,24 @@ Claude (Claude Code, cloud/mobile session)
     are already used elsewhere in the app without flagged contrast issues, but not independently
     measured for this specific text size/weight combination).
 
+### Code Review Fixes Applied (2026-07-04)
+
+A 2-angle multi-agent review (correctness/cross-file, reuse/altitude/conventions) found 1
+finding; two other candidates (`VerseCardView` duplicating `VerseText`'s markup instead of
+composing it; the attribution invariant only guaranteeing prop *presence* not non-empty content)
+were evaluated and correctly left as-is — both are explicitly anticipated and justified by this
+story's own Scope Note and Dev Notes, not oversights:
+
+- **`ScriptureCard.tsx` — `accessibilityRole="button"` always set (CONFIRMED, fixed):** the role
+  was hardcoded even when `onPress` is `undefined` (a valid, story-anticipated non-interactive
+  usage), so a screen reader would announce a non-interactive card as a tappable button that does
+  nothing. Now `accessibilityRole={onPress ? 'button' : undefined}`.
+
+Re-verified: `tsc`/lint/format/tracker-audit all still pass.
+
 ### File List
 
 - `components/scripture/VerseText.tsx` (new)
-- `components/scripture/ScriptureCard.tsx` (new)
+- `components/scripture/ScriptureCard.tsx` (new; revised in code review — conditional accessibilityRole)
 - `components/scripture/VerseCardView.tsx` (new)
 - `components/scripture/index.ts` (modified — barrel export)
