@@ -97,6 +97,8 @@ export default function Layout() {
             <Stack.Screen name="spikes" />
             <Stack.Screen name="about" />
             <Stack.Screen name="report-concern" />
+            <Stack.Screen name="word" />
+            <Stack.Screen name="verse/[id]" />
           </Stack.Protected>
         </Stack>
       </SQLiteProvider>
