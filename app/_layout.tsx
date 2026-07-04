@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 
 import { initSchema } from '@/lib/sqlite';
+import { usePrefsStore } from '@/store/prefsStore';
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
@@ -53,9 +54,14 @@ async function setupRNTP() {
 }
 
 export default function Layout() {
+  const vowAcknowledged = usePrefsStore((state) => state.vowAcknowledged);
+  const hasHydrated = usePrefsStore((state) => state._hasHydrated);
+
   useEffect(() => {
     setupRNTP();
   }, []);
+
+  if (!hasHydrated) return null;
 
   return (
     <SafeAreaProvider>
@@ -64,7 +70,15 @@ export default function Layout() {
         assetSource={{ assetId: require('@/assets/db/scripture.db') }}
         onInit={initSchema}
         onError={(e) => console.error('[SQLite] DB failed to open:', e)}>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Protected guard={!vowAcknowledged}>
+            <Stack.Screen name="vow" />
+          </Stack.Protected>
+          <Stack.Protected guard={vowAcknowledged}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="spikes" />
+          </Stack.Protected>
+        </Stack>
       </SQLiteProvider>
     </SafeAreaProvider>
   );

@@ -64,7 +64,7 @@ development_status:
   # Epic 2: Opening Vow, Integrity Layer & About
   # ─────────────────────────────────────────────────────────────────
   epic-2: in-progress
-  2-1-opening-vow-first-launch-gate: ready-for-dev
+  2-1-opening-vow-first-launch-gate: review
   2-2-returning-user-re-acknowledgment-and-vow-state-management: backlog
   2-3-about-page-and-privacy-policy: backlog
   2-4-theological-concern-submission-form: backlog

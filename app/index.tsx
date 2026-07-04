@@ -1,7 +1,6 @@
 import { View, Text } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-// Placeholder — replaced by Opening Vow screen in Story 2.1
 export default function Home() {
   const { t } = useTranslation();
 

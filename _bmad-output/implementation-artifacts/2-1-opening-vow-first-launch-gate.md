@@ -1,6 +1,6 @@
 # Story 2.1: Opening Vow — First-Launch Gate
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -32,42 +32,42 @@ So that I understand from the first moment that Arokia is a tool pointing to Jes
 
 ## Tasks / Subtasks
 
-- [ ] **Install AsyncStorage** (AC: 3)
-  - [ ] `npx expo install @react-native-async-storage/async-storage` (expo install resolves the SDK-54-compatible version — do NOT pin manually)
-  - [ ] Verify `npx tsc --noEmit` still passes after install
+- [x] **Install AsyncStorage** (AC: 3)
+  - [x] `npx expo install @react-native-async-storage/async-storage` — could not reach the Expo compatibility API from this cloud session; installed `@react-native-async-storage/async-storage@2.2.0` directly via `npm install` (the version Expo SDK 54 bundles, confirmed via SDK 54 changelog)
+  - [x] Verify `npx tsc --noEmit` still passes after install
 
-- [ ] **Persist `prefsStore` with zustand persist middleware** (AC: 1, 3)
-  - [ ] Wrap the existing `store/prefsStore.ts` creator with `persist(...)` from `zustand/middleware` using `createJSONStorage(() => AsyncStorage)`, storage key `arokia-prefs`
-  - [ ] Keep the existing state shape and actions EXACTLY as-is (`playbackSpeed`, `vowAcknowledged`, `lastVowAppVersion`, `setPlaybackSpeed`, `acknowledgeVow`, `resetVow`) — Story 2.2 handles vow versioning; do not add `VOW_VERSION` logic here
-  - [ ] Add a `_hasHydrated: boolean` flag + `setHasHydrated` action set via the persist `onRehydrateStorage` callback so components can reactively wait for hydration (do NOT persist `_hasHydrated` — use `partialize` to exclude it)
+- [x] **Persist `prefsStore` with zustand persist middleware** (AC: 1, 3)
+  - [x] Wrap the existing `store/prefsStore.ts` creator with `persist(...)` from `zustand/middleware` using `createJSONStorage(() => AsyncStorage)`, storage key `arokia-prefs`
+  - [x] Keep the existing state shape and actions EXACTLY as-is (`playbackSpeed`, `vowAcknowledged`, `lastVowAppVersion`, `setPlaybackSpeed`, `acknowledgeVow`, `resetVow`) — Story 2.2 handles vow versioning; do not add `VOW_VERSION` logic here
+  - [x] Add a `_hasHydrated: boolean` flag + `setHasHydrated` action set via the persist `onRehydrateStorage` callback so components can reactively wait for hydration (do NOT persist `_hasHydrated` — use `partialize` to exclude it)
 
-- [ ] **Create `OpeningVow` component** (AC: 2, 5)
-  - [ ] Create `components/onboarding/OpeningVow.tsx` (new feature directory — architecture-designated home for this component)
-  - [ ] Create `components/onboarding/index.ts` barrel exporting `OpeningVow`
-  - [ ] Render `t('vow.title')`, `t('vow.body')`, and a CTA button with `t('vow.cta')` — zero hardcoded strings
-  - [ ] Component accepts an `onAcknowledge: () => void` prop; it does NOT touch the store or router itself (keeps it testable and dumb)
-  - [ ] CTA: NativeWind classes only, `bg-primary` golden, dark text token for AA contrast, `min-h-12` + adequate horizontal padding for ≥48×48 dp target, `accessibilityRole="button"`
-  - [ ] Screen background `bg-background` (warm cream), body text `text-text-primary`
-  - [ ] Use `className` exclusively — no `StyleSheet.create()`
+- [x] **Create `OpeningVow` component** (AC: 2, 5)
+  - [x] Create `components/onboarding/OpeningVow.tsx` (new feature directory — architecture-designated home for this component)
+  - [x] Create `components/onboarding/index.ts` barrel exporting `OpeningVow`
+  - [x] Render `t('vow.title')`, `t('vow.body')`, and a CTA button with `t('vow.cta')` — zero hardcoded strings
+  - [x] Component accepts an `onAcknowledge: () => void` prop; it does NOT touch the store or router itself (keeps it testable and dumb)
+  - [x] CTA: NativeWind classes only, `bg-primary` golden, dark text token for AA contrast, `min-h-12` + adequate horizontal padding for ≥48×48 dp target, `accessibilityRole="button"`
+  - [x] Screen background `bg-background` (warm cream), body text `text-text-primary`
+  - [x] Use `className` exclusively — no `StyleSheet.create()`
 
-- [ ] **Create `/vow` route and gate navigation with Expo Router Protected routes** (AC: 1, 3, 4)
-  - [ ] Create `app/vow.tsx` — thin screen wrapper: renders `<OpeningVow onAcknowledge={...} />` inside a `SafeScreen`-style container; the handler calls `acknowledgeVow(<app version>)` (use `expo-constants` `Constants.expoConfig?.version ?? '1.0.0'`), then `logEvent('vow_completed')`
-  - [ ] In `app/_layout.tsx`, restructure the `<Stack>` using `Stack.Protected` guards (Expo Router v6 supports these):
+- [x] **Create `/vow` route and gate navigation with Expo Router Protected routes** (AC: 1, 3, 4)
+  - [x] Create `app/vow.tsx` — thin screen wrapper: renders `<OpeningVow onAcknowledge={...} />` inside a `SafeScreen`-style container; the handler calls `acknowledgeVow(<app version>)` (use `expo-constants` `Constants.expoConfig?.version ?? '1.0.0'`), then `logEvent('vow_completed')`
+  - [x] In `app/_layout.tsx`, restructure the `<Stack>` using `Stack.Protected` guards (Expo Router v6 supports these):
     - `<Stack.Protected guard={!vowAcknowledged}>` → contains `vow` screen
     - `<Stack.Protected guard={vowAcknowledged}>` → contains `index`, `spikes` (and all future content screens)
-  - [ ] Guard values must come from `usePrefsStore` reactively — when `acknowledgeVow` fires, the guard flips and Expo Router automatically navigates to the newly available `index` screen; no manual `router.replace` needed (verify this behavior; if the auto-redirect does not fire, fall back to `router.replace('/')` after acknowledging)
-  - [ ] Protected guards also block deep links into guarded routes (FR2) — verify by opening a deep link to `/` before acknowledging
-  - [ ] Do NOT render the Stack until `_hasHydrated` is true — return `null` (or keep the splash screen visible) while hydrating, so an already-acknowledged user never sees a vow flash, and a new user never sees home flash
+  - [x] Guard values must come from `usePrefsStore` reactively — when `acknowledgeVow` fires, the guard flips and Expo Router automatically navigates to the newly available `index` screen; no manual `router.replace` needed (verify this behavior; if the auto-redirect does not fire, fall back to `router.replace('/')` after acknowledging) — **implemented per the documented (no-manual-redirect) pattern; auto-navigation itself is unverified, see Dev Agent Record**
+  - [ ] Protected guards also block deep links into guarded routes (FR2) — verify by opening a deep link to `/` before acknowledging — **pending desktop verification, needs simulator/device**
+  - [x] Do NOT render the Stack until `_hasHydrated` is true — return `null` (or keep the splash screen visible) while hydrating, so an already-acknowledged user never sees a vow flash, and a new user never sees home flash
 
-- [ ] **Analytics event** (AC: 3)
-  - [ ] Call the existing `logEvent('vow_completed')` from `@/lib/analytics` — this is currently a console stub; do NOT implement the Supabase insert in this story (tracked as deferred work; requires `expo-secure-store` install-id which is out of scope here)
+- [x] **Analytics event** (AC: 3)
+  - [x] Call the existing `logEvent('vow_completed')` from `@/lib/analytics` — this is currently a console stub; do NOT implement the Supabase insert in this story (tracked as deferred work; requires `expo-secure-store` install-id which is out of scope here)
 
-- [ ] **Verification** (AC: all)
-  - [ ] `npm run format` after all file writes
-  - [ ] `npx tsc --noEmit` — 0 errors
-  - [ ] `npm run lint` — 0 new warnings (1 pre-existing in `lib/i18n.ts` is known)
-  - [ ] Simulator walkthrough: fresh install → vow shows first → tap ஆமென் — தொடங்கு → lands on home → kill + relaunch → home shows directly (no vow)
-  - [ ] Simulator walkthrough: before acknowledging, attempt back gesture / deep link — vow remains
+- [x] **Verification** (AC: all)
+  - [x] `npm run format` after all file writes
+  - [x] `npx tsc --noEmit` — 0 errors
+  - [x] `npm run lint` — 0 new warnings (1 pre-existing in `lib/i18n.ts` is known)
+  - [ ] Simulator walkthrough: fresh install → vow shows first → tap ஆமென் — தொடங்கு → lands on home → kill + relaunch → home shows directly (no vow) — **pending desktop verification, needs simulator/device**
+  - [ ] Simulator walkthrough: before acknowledging, attempt back gesture / deep link — vow remains — **pending desktop verification, needs simulator/device**
 
 ## Dev Notes
 
@@ -181,8 +181,45 @@ No test suite exists yet (deferred per Epic 1). Verification is: tsc + lint + th
 
 ### Agent Model Used
 
+Claude (Claude Code, cloud/mobile session)
+
 ### Debug Log References
+
+- `npx tsc --noEmit` — 0 errors
+- `npm run lint` — 0 errors, 1 pre-existing warning (`lib/i18n.ts:8`, known, not in scope)
+- `npm run format` — clean
+- `bash scripts/audit-trackers.sh` — passed, no forbidden SDKs
 
 ### Completion Notes List
 
+- Installed `@react-native-async-storage/async-storage@2.2.0` via `npm install` (pinned to the
+  version Expo SDK 54 bundles — `npx expo install` could not run in this cloud session because it
+  calls out to the Expo native-module-compatibility API, which isn't reachable through this
+  session's network egress; version confirmed against the SDK 54 changelog instead).
+- `prefsStore` wrapped with zustand `persist` + `createJSONStorage(() => AsyncStorage)`, storage key
+  `arokia-prefs`, `partialize` excludes `_hasHydrated`. State shape/actions unchanged per scope note.
+- `components/onboarding/OpeningVow.tsx` + barrel created; dumb component, no store/router access.
+- `app/vow.tsx` route wires `acknowledgeVow(appVersion)` + `logEvent('vow_completed')`.
+- `app/_layout.tsx`: hydration gate (`return null` until `_hasHydrated`) + `Stack.Protected` guards
+  (`vow` unguarded-when-not-acknowledged, `index`/`spikes` guarded-when-acknowledged), relying on
+  Expo Router's guard-flip auto-navigation (no manual `router.replace` added).
+- Removed the stale placeholder comment in `app/index.tsx`.
+- **Pending desktop verification (cannot run in this cloud session — no simulator/device access):**
+  - Fresh-install walkthrough: vow shows first → tap CTA → lands on home → relaunch → home shows
+    directly (no vow).
+  - Back-gesture / deep-link-into-`/` block before acknowledging.
+  - Confirm the `Stack.Protected` guard flip auto-navigates away from `/vow` after acknowledgment.
+    If it does **not** auto-navigate, add `router.replace('/')` at the end of `handleAcknowledge` in
+    `app/vow.tsx` (the story's documented fallback) before merging.
+  - Touch-target / contrast spot-check of the CTA on-device (`min-h-12` + `bg-primary` /
+    `text-on-primary` used; not device-measured).
+
 ### File List
+
+- `store/prefsStore.ts` (modified)
+- `app/_layout.tsx` (modified)
+- `app/index.tsx` (modified)
+- `app/vow.tsx` (new)
+- `components/onboarding/OpeningVow.tsx` (new)
+- `components/onboarding/index.ts` (new)
+- `package.json`, `package-lock.json` (modified — AsyncStorage dependency)
