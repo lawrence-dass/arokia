@@ -170,11 +170,54 @@ Claude (Claude Code, cloud/mobile session)
   - Keyboard/`TextInput` behavior on-device (multiline description field sizing, keyboard type
     for email) — not visually confirmed.
 
+### Code Review Fixes Applied (2026-07-04)
+
+A 3-angle multi-agent review found 5 findings; fixed the 3 that were real bugs or reuse issues,
+left 2 as-is after evaluating them as correctly-scoped-already:
+
+- **Misleading "offline" error on malformed email (CONFIRMED by 2 independent agents, fixed):**
+  `ConcernForm` originally only disabled Submit on an empty description, so a non-empty but
+  malformed email reached `submitConcern`, which throws `'invalid email format'` — a client-side
+  validation error, not a network failure — and `report-concern.tsx`'s catch block mapped it to
+  `t('errors.offline')` ("No connection"), telling a fully-online user the wrong thing entirely.
+  Added an email-format check to `ConcernForm` (mirroring `lib/concerns.ts`'s own regex exactly,
+  with a comment cross-referencing it) that disables Submit and shows a new `concern.invalidEmail`
+  message inline, so a malformed email never reaches the network call — the generic offline
+  message is now accurate again for whatever it still catches.
+- **Unsound `contentItemId` param typing (CONFIRMED, fixed):** `useLocalSearchParams<{
+  contentItemId?: string }>()`'s generic is an unchecked type assertion — at runtime the value can
+  be a `string[]` (duplicate query key) or `""` (present-but-blank), neither a valid
+  `content_items` uuid. Currently dormant (nothing passes this param yet), but it's explicitly
+  built as prep for a future Epic 3/4 deep link, so a real caller would hit it. Normalized:
+  `Array.isArray(...) ? [0] : value`, then `|| undefined` to collapse an empty string.
+- **Duplicated CTA button styling (PLAUSIBLE, fixed):** `ConcernForm`'s Submit button copied
+  `OpeningVow`'s exact `min-h-12 rounded-pill bg-primary ...` classes verbatim — the second
+  instance of the same styling, and `components/shared/index.ts`'s own scaffolding comment already
+  anticipated a `Button` export. Extracted `components/shared/Button.tsx` (label/onPress/disabled/
+  loading props, with an `ActivityIndicator` for the loading state) and refactored both
+  `OpeningVow` and `ConcernForm` to use it — this also picks up the separately-flagged "no
+  in-flight loading feedback" finding for free, since `Button`'s `loading` prop now drives
+  `ConcernForm`'s Submit state.
+- **Not fixed — untrimmed description (PLAUSIBLE, addressed as a side effect):** a reviewer noted
+  `description` was validated trimmed but submitted untrimmed. Fixed as part of the `Button`
+  refactor's `onPress` change (`onSubmit(description.trim(), trimmedEmail)`), so this is resolved
+  incidentally, not as a standalone change.
+- **Not fixed — premature "async submit" hook (considered, correctly rejected):** one reviewer
+  asked whether the submit/error/success `useState` trio in `report-concern.tsx` should be a
+  shared hook now, anticipating Epic 6's donation flow needing the same shape. Kept inline: there's
+  a single call site today, Epic 6 is still `backlog`, and a Razorpay error surface will look
+  nothing like a Supabase insert's — extracting an abstraction from a guessed-at future shape
+  would be the premature-abstraction mistake, not avoiding one.
+
+Re-verified after all fixes: `tsc`/lint/format/tracker-audit all still pass.
+
 ### File List
 
-- `components/shared/ConcernForm.tsx` (new)
+- `components/shared/Button.tsx` (new — code review fix, extracted shared CTA button)
+- `components/onboarding/OpeningVow.tsx` (modified in code review — now uses `Button`)
+- `components/shared/ConcernForm.tsx` (new; revised in code review — email validation, `Button`)
 - `components/shared/index.ts` (modified — barrel export)
-- `app/report-concern.tsx` (new)
+- `app/report-concern.tsx` (new; revised in code review — `contentItemId` normalization)
 - `app/_layout.tsx` (modified — added `report-concern` to the guarded block)
 - `app/about.tsx` (modified — added link to `/report-concern`)
 - `locales/ta.json` (modified — new `concern` namespace)

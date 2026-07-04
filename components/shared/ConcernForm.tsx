@@ -1,6 +1,13 @@
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+
+import { Button } from './Button';
+
+// Mirrors lib/concerns.ts:submitConcern's own email validation exactly, so a malformed
+// email is caught here — before a network round-trip — instead of surfacing as a
+// misleading generic submission error.
+const EMAIL_FORMAT = /^[^@]+@[^@]+\.[^@]+$/;
 
 interface ConcernFormProps {
   onSubmit: (description: string, email: string) => void;
@@ -13,7 +20,9 @@ export function ConcernForm({ onSubmit, submitting, errorMessage }: ConcernFormP
   const [description, setDescription] = useState('');
   const [email, setEmail] = useState('');
 
-  const canSubmit = description.trim().length > 0 && !submitting;
+  const trimmedEmail = email.trim();
+  const emailValid = trimmedEmail.length === 0 || EMAIL_FORMAT.test(trimmedEmail);
+  const canSubmit = description.trim().length > 0 && emailValid && !submitting;
 
   return (
     <View className="gap-4">
@@ -42,19 +51,17 @@ export function ConcernForm({ onSubmit, submitting, errorMessage }: ConcernFormP
           autoCapitalize="none"
           className="min-h-12 rounded-card border border-border bg-surface px-4 py-3 text-base text-text-primary"
         />
+        {!emailValid && <Text className="text-sm text-error">{t('concern.invalidEmail')}</Text>}
       </View>
 
       {errorMessage && <Text className="text-base text-error">{errorMessage}</Text>}
 
-      <Pressable
-        onPress={() => onSubmit(description, email)}
+      <Button
+        label={t('concern.submitCta')}
+        onPress={() => onSubmit(description.trim(), trimmedEmail)}
         disabled={!canSubmit}
-        accessibilityRole="button"
-        className={`min-h-12 items-center justify-center rounded-pill px-8 py-3 ${
-          canSubmit ? 'bg-primary' : 'bg-border'
-        }`}>
-        <Text className="text-lg font-semibold text-text-on-primary">{t('concern.submitCta')}</Text>
-      </Pressable>
+        loading={submitting}
+      />
     </View>
   );
 }

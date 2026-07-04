@@ -1,5 +1,7 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+
+import { Button } from '@/components/shared';
 
 interface OpeningVowProps {
   onAcknowledge: () => void;
@@ -20,12 +22,7 @@ export function OpeningVow({ onAcknowledge, isUpdate = false }: OpeningVowProps)
           </Text>
         )}
       </View>
-      <Pressable
-        onPress={onAcknowledge}
-        accessibilityRole="button"
-        className="min-h-12 items-center justify-center rounded-pill bg-primary px-8 py-3">
-        <Text className="text-lg font-semibold text-text-on-primary">{t('vow.cta')}</Text>
-      </Pressable>
+      <Button label={t('vow.cta')} onPress={onAcknowledge} />
     </View>
   );
 }

@@ -8,7 +8,14 @@ import { submitConcern } from '@/lib/concerns';
 
 export default function ReportConcernScreen() {
   const { t } = useTranslation();
-  const { contentItemId } = useLocalSearchParams<{ contentItemId?: string }>();
+  const params = useLocalSearchParams<{ contentItemId?: string }>();
+  // expo-router types this as `string | undefined` but a real deep link can hand back a
+  // string[] (repeated query key) or "" (present-but-blank) — neither of which is a valid
+  // content_items uuid, so normalize before it ever reaches submitConcern.
+  const rawContentItemId = Array.isArray(params.contentItemId)
+    ? params.contentItemId[0]
+    : params.contentItemId;
+  const contentItemId = rawContentItemId || undefined;
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -17,7 +24,7 @@ export default function ReportConcernScreen() {
     setSubmitting(true);
     setErrorMessage(null);
     try {
-      await submitConcern(description, contentItemId, email.trim() || undefined);
+      await submitConcern(description, contentItemId, email || undefined);
       setSubmitted(true);
     } catch (e) {
       console.error('[report-concern] Submission failed:', e);
