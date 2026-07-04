@@ -164,6 +164,31 @@ Claude (Claude Code, cloud/mobile session)
   scripts/seed-content.ts` (dry run) to validate, then re-run with `--execute` to actually seed.
   The script needs no code changes to do this — only the `SAMPLE_QUOTES` array's content changes.
 
+### Code Review Fixes Applied (2026-07-04)
+
+A single-agent review of this small, already-hand-tested script found 2 issues, both fixed:
+
+- **No Unicode normalization on the verbatim comparison (CONFIRMED, fixed):** `source.text !==
+  quote.scriptureText` did a raw code-unit comparison. Tamil vowel signs can be represented as
+  either a single precomposed codepoint (NFC) or a base character + combining mark (NFD) —
+  visually identical, but `!==` treats them as different. Verified directly: constructing an NFD
+  form of a Tamil syllable and comparing it raw against its NFC form gives `!==`, but
+  `.normalize('NFC')` on both sides gives `===`. Since Lawrence will paste the real 50 verses from
+  varied sources (some of which commonly emit NFD for Tamil), this would have produced spurious
+  "not verbatim" failures on text a human would see as identical. Added a `normalize()` helper
+  (`.normalize('NFC')`) used on both sides of the comparison, and on the text actually inserted in
+  `--execute` mode (so the DB always stores the canonical NFC form regardless of the source
+  pasting's encoding).
+- **`JSON.parse` had no error handling (CONFIRMED, fixed):** unlike the clean `existsSync` guard
+  one line above it, a corrupt `data/tamil-ov-nt.json` would crash with a raw `SyntaxError` and a
+  multi-line stack trace instead of the file's own `ERROR: ...` + `process.exit(1)` convention.
+  Wrapped in try/catch for a consistent error message.
+
+Re-verified after fixes: `tsc` clean; re-ran the dry run (still 3/3 PASS); re-ran the corrupted-text
+failure test (still correctly FAILs) to confirm the normalization fix didn't accidentally make the
+validation too lenient.
+
 ### File List
 
-- `scripts/seed-content.ts` (new)
+- `scripts/seed-content.ts` (new; revised in code review — Unicode NFC normalization, JSON.parse
+  error handling)

@@ -86,12 +86,26 @@ function loadBundledVerses(): Map<string, BundledVerse> {
     console.error(`ERROR: Source data not found at ${dataPath}`);
     process.exit(1);
   }
-  const verses: BundledVerse[] = JSON.parse(readFileSync(dataPath, 'utf-8'));
+  let verses: BundledVerse[];
+  try {
+    verses = JSON.parse(readFileSync(dataPath, 'utf-8'));
+  } catch (e) {
+    console.error(`ERROR: Failed to parse ${dataPath} as JSON:`, (e as Error).message);
+    process.exit(1);
+  }
   const byReference = new Map<string, BundledVerse>();
   for (const v of verses) {
     byReference.set(`${v.book}|${v.chapter}|${v.verse}`, v);
   }
   return byReference;
+}
+
+// Tamil vowel signs can be represented as a single precomposed codepoint (NFC) or a base +
+// combining-mark sequence (NFD) — visually identical, but `!==` would treat them as different
+// text. Normalize both sides before comparing so "verbatim" actually means "same text," not
+// "same byte sequence."
+function normalize(text: string): string {
+  return text.normalize('NFC');
 }
 
 function validateQuote(quote: SeedQuote, bundled: Map<string, BundledVerse>): ValidationResult {
@@ -103,7 +117,7 @@ function validateQuote(quote: SeedQuote, bundled: Map<string, BundledVerse>): Va
     problems.push(
       `verse_reference does not resolve: "${quote.book} ${quote.chapter}:${quote.verse}" not found in bundled Tamil OV data`
     );
-  } else if (source.text !== quote.scriptureText) {
+  } else if (normalize(source.text) !== normalize(quote.scriptureText)) {
     problems.push(
       `scriptureText is not verbatim — does not match the bundled Tamil OV source character-for-character`
     );
@@ -168,7 +182,7 @@ async function main() {
     mood_tag: quote.moodTag,
     review_status: 'published',
     verse_reference: `${quote.book} ${quote.chapter}:${quote.verse}`,
-    scripture_text: quote.scriptureText,
+    scripture_text: normalize(quote.scriptureText),
   }));
 
   const { error } = await admin.from('content_items').insert(rows);
