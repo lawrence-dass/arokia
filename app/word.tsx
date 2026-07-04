@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { FlatList, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -12,24 +12,29 @@ export default function WordScreen() {
   const isLoading = useContentStore((state) => state.isLoading);
   const error = useContentStore((state) => state.error);
   const fetchQuotes = useContentStore((state) => state.fetchQuotes);
+  // `isLoading` starts false until the effect below fires, so without this flag the empty
+  // state would flash for one frame before the fetch actually begins.
+  const [hasFetched, setHasFetched] = useState(false);
 
   useEffect(() => {
-    fetchQuotes('ta');
+    fetchQuotes('ta').finally(() => setHasFetched(true));
   }, [fetchQuotes]);
+
+  const isPending = isLoading || !hasFetched;
 
   return (
     <View className="flex-1 bg-background px-6 pt-10">
       <Text className="mb-6 text-3xl font-bold text-text-primary">{t('word.title')}</Text>
 
-      {isLoading && <Text className="text-base text-text-secondary">{t('word.loading')}</Text>}
+      {isPending && <Text className="text-base text-text-secondary">{t('word.loading')}</Text>}
 
-      {!isLoading && error && <Text className="text-base text-error">{t(error)}</Text>}
+      {!isPending && error && <Text className="text-base text-error">{t(error)}</Text>}
 
-      {!isLoading && !error && quotes.length === 0 && (
+      {!isPending && !error && quotes.length === 0 && (
         <Text className="text-base text-text-secondary">{t('word.empty')}</Text>
       )}
 
-      {!isLoading && !error && quotes.length > 0 && (
+      {!isPending && !error && quotes.length > 0 && (
         <FlatList
           data={quotes}
           keyExtractor={(item) => item.id}

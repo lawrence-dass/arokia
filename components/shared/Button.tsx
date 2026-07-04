@@ -10,6 +10,23 @@ interface ButtonProps {
   variant?: 'primary' | 'secondary';
 }
 
+const STYLES = {
+  primary: {
+    container: 'bg-primary',
+    containerDisabled: 'bg-border',
+    text: 'text-text-on-primary',
+    textDisabled: 'text-text-on-primary',
+    indicatorColor: colors.textOnPrimary,
+  },
+  secondary: {
+    container: 'border border-border bg-transparent',
+    containerDisabled: 'border border-border-light bg-transparent',
+    text: 'text-text-primary',
+    textDisabled: 'text-text-muted',
+    indicatorColor: colors.textPrimary,
+  },
+} as const;
+
 export function Button({
   label,
   onPress,
@@ -18,7 +35,7 @@ export function Button({
   variant = 'primary',
 }: ButtonProps) {
   const isDisabled = disabled || loading;
-  const isSecondary = variant === 'secondary';
+  const style = STYLES[variant];
 
   return (
     <Pressable
@@ -26,19 +43,12 @@ export function Button({
       disabled={isDisabled}
       accessibilityRole="button"
       className={`min-h-12 items-center justify-center rounded-pill px-8 py-3 ${
-        isSecondary
-          ? 'border border-border bg-transparent'
-          : isDisabled
-            ? 'bg-border'
-            : 'bg-primary'
+        isDisabled ? style.containerDisabled : style.container
       }`}>
       {loading ? (
-        <ActivityIndicator color={isSecondary ? colors.textPrimary : colors.textOnPrimary} />
+        <ActivityIndicator color={style.indicatorColor} />
       ) : (
-        <Text
-          className={`text-lg font-semibold ${
-            isSecondary ? 'text-text-primary' : 'text-text-on-primary'
-          }`}>
+        <Text className={`text-lg font-semibold ${isDisabled ? style.textDisabled : style.text}`}>
           {label}
         </Text>
       )}

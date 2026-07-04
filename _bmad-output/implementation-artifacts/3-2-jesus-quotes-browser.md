@@ -201,11 +201,34 @@ Claude (Claude Code, cloud/mobile session)
     opening with correct text, and the play/pause button's visual state toggling correctly.
   - NFR-P4 (≤1s to scrollable interactive state) — unverifiable without a device.
 
+### Code Review Fixes Applied (2026-07-04)
+
+A 2-angle multi-agent review found 3 candidates; 1 (the `/verse/[id]` cold-deep-link limitation)
+was independently re-confirmed as the already-documented, deliberately-scoped decision above —
+no change. The other 2 were real bugs, fixed:
+
+- **`components/shared/Button.tsx` — secondary variant had no disabled styling (CONFIRMED,
+  fixed):** the container/text className ternaries only branched on `isDisabled` inside the
+  primary path, so a `variant="secondary"` button with `disabled`/`loading` true rendered fully
+  opaque with no visual cue, even though `Pressable`'s `disabled` correctly blocked the press.
+  No caller in this story hits the combination yet, but it was a live bug in a component other
+  code will call. Refactored the whole component around a `STYLES` lookup table (keyed by
+  variant, each with `container`/`containerDisabled`/`text`/`textDisabled`/`indicatorColor`)
+  instead of nested ternaries — also directly addresses the reviewer's readability concern about
+  the ternary nesting getting worse as variants grow.
+- **`app/word.tsx` — one-frame empty-state flash on mount (CONFIRMED, fixed):** `isLoading`
+  defaults to `false` in `contentStore` until the mount `useEffect` actually fires, so the first
+  render showed "no quotes" for a frame before flipping to "loading." Added a local `hasFetched`
+  flag (set once `fetchQuotes` resolves) and gated the loading state on `isLoading || !hasFetched`.
+
+Re-verified: `tsc`/lint/format/tracker-audit all still pass.
+
 ### File List
 
-- `app/word.tsx` (new)
+- `app/word.tsx` (new; revised in code review — `hasFetched` flag)
 - `app/verse/[id].tsx` (new)
 - `app/_layout.tsx` (modified — added `word`/`verse/[id]` to the guarded block)
 - `app/index.tsx` (modified — temporary link to `/word`)
-- `components/shared/Button.tsx` (modified — added `variant` prop)
+- `components/shared/Button.tsx` (modified — added `variant` prop; revised in code review —
+  lookup-table refactor + disabled-secondary fix)
 - `locales/ta.json` (modified — new `word` namespace)
