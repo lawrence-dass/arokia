@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Asset } from 'expo-asset';
-import * as FileSystem from 'expo-file-system';
+import { File } from 'expo-file-system';
 import Markdown from 'react-native-markdown-display';
 
 export function GlassWallBudget() {
@@ -19,7 +19,7 @@ export function GlassWallBudget() {
         const asset = Asset.fromModule(require('@/docs/glass-wall-budget.md'));
         await asset.downloadAsync();
         if (!asset.localUri) throw new Error('No local URI for glass-wall-budget.md');
-        const content = await FileSystem.readAsStringAsync(asset.localUri);
+        const content = await new File(asset.localUri).text();
         if (!cancelled) setMarkdown(content);
       } catch (e) {
         console.warn('[GlassWallBudget] Failed to load glass-wall-budget.md:', e);
