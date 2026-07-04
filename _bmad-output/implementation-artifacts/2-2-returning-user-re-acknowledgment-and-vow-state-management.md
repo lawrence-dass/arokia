@@ -139,11 +139,12 @@ Claude (Claude Code, cloud/mobile session)
 - `npm run lint` — 0 errors, 1 pre-existing warning (`lib/i18n.ts:8`, known, not in scope)
 - `npm run format` — clean
 - `bash scripts/audit-trackers.sh` — passed
-- Pure-function check (`node` scratch script, 7 assertions): empty `VOW_REQUIRED_VERSIONS` never
-  triggers re-vow regardless of version delta; version-in-list + matching `lastVowAppVersion` →
-  `false`; version-in-list + non-matching → `true`; `isVowSatisfied` correctly composes
-  `vowAcknowledged` with `needsReVow` across never-acknowledged / re-vow-required /
-  already-current-version cases — all 7 passed
+- Pure-function check (`node` scratch script, 11 assertions post-code-review-fix): empty
+  `VOW_REQUIRED_VERSIONS` never triggers; exact-match on flagged version; version-skip case
+  (last 1.0.0, current 1.2.0, only 1.1.0 flagged → still triggers); not-yet-reached flagged
+  version; already-re-acknowledged past the flagged version; numeric (not lexical) comparison
+  for double-digit segments (1.10.0 > 1.9.0); multiple flagged versions picks the latest — all
+  11 passed
 
 ### Completion Notes List
 
@@ -174,6 +175,48 @@ Claude (Claude Code, cloud/mobile session)
   `epics.md`'s numeric-version wording — see "Reconciling a planning-doc discrepancy" in Dev
   Notes above. No code changes needed to `prefsStore.ts` as a result (avoided the rename
   `epics.md` implied).
+
+### Code Review Fixes Applied (2026-07-04)
+
+A 5-angle multi-agent review (line-by-line, removed-behavior, cross-file, reuse/simplification/
+efficiency, altitude/conventions) found 6 findings against the initial implementation:
+
+- **`constants/vow.ts` — version-skip gap (CONFIRMED by 2 independent agents, fixed):** the
+  original `needsReVow` used exact string-membership (`VOW_REQUIRED_VERSIONS.includes(currentAppVersion)`),
+  so a user who updated straight past a flagged version (e.g. last seen 1.0.0, next launch already
+  at 1.2.0, with only 1.1.0 flagged) would never be re-prompted — silently defeating the story's
+  core purpose for exactly the users an infrequent-update cadence makes most likely to matter.
+  Rewrote `needsReVow` around a small `compareVersions()` numeric comparator: re-vow now triggers
+  whenever `currentAppVersion >= latest flagged version > lastVowAppVersion`, so skipping past the
+  flagged version still triggers it. Re-verified with 11 pure-function cases including the
+  version-skip scenario and numeric (not lexical) comparison of multi-digit segments.
+- **`constants/vow.ts` — exact-string-match fragility / OTA blind spot (CONFIRMED, documented not
+  fixed):** a typo'd version string, or a vow-text change shipped via EAS OTA without a native
+  version bump, would silently disable re-prompting with no error signal. Both are inherent to any
+  version-string approach and out of this story's AC scope (which only describes app-version-
+  triggered re-vow) — logged to `deferred-work.md` rather than adding semver validation or a
+  second OTA-aware signal now.
+- **Reuse — triplicated selector + gating computation (PLAUSIBLE, fixed):** the
+  `usePrefsStore` reads + `isVowSatisfied`/`needsReVow`/`getCurrentAppVersion` calls were
+  copy-pasted across `app/_layout.tsx`, `app/vow.tsx`, and `app/+not-found.tsx` — the reviewer
+  noted this is exactly the kind of drift that caused the dead-link bug below. Extracted a
+  `useVowGate()` hook in `store/prefsStore.ts` returning `{ vowSatisfied, isUpdate,
+  currentAppVersion }`; all three call sites now use it instead of duplicating the computation.
+- **`app/vow.tsx` — "redundant" `vowAcknowledged &&` guard on `isUpdate` (PLAUSIBLE, reviewed,
+  not changed):** a reviewer flagged this as possibly dead code. Verified it is NOT redundant: without
+  it, a brand-new user whose very first app version happened to be listed in
+  `VOW_REQUIRED_VERSIONS` would see `needsReVow('', currentVersion)` evaluate against an empty
+  `lastVowAppVersion` and could incorrectly show the "vow updated" notice on their first-ever
+  vow screen. Kept the guard (now inside `useVowGate()`); added a comment in `constants/vow.ts`
+  explaining the empty-`lastVowAppVersion` case explicitly instead.
+- **Barrel-export inconsistency (PLAUSIBLE, not fixed):** `constants/index.ts` re-exports
+  `constants/vow.ts`'s functions, but all three call sites imported directly from
+  `@/constants/vow`. Checked: no other file in the repo imports from the `@/constants` barrel
+  either (confirmed via repo-wide grep) — CLAUDE.md's Component Barrel Pattern rule is scoped to
+  `components/<feature>/`, not `constants/`, so this isn't a convention violation, just a
+  pre-existing repo-wide pattern (direct imports from `constants/*` files). Left as-is; the barrel
+  export itself is harmless and may be used later.
+
 - **Pending desktop verification (cannot run in this cloud session — no simulator/device access):**
   - Fresh vow flow unaffected (Story 2.1's walkthrough still applies).
   - Re-vow flow: acknowledge → temporarily add current dev-build version string to
@@ -185,10 +228,13 @@ Claude (Claude Code, cloud/mobile session)
 
 ### File List
 
-- `constants/vow.ts` (new)
+- `constants/vow.ts` (new; revised in code review — semver-style comparison)
 - `constants/index.ts` (modified — barrel export)
+- `store/prefsStore.ts` (modified in code review — added `useVowGate()` hook)
 - `locales/ta.json` (modified — new `vow.updatedNotice` key)
-- `app/_layout.tsx` (modified — guard condition only)
-- `app/vow.tsx` (modified — `isUpdate` computation + prop)
-- `app/+not-found.tsx` (modified — back-home link uses `isVowSatisfied`)
+- `app/_layout.tsx` (modified — guard now uses `useVowGate()`)
+- `app/vow.tsx` (modified — `isUpdate`/`currentAppVersion` now from `useVowGate()`)
+- `app/+not-found.tsx` (modified — back-home link now uses `useVowGate()`)
 - `components/onboarding/OpeningVow.tsx` (modified — new `isUpdate` prop + conditional notice)
+- `_bmad-output/implementation-artifacts/deferred-work.md` (modified — logged 2 low-severity
+  review findings not fixed in this story)

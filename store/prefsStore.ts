@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { getCurrentAppVersion, isVowSatisfied, needsReVow } from '@/constants/vow';
+
 interface PrefsState {
   // Persisted user preference. On app start, seed audioStore.speed from this value (Story 1.6/2.1).
   playbackSpeed: 0.75 | 1 | 1.25;
@@ -50,3 +52,18 @@ export const usePrefsStore = create<PrefsState>()(
     }
   )
 );
+
+// Single source of truth for "is the vow gate satisfied" / "is this a re-acknowledgment"
+// so app/_layout.tsx, app/vow.tsx, and app/+not-found.tsx can't drift out of sync with
+// each other (Story 2.1's +not-found fix and Story 2.2's re-vow gate both depend on this).
+export function useVowGate() {
+  const vowAcknowledged = usePrefsStore((state) => state.vowAcknowledged);
+  const lastVowAppVersion = usePrefsStore((state) => state.lastVowAppVersion);
+  const currentAppVersion = getCurrentAppVersion();
+
+  return {
+    vowSatisfied: isVowSatisfied(vowAcknowledged, lastVowAppVersion, currentAppVersion),
+    isUpdate: vowAcknowledged && needsReVow(lastVowAppVersion, currentAppVersion),
+    currentAppVersion,
+  };
+}

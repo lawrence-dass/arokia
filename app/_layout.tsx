@@ -9,9 +9,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
-import { getCurrentAppVersion, isVowSatisfied } from '@/constants/vow';
 import { initSchema } from '@/lib/sqlite';
-import { usePrefsStore } from '@/store/prefsStore';
+import { usePrefsStore, useVowGate } from '@/store/prefsStore';
 
 // Held open until prefsStore finishes hydrating, so the vow/home guard never flashes
 // the wrong screen and the app never shows a blank frame while AsyncStorage is read.
@@ -60,10 +59,8 @@ async function setupRNTP() {
 }
 
 export default function Layout() {
-  const vowAcknowledged = usePrefsStore((state) => state.vowAcknowledged);
-  const lastVowAppVersion = usePrefsStore((state) => state.lastVowAppVersion);
   const hasHydrated = usePrefsStore((state) => state._hasHydrated);
-  const vowSatisfied = isVowSatisfied(vowAcknowledged, lastVowAppVersion, getCurrentAppVersion());
+  const { vowSatisfied } = useVowGate();
 
   useEffect(() => {
     setupRNTP();

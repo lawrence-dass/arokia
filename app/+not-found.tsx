@@ -2,14 +2,11 @@ import { View, Text } from 'react-native';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { getCurrentAppVersion, isVowSatisfied } from '@/constants/vow';
-import { usePrefsStore } from '@/store/prefsStore';
+import { useVowGate } from '@/store/prefsStore';
 
 export default function NotFoundScreen() {
   const { t } = useTranslation();
-  const vowAcknowledged = usePrefsStore((state) => state.vowAcknowledged);
-  const lastVowAppVersion = usePrefsStore((state) => state.lastVowAppVersion);
-  const vowSatisfied = isVowSatisfied(vowAcknowledged, lastVowAppVersion, getCurrentAppVersion());
+  const { vowSatisfied } = useVowGate();
 
   return (
     <View className="flex-1 items-center justify-center bg-background">

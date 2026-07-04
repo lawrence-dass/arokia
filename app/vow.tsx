@@ -1,16 +1,12 @@
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { OpeningVow } from '@/components/onboarding';
-import { getCurrentAppVersion, needsReVow } from '@/constants/vow';
 import { logEvent } from '@/lib/analytics';
-import { usePrefsStore } from '@/store/prefsStore';
+import { usePrefsStore, useVowGate } from '@/store/prefsStore';
 
 export default function VowScreen() {
   const acknowledgeVow = usePrefsStore((state) => state.acknowledgeVow);
-  const vowAcknowledged = usePrefsStore((state) => state.vowAcknowledged);
-  const lastVowAppVersion = usePrefsStore((state) => state.lastVowAppVersion);
-  const currentAppVersion = getCurrentAppVersion();
-  const isUpdate = vowAcknowledged && needsReVow(lastVowAppVersion, currentAppVersion);
+  const { isUpdate, currentAppVersion } = useVowGate();
 
   const handleAcknowledge = () => {
     acknowledgeVow(currentAppVersion);
