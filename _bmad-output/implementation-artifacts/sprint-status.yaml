@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-07-03 # re-sequenced: 1.6/1.7 device validation + 1.8 deferred to pre-Epic-4 gate; jumping to Epic 2
+last_updated: 2026-07-03 # re-sequenced: 1.6/1.7 device validation + 1.8 deferred to pre-Epic-4 gate; story 2-1 created (ready-for-dev)
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -63,8 +63,8 @@ development_status:
   # ─────────────────────────────────────────────────────────────────
   # Epic 2: Opening Vow, Integrity Layer & About
   # ─────────────────────────────────────────────────────────────────
-  epic-2: backlog
-  2-1-opening-vow-first-launch-gate: backlog
+  epic-2: in-progress
+  2-1-opening-vow-first-launch-gate: ready-for-dev
   2-2-returning-user-re-acknowledgment-and-vow-state-management: backlog
   2-3-about-page-and-privacy-policy: backlog
   2-4-theological-concern-submission-form: backlog

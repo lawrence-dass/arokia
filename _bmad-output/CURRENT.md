@@ -1,60 +1,49 @@
-# Handover — 2026-06-20 | Claude Opus 4.8
+# Handover — 2026-07-03 | Claude Opus 4.8 (Winston session)
 
 ## Mode
-Setup complete — two spike stories (1.6, 1.7) paused awaiting Lawrence's physical-device validation.
+Development restarted after pause. Sprint re-sequenced; Story 2.1 created and ready-for-dev.
+**Repo is now cloud-portable — Lawrence will drive the loop from Claude Code mobile/web.**
 
 ## Integration State (READ FIRST)
-- **Base branch is now `main`** — the GitHub default and the merge target for every story PR.
-  (Previously the default was wrongly `feat/story-1-1-project-scaffold`; fixed this session.)
-- **Stories 1.4 + 1.5 are merged into `main`** via PR #4 (CI green). `main` tip: `fb09493`.
-- **Currently on `feat/story-1-7-device-spikes`** — a clean descendant of `main`, already pushed to origin.
-  This branch holds Story 1.7 spike scaffolding (see below) plus this handoff commit. NOT yet PR'd to main.
+- Base branch: `main` (tip `59a2154` — PR #5 merged, CI green). All story PRs target `main`.
+- **Currently on `feat/story-2-1-opening-vow`** — pushed to origin. Holds the Story 2.1 story file,
+  sprint-status update, and mobile-workflow docs. Implementation NOT started.
+- Stories 1.1–1.5 `done` and merged. Stories 1.6/1.7 code-complete, `in-progress`:
+  device/ElevenLabs/Razorpay validation **deferred** behind the pre-Epic-4 gate (see below).
 
-## Active Stories (both spikes, both paused on device validation)
-- **Story 1.6** — RNTP background-audio spike — `in-progress`. Needs physical-device test → `docs/SPIKE_RNTP.md`.
-- **Story 1.7** — Tamil rendering / AAC format / offline cache / Razorpay device spikes — `in-progress`.
-  Scaffolding already on this branch: `app/spikes.tsx`, `scripts/validate-aac.ts`,
-  `scripts/simulate-razorpay-webhook.ts`, `docs/SPIKES_VALIDATION.md`, `locales/ta.json` keys, `.env.example`.
-  Needs physical-device validation → fill in `docs/SPIKES_VALIDATION.md`.
+## Sprint Re-sequencing Decision (2026-07-03)
+- Lawrence prioritized development speed over spike validation. Agreed deferral:
+  - RNTP device validation (1.6), offline-cache + AAC + Tamil-device spikes (1.7) → **hard gate before Story 4.3**
+  - Razorpay spike → before Epic 6. Story 1.8 (ElevenLabs) → before Story 4.6 (content seeding)
+- Tamil rendering gets a simulator smoke-check opportunistically; Epics 2–3 have zero dependency on deferred spikes.
 
-## Resume Point
-1. Lawrence runs device validation for **1.6** (`docs/SPIKE_RNTP.md`) and **1.7** (`docs/SPIKES_VALIDATION.md`).
-2. Finish 1.7: code review + fix → commit → push → `gh pr create --base main` → `gh pr merge --merge --delete-branch`
-   → mark 1.6/1.7 `done` in `sprint-status.yaml`.
-3. Then the autonomous loop (AGENTS.md §3.4) picks up **Story 1.8** (ElevenLabs audio-generation script),
-   then Epic 2. For each: branch off `main` → `bmad-create-story` → `bmad-dev-story` → review + fix →
-   commit (no AI attribution) → push → PR `--base main` → merge → mark `done` → repeat.
+## Resume Point (works from mobile/cloud)
+1. On branch `feat/story-2-1-opening-vow`, run `/bmad-dev-story` to implement
+   `_bmad-output/implementation-artifacts/2-1-opening-vow-first-launch-gate.md` (status: ready-for-dev).
+2. Then `/code-review` → apply fixes → commit → push → `gh pr create --base main` → merge after CI green
+   → mark 2-1 `done` in sprint-status.yaml.
+3. Continue loop: 2.2 → 2.3 → 2.4, then Epic 3. Full loop instructions: CLAUDE.md §Remote / Mobile Development Workflow.
 
 ## What Happened This Session
-- Rewrote `AGENTS.md` into a full Codex operating manual: operating principles, theological guardrails,
-  BMAD workflow loop (run via `_bmad/_config/skill-manifest.csv` — no Skill tool on Codex), sprint/story
-  discipline, Codex hooks, session handoff, and the **§3.4 autonomous epic loop**.
-- Synced `CLAUDE.md` sprint status with `sprint-status.yaml`.
-- Fixed GitHub default branch → `main`; verified `gh` auth + SSH push.
-- Merged PR #4 (stories 1.4/1.5 + AGENTS.md + `.codex/` hooks) into `main`.
+- Architectural review: foundation healthy; blocker was device validation, not code. Re-sequenced sprint.
+- Merged PR #5 (1.7 spike scaffolding + re-sequencing) into `main`; fixed stale `origin/HEAD` → `main`.
+- Created Story 2.1 file (ultimate-context format: Protected-routes gate, zustand persist + AsyncStorage,
+  hydration flag, scope boundaries vs 2.2/2.3).
+- Added CLAUDE.md §Remote / Mobile Development Workflow (push discipline + loop steps for cloud sessions).
 
-## Decisions Made
-- `main` is the single integration branch; story PRs use `--base main` and merge-commit style (`--merge`),
-  matching existing main history (PRs #1–#3 were merge commits).
-- Commit/push/merge are authorized only as part of the §3.4 loop; otherwise commit only when asked.
-- Loop hands off to Lawrence for: device testing, secrets/credentials, money (Razorpay), theological
-  judgment, content-pipeline approval, or red CI on `main`.
-
-## Open Drift to Watch
-- Stories 1.6 and 1.7 both sit `in-progress` on feature branches ahead of `main` and are not yet merged.
-  `main` currently reflects through 1.5 only. Merge them once device validation passes.
-
-## Next Action
-Lawrence: device-validate 1.6 + 1.7 → fill `docs/SPIKE_RNTP.md` and `docs/SPIKES_VALIDATION.md`.
-Then close out 1.7 via PR into `main` and continue the loop from Story 1.8.
+## Open Items / Lawrence-Only Steps
+- Vow copy: `ta.json` `vow.body` is one sentence; PRD implies fuller vow (AI-voice disclosure, no-paraphrase,
+  ecumenical framing). Theological call — Lawrence drafts before launch; not blocking Story 2.1.
+- Pre-Epic-4 gate (device session, ~2 hrs): fill `docs/SPIKE_RNTP.md` + `docs/SPIKES_VALIDATION.md`;
+  needs physical devices, ElevenLabs key, Razorpay test creds, Supabase service-role key.
+- Deferred-work ledger: `_bmad-output/implementation-artifacts/deferred-work.md` (prefsStore persistence
+  lands IN Story 2.1; 1000-row donation aggregate must be fixed before Epic 6).
 
 ## References
-- Operating manual: `AGENTS.md` (loop in §3.4)
+- Story 2.1: `_bmad-output/implementation-artifacts/2-1-opening-vow-first-launch-gate.md`
 - Sprint: `_bmad-output/implementation-artifacts/sprint-status.yaml`
-- Story 1.6: `_bmad-output/implementation-artifacts/1-6-react-native-track-player-background-audio-spike.md`
-- Story 1.7: `_bmad-output/implementation-artifacts/1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes.md`
-- Spike docs to fill: `docs/SPIKE_RNTP.md`, `docs/SPIKES_VALIDATION.md`
-- PR (1.4/1.5): https://github.com/lawrence-dass/arokia/pull/4
+- Workflow: `CLAUDE.md` §Remote / Mobile Development Workflow
+- PR #5 (merged): https://github.com/lawrence-dass/arokia/pull/5
 
 ---
-*Generated 2026-06-20 — base branch corrected to main; 1.4/1.5 merged; on feat/story-1-7-device-spikes.*
+*Generated 2026-07-03 — sprint re-sequenced, Story 2.1 ready-for-dev, repo cloud-portable.*
