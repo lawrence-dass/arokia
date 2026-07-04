@@ -204,14 +204,40 @@ Claude (Claude Code, cloud/mobile session)
   - English book-name fallback (e.g. typing "Matthew") actually triggering and returning results.
   - Clearing the search field restoring the quotes list without a visible flash/reload.
 
+### Code Review Fixes Applied (2026-07-04)
+
+A 2-angle multi-agent review confirmed SQL parameterization, the Tamil-first fallback logic, and
+`app/word.tsx`'s rewrite were all correct — but found 3 real bugs, all fixed:
+
+- **`useQuotesFetch` refetched on every mount (CONFIRMED by 2 independent agents, fixed):** the
+  hook tracked "has fetched" as component-LOCAL state, so `word.tsx` and `search.tsx` each ran
+  their own independent fetch, contradicting this story's own task spec ("call fetchQuotes if not
+  already populated"). Navigating between the two screens re-fetched every time and flashed the
+  loading state over an already-loaded list. Moved the flag into the store itself
+  (`hasFetchedQuotes: boolean`, set `true` in `fetchQuotes` on both success and failure) so it's
+  shared across every screen using the hook, not per-component.
+- **`QuoteList` showed a transient error over valid cached data (CONFIRMED, fixed):** the render
+  checked `error` before `quotes.length`, so the redundant refetch above (now eliminated, but this
+  is also correct on its own) could blank out an already-successfully-loaded list if that specific
+  background refetch failed. Reordered: cached quotes render unconditionally once present; `error`
+  only shows when there's genuinely nothing to display instead.
+- **`app/search.tsx` flashed stale results while a new query resolved (CONFIRMED, fixed):**
+  `results` wasn't cleared when the query text changed, so a fast retype could briefly show
+  matches for the previous query. Now clears `results` synchronously at the start of the effect,
+  before the new `searchContent()` call resolves.
+
+Re-verified: `tsc`/lint/format/tracker-audit all still pass.
+
 ### File List
 
 - `lib/sqlite.ts` (modified — added `searchScriptureByBook()`)
 - `lib/content.ts` (modified — `searchContent()` rewritten to query SQLite instead of Supabase)
-- `store/contentStore.ts` (modified — added `useQuotesFetch()` hook)
-- `components/scripture/QuoteList.tsx` (new)
+- `store/contentStore.ts` (modified — added `useQuotesFetch()` hook + `hasFetchedQuotes` state;
+  revised in code review — moved the fetch-guard flag from component-local to store-level)
+- `components/scripture/QuoteList.tsx` (new; revised in code review — cached-data-before-error
+  precedence)
 - `components/scripture/index.ts` (modified — barrel export)
 - `app/word.tsx` (modified — rewritten to use `useQuotesFetch`/`QuoteList`, added search link)
-- `app/search.tsx` (new)
+- `app/search.tsx` (new; revised in code review — clears stale results on query change)
 - `app/_layout.tsx` (modified — added `search` to the guarded block)
 - `locales/ta.json` (modified — new `search` namespace)

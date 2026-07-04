@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { create } from 'zustand';
 import type { ContentItem, LanguageCode, PracticePath, MoodTag } from '@/types';
 import { getQuotes, getMeditations } from '@/lib/content';
@@ -12,6 +12,9 @@ interface ContentState {
   };
   isLoading: boolean;
   error: string | null;
+  // True once fetchQuotes has completed at least once (success or failure) this session —
+  // lets useQuotesFetch avoid a redundant re-fetch every time a new screen mounts.
+  hasFetchedQuotes: boolean;
   // Actions
   fetchQuotes: (lang: LanguageCode) => Promise<void>;
   fetchMeditations: (lang: LanguageCode) => Promise<void>;
@@ -25,6 +28,7 @@ export const useContentStore = create<ContentState>()((set, get) => ({
   activeFilters: { practicePath: null, moodTag: null },
   isLoading: false,
   error: null,
+  hasFetchedQuotes: false,
 
   fetchQuotes: async (lang) => {
     const { activeFilters } = get();
@@ -35,9 +39,9 @@ export const useContentStore = create<ContentState>()((set, get) => ({
         activeFilters.practicePath ?? undefined,
         activeFilters.moodTag ?? undefined
       );
-      set({ quotes, isLoading: false });
+      set({ quotes, isLoading: false, hasFetchedQuotes: true });
     } catch {
-      set({ error: 'errors.offline', isLoading: false });
+      set({ error: 'errors.offline', isLoading: false, hasFetchedQuotes: true });
     }
   },
 
@@ -59,17 +63,20 @@ export const useContentStore = create<ContentState>()((set, get) => ({
   clearFilters: () => set({ activeFilters: { practicePath: null, moodTag: null } }),
 }));
 
-// Triggers fetchQuotes on mount and reports a single "pending" flag that also covers the gap
-// before the fetch actually starts — `isLoading` alone is false for one frame on mount, which
-// would otherwise flash the empty state before the fetch begins.
+// Triggers fetchQuotes on mount ONLY if it hasn't already run this session (`hasFetchedQuotes`
+// lives in the store, shared across every screen using this hook) — otherwise navigating between
+// /word and /search would re-fetch and flash the loading state every time, even though the data
+// is already cached. Also covers the one-frame gap before the very first fetch actually starts.
 export function useQuotesFetch(lang: LanguageCode) {
   const fetchQuotes = useContentStore((state) => state.fetchQuotes);
   const isLoading = useContentStore((state) => state.isLoading);
-  const [hasFetched, setHasFetched] = useState(false);
+  const hasFetchedQuotes = useContentStore((state) => state.hasFetchedQuotes);
 
   useEffect(() => {
-    fetchQuotes(lang).finally(() => setHasFetched(true));
-  }, [fetchQuotes, lang]);
+    if (!hasFetchedQuotes) {
+      fetchQuotes(lang);
+    }
+  }, [fetchQuotes, hasFetchedQuotes, lang]);
 
-  return { isPending: isLoading || !hasFetched };
+  return { isPending: isLoading || !hasFetchedQuotes };
 }

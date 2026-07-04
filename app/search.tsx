@@ -20,6 +20,9 @@ export default function SearchScreen() {
       setResults([]);
       return;
     }
+    // Clear stale results immediately so a fast retype never shows matches for the previous
+    // query while the new one is still resolving.
+    setResults([]);
     let cancelled = false;
     searchContent(db, 'ta', query).then((matches) => {
       if (!cancelled) setResults(matches);

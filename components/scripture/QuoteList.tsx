@@ -20,27 +20,29 @@ export function QuoteList({ isPending }: QuoteListProps) {
     return <Text className="text-base text-text-secondary">{t('word.loading')}</Text>;
   }
 
+  // Cached quotes win over a transient error — e.g. a redundant background re-fetch failing
+  // shouldn't blank out a list that already loaded successfully.
+  if (quotes.length > 0) {
+    return (
+      <FlatList
+        data={quotes}
+        keyExtractor={(item) => item.id}
+        contentContainerClassName="gap-4 pb-10"
+        renderItem={({ item }) => (
+          <ScriptureCard
+            text={item.scriptureText}
+            reference={item.verseReference}
+            languageCode={item.languageCode}
+            onPress={() => router.push(`/verse/${item.id}`)}
+          />
+        )}
+      />
+    );
+  }
+
   if (error) {
     return <Text className="text-base text-error">{t(error)}</Text>;
   }
 
-  if (quotes.length === 0) {
-    return <Text className="text-base text-text-secondary">{t('word.empty')}</Text>;
-  }
-
-  return (
-    <FlatList
-      data={quotes}
-      keyExtractor={(item) => item.id}
-      contentContainerClassName="gap-4 pb-10"
-      renderItem={({ item }) => (
-        <ScriptureCard
-          text={item.scriptureText}
-          reference={item.verseReference}
-          languageCode={item.languageCode}
-          onPress={() => router.push(`/verse/${item.id}`)}
-        />
-      )}
-    />
-  );
+  return <Text className="text-base text-text-secondary">{t('word.empty')}</Text>;
 }
