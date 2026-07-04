@@ -1,9 +1,9 @@
-import { ScrollView, Share, Text, View } from 'react-native';
+import { Share, Text, View } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { VerseText } from '@/components/scripture';
-import { Button } from '@/components/shared';
+import { Button, SafeScreen } from '@/components/shared';
 import { useAudioStore } from '@/store/audioStore';
 import { useContentStore, useQuotesFetch } from '@/store/contentStore';
 
@@ -22,20 +22,20 @@ export default function VerseScreen() {
 
   if (isPending) {
     return (
-      <View className="flex-1 items-center justify-center bg-background px-6">
+      <SafeScreen className="items-center justify-center px-6">
         <Text className="text-text-secondary">{t('word.loading')}</Text>
-      </View>
+      </SafeScreen>
     );
   }
 
   if (!quote) {
     return (
-      <View className="flex-1 items-center justify-center gap-4 bg-background px-6">
+      <SafeScreen className="items-center justify-center gap-4 px-6">
         <Text className="text-text-secondary">{t('errors.notFound')}</Text>
         <Link href="/word" replace className="text-primary">
           {t('errors.backHome')}
         </Link>
-      </View>
+      </SafeScreen>
     );
   }
 
@@ -58,7 +58,7 @@ export default function VerseScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-8 px-6 py-10">
+    <SafeScreen scroll contentContainerClassName="gap-8 px-6 pb-10 pt-4">
       <VerseText
         text={quote.scriptureText}
         reference={quote.verseReference}
@@ -74,6 +74,6 @@ export default function VerseScreen() {
         )}
         <Button label={t('word.shareCta')} onPress={handleShare} variant="secondary" />
       </View>
-    </ScrollView>
+    </SafeScreen>
   );
 }

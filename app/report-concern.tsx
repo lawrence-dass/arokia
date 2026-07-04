@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Text } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { ConcernForm } from '@/components/shared';
+import { ConcernForm, SafeScreen } from '@/components/shared';
 import { submitConcern } from '@/lib/concerns';
 
 export default function ReportConcernScreen() {
@@ -36,21 +36,21 @@ export default function ReportConcernScreen() {
 
   if (submitted) {
     return (
-      <View className="flex-1 items-center justify-center gap-4 bg-background px-6">
+      <SafeScreen className="items-center justify-center gap-4 px-6">
         <Text className="text-center text-2xl font-bold text-text-primary">
           {t('concern.confirmationTitle')}
         </Text>
         <Text className="text-center text-base leading-7 text-text-secondary">
           {t('concern.confirmationBody')}
         </Text>
-      </View>
+      </SafeScreen>
     );
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-6 px-6 py-10">
+    <SafeScreen scroll contentContainerClassName="gap-6 px-6 pb-10 pt-4">
       <Text className="text-3xl font-bold text-text-primary">{t('concern.title')}</Text>
       <ConcernForm onSubmit={handleSubmit} submitting={submitting} errorMessage={errorMessage} />
-    </ScrollView>
+    </SafeScreen>
   );
 }

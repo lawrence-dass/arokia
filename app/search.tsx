@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { FlatList, Text, TextInput, View } from 'react-native';
+import { FlatList, Text, TextInput } from 'react-native';
 import { useSQLiteContext } from 'expo-sqlite';
 import { useTranslation } from 'react-i18next';
 
 import { QuoteList, ScriptureCard } from '@/components/scripture';
+import { SafeScreen } from '@/components/shared';
 import { searchContent } from '@/lib/content';
 import { useQuotesFetch } from '@/store/contentStore';
 import type { ScriptureVerse } from '@/types';
@@ -84,7 +85,7 @@ export default function SearchScreen() {
   }
 
   return (
-    <View className="flex-1 bg-background px-6 pt-10">
+    <SafeScreen className="px-6 pt-4">
       <Text className="mb-6 text-3xl font-bold text-text-primary">{t('search.title')}</Text>
 
       <TextInput
@@ -95,6 +96,6 @@ export default function SearchScreen() {
       />
 
       {isSearching ? renderResults() : <QuoteList isPending={isPending} />}
-    </View>
+    </SafeScreen>
   );
 }

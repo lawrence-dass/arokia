@@ -10,13 +10,7 @@
       "output": "static",
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-router",
-      "expo-localization",
-      "expo-sqlite",
-      "@sentry/react-native",
-      "react-native-track-player"
-    ],
+    "plugins": ["expo-router", "expo-localization", "expo-sqlite", "@sentry/react-native"],
     "experiments": {
       "typedRoutes": true,
       "tsconfigPaths": true

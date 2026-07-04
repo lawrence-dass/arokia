@@ -3,6 +3,7 @@ import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { QuoteList } from '@/components/scripture';
+import { SafeScreen } from '@/components/shared';
 import { useQuotesFetch } from '@/store/contentStore';
 
 export default function WordScreen() {
@@ -10,7 +11,7 @@ export default function WordScreen() {
   const { isPending } = useQuotesFetch('ta');
 
   return (
-    <View className="flex-1 bg-background px-6 pt-10">
+    <SafeScreen className="px-6 pt-4">
       <View className="mb-6 flex-row items-center justify-between">
         <Text className="text-3xl font-bold text-text-primary">{t('word.title')}</Text>
         <Link href="/search" className="text-base font-semibold text-primary">
@@ -19,6 +20,6 @@ export default function WordScreen() {
       </View>
 
       <QuoteList isPending={isPending} />
-    </View>
+    </SafeScreen>
   );
 }
