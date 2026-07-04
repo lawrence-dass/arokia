@@ -9,6 +9,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 
+import { getCurrentAppVersion, isVowSatisfied } from '@/constants/vow';
 import { initSchema } from '@/lib/sqlite';
 import { usePrefsStore } from '@/store/prefsStore';
 
@@ -60,7 +61,9 @@ async function setupRNTP() {
 
 export default function Layout() {
   const vowAcknowledged = usePrefsStore((state) => state.vowAcknowledged);
+  const lastVowAppVersion = usePrefsStore((state) => state.lastVowAppVersion);
   const hasHydrated = usePrefsStore((state) => state._hasHydrated);
+  const vowSatisfied = isVowSatisfied(vowAcknowledged, lastVowAppVersion, getCurrentAppVersion());
 
   useEffect(() => {
     setupRNTP();
@@ -80,14 +83,15 @@ export default function Layout() {
         onInit={initSchema}
         onError={(e) => console.error('[SQLite] DB failed to open:', e)}>
         <Stack screenOptions={{ headerShown: false }}>
-          {/* Pre-vow screens (reachable before acknowledgment) go here. */}
-          <Stack.Protected guard={!vowAcknowledged}>
+          {/* Pre-vow screens (reachable before acknowledgment, or when a re-vow is required
+              after a significant update — see constants/vow.ts) go here. */}
+          <Stack.Protected guard={!vowSatisfied}>
             <Stack.Screen name="vow" />
           </Stack.Protected>
           {/* Post-vow content screens go here — every new route must be added to this
               block or it renders unguarded (expo-router only excludes routes explicitly
               listed inside a false-guarded Stack.Protected). */}
-          <Stack.Protected guard={vowAcknowledged}>
+          <Stack.Protected guard={vowSatisfied}>
             <Stack.Screen name="index" />
             <Stack.Screen name="spikes" />
           </Stack.Protected>
