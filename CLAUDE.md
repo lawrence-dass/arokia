@@ -114,6 +114,14 @@ Lawrence drives development from Claude Code mobile/web (cloud sessions) as well
 
 **Cloud verification limits:** `npx tsc --noEmit` and `npm run lint` run anywhere; CI re-verifies on every PR. Simulator/device checks cannot run in cloud sessions — device-dependent validation is batched at Lawrence's pre-Epic-4 gate (see Sprint Tracking). No story work requires `.env.local` secrets; anything that does (Supabase service role, Razorpay, ElevenLabs) is a Lawrence-handled step, not an agent step.
 
+**Unattended session policy (Lawrence away, mobile-only):**
+
+- One story per branch per PR. Work stories strictly in sprint order — never parallel (stories share files, e.g. 2.1/2.2 both touch `prefsStore`).
+- Merge a PR only when: CI is green, code review ran and accepted findings are fixed, and nothing in the story deviated from spec. Otherwise **leave the PR open** and record why in `_bmad-output/CURRENT.md` — Lawrence reconciles on return.
+- Simulator-verification tasks in a story cannot run in cloud: note them as "pending desktop verification" in the story's Dev Agent Record; do not block the PR on them, do not claim they passed.
+- Never modify: theological content/vow copy, `locales/ta.json` Tamil phrasing beyond adding keys for new UI, DB migrations, money-related code, or anything in the deferred-work ledger — park it and document instead.
+- If genuinely blocked mid-story: commit + push whatever is consistent (tsc/lint clean), update `CURRENT.md` with exact state, stop. A clean stop beats a broken merge.
+
 ## Sprint Tracking
 
 `_bmad-output/implementation-artifacts/sprint-status.yaml` is the authoritative source of story status — always re-read it rather than trusting this summary. Story files live in `_bmad-output/implementation-artifacts/`. Current sprint state: Epic 1 (`in-progress`) — Stories 1.1–1.5 (`done`); Stories 1.6–1.7 code-complete with device/service validation **deferred** (hard gate: must pass before Story 4.3 audio player; Razorpay spike before Epic 6); Story 1.8 deferred until before content seeding (Story 4.6). Active development jumps to Epic 2 (Opening Vow). Epics 2–7 (`backlog`).
