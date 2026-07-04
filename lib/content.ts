@@ -110,9 +110,15 @@ export async function searchContent(
 ): Promise<ScriptureVerse[]> {
   if (!query.trim()) return [];
 
-  const tamilResults = await searchScripture(db, query, lang);
-  if (tamilResults.length > 0 || !/[a-zA-Z]/.test(query)) {
-    return tamilResults;
+  try {
+    const tamilResults = await searchScripture(db, query, lang);
+    if (tamilResults.length > 0 || !/[a-zA-Z]/.test(query)) {
+      return tamilResults;
+    }
+    return await searchScriptureByBook(db, query, lang);
+  } catch (error) {
+    console.error('[content] searchContent error:', error);
+    Sentry.captureException(error);
+    throw error;
   }
-  return searchScriptureByBook(db, query, lang);
 }

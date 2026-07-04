@@ -2,12 +2,9 @@ import { useState } from 'react';
 import { Text, TextInput, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from './Button';
+import { isValidEmail } from '@/lib/concerns';
 
-// Mirrors lib/concerns.ts:submitConcern's own email validation exactly, so a malformed
-// email is caught here — before a network round-trip — instead of surfacing as a
-// misleading generic submission error.
-const EMAIL_FORMAT = /^[^@]+@[^@]+\.[^@]+$/;
+import { Button } from './Button';
 
 interface ConcernFormProps {
   onSubmit: (description: string, email: string) => void;
@@ -21,7 +18,7 @@ export function ConcernForm({ onSubmit, submitting, errorMessage }: ConcernFormP
   const [email, setEmail] = useState('');
 
   const trimmedEmail = email.trim();
-  const emailValid = trimmedEmail.length === 0 || EMAIL_FORMAT.test(trimmedEmail);
+  const emailValid = trimmedEmail.length === 0 || isValidEmail(trimmedEmail);
   const canSubmit = description.trim().length > 0 && emailValid && !submitting;
 
   return (

@@ -8,31 +8,80 @@ import { searchContent } from '@/lib/content';
 import { useQuotesFetch } from '@/store/contentStore';
 import type { ScriptureVerse } from '@/types';
 
+type SearchStatus = 'idle' | 'searching' | 'error';
+
 export default function SearchScreen() {
   const { t } = useTranslation();
   const db = useSQLiteContext();
   const { isPending } = useQuotesFetch('ta');
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ScriptureVerse[]>([]);
+  const [status, setStatus] = useState<SearchStatus>('idle');
 
   useEffect(() => {
-    if (!query.trim()) {
+    const trimmed = query.trim();
+    if (!trimmed) {
       setResults([]);
+      setStatus('idle');
       return;
     }
-    // Clear stale results immediately so a fast retype never shows matches for the previous
-    // query while the new one is still resolving.
-    setResults([]);
+
+    setStatus('searching');
     let cancelled = false;
-    searchContent(db, 'ta', query).then((matches) => {
-      if (!cancelled) setResults(matches);
-    });
+    // Debounce so the full FTS scan runs once the user pauses typing, not on every keystroke.
+    const handle = setTimeout(() => {
+      searchContent(db, 'ta', trimmed)
+        .then((matches) => {
+          if (cancelled) return;
+          setResults(matches);
+          setStatus('idle');
+        })
+        .catch(() => {
+          // searchContent already reported to Sentry; surface a retryable error to the user
+          // rather than a misleading "no matches" empty state.
+          if (cancelled) return;
+          setResults([]);
+          setStatus('error');
+        });
+    }, 250);
+
     return () => {
       cancelled = true;
+      clearTimeout(handle);
     };
   }, [db, query]);
 
   const isSearching = query.trim().length > 0;
+
+  function renderResults() {
+    // Gate the empty state on status so "no matches" never flashes while a search is in flight.
+    if (status === 'searching') {
+      return <Text className="text-base text-text-secondary">{t('search.searching')}</Text>;
+    }
+    if (status === 'error') {
+      return <Text className="text-base text-error">{t('search.error')}</Text>;
+    }
+    if (results.length === 0) {
+      return <Text className="text-base text-text-secondary">{t('search.empty')}</Text>;
+    }
+    return (
+      <FlatList
+        data={results}
+        keyExtractor={(item) => String(item.id)}
+        contentContainerClassName="gap-4 pb-10"
+        renderItem={({ item }) => (
+          // Display-only: results are raw bundled-scripture verses (ScriptureVerse), NOT curated
+          // content_items quotes, so they have no /verse/[id] detail target. Do not add a quote
+          // onPress here — item.id is a scripture rowid, a different id space than quote uuids.
+          <ScriptureCard
+            text={item.text}
+            reference={`${item.book} ${item.chapter}:${item.verse}`}
+            languageCode={item.languageCode}
+          />
+        )}
+      />
+    );
+  }
 
   return (
     <View className="flex-1 bg-background px-6 pt-10">
@@ -45,26 +94,7 @@ export default function SearchScreen() {
         className="mb-6 min-h-12 rounded-card border border-border bg-surface px-4 py-3 text-base text-text-primary"
       />
 
-      {isSearching ? (
-        results.length === 0 ? (
-          <Text className="text-base text-text-secondary">{t('search.empty')}</Text>
-        ) : (
-          <FlatList
-            data={results}
-            keyExtractor={(item) => String(item.id)}
-            contentContainerClassName="gap-4 pb-10"
-            renderItem={({ item }) => (
-              <ScriptureCard
-                text={item.text}
-                reference={`${item.book} ${item.chapter}:${item.verse}`}
-                languageCode={item.languageCode}
-              />
-            )}
-          />
-        )
-      ) : (
-        <QuoteList isPending={isPending} />
-      )}
+      {isSearching ? renderResults() : <QuoteList isPending={isPending} />}
     </View>
   );
 }

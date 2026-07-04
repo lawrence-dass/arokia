@@ -24,7 +24,16 @@ export async function searchScripture(
   query: string,
   languageCode = 'ta'
 ): Promise<ScriptureVerse[]> {
-  const escaped = `"${query.replace(/"/g, '""')}"`;
+  // Quote each term individually and join with a space so FTS5 does an implicit AND across
+  // terms (all must appear, in any order) rather than requiring the whole query as one adjacent
+  // phrase. Per-term quoting also neutralises FTS5 operator characters within a term.
+  const escaped = query
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((term) => `"${term.replace(/"/g, '""')}"`)
+    .join(' ');
+  if (!escaped) return [];
   return db.getAllAsync<ScriptureVerse>(
     `SELECT s.id, s.book, s.chapter, s.verse, s.text, s.language_code AS "languageCode"
      FROM scripture_fts
@@ -42,10 +51,13 @@ export async function searchScriptureByBook(
   bookQuery: string,
   languageCode = 'ta'
 ): Promise<ScriptureVerse[]> {
+  // Escape LIKE metacharacters (\ % _) so a query such as "a_c" matches the literal text
+  // rather than acting as a wildcard; the ESCAPE clause below defines `\` as the escape char.
+  const escapedBook = bookQuery.replace(/[\\%_]/g, '\\$&');
   return db.getAllAsync<ScriptureVerse>(
     `SELECT id, book, chapter, verse, text, language_code AS "languageCode"
-     FROM scripture WHERE book LIKE ? AND language_code = ?
+     FROM scripture WHERE book LIKE ? ESCAPE '\\' AND language_code = ?
      LIMIT 20`,
-    [`%${bookQuery}%`, languageCode]
+    [`%${escapedBook}%`, languageCode]
   );
 }

@@ -5,16 +5,28 @@ import { useTranslation } from 'react-i18next';
 import { VerseText } from '@/components/scripture';
 import { Button } from '@/components/shared';
 import { useAudioStore } from '@/store/audioStore';
-import { useContentStore } from '@/store/contentStore';
+import { useContentStore, useQuotesFetch } from '@/store/contentStore';
 
 export default function VerseScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
+  // Self-hydrate the quotes store so a deep link or cold start straight to /verse/[id] works even
+  // when neither /word nor /search has triggered the fetch yet.
+  const { isPending } = useQuotesFetch('ta');
   const quote = useContentStore((state) => state.quotes.find((item) => item.id === id));
   const currentTrack = useAudioStore((state) => state.currentTrack);
   const isPlaying = useAudioStore((state) => state.isPlaying);
   const playTrack = useAudioStore((state) => state.playTrack);
   const pauseAudio = useAudioStore((state) => state.pauseAudio);
+  const resumeAudio = useAudioStore((state) => state.resumeAudio);
+
+  if (isPending) {
+    return (
+      <View className="flex-1 items-center justify-center bg-background px-6">
+        <Text className="text-text-secondary">{t('word.loading')}</Text>
+      </View>
+    );
+  }
 
   if (!quote) {
     return (
@@ -27,11 +39,15 @@ export default function VerseScreen() {
     );
   }
 
-  const isThisPlaying = isPlaying && currentTrack?.id === quote.id;
+  const isCurrent = currentTrack?.id === quote.id;
+  const isThisPlaying = isPlaying && isCurrent;
 
   const handlePlayToggle = () => {
     if (isThisPlaying) {
       pauseAudio();
+    } else if (isCurrent) {
+      // Same track, currently paused — resume from position rather than reset + restart from 0.
+      resumeAudio();
     } else {
       playTrack(quote);
     }
