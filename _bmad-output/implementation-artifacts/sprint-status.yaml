@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-06-14 # story 1-6 in-progress
+last_updated: 2026-07-03 # re-sequenced: 1.6/1.7 device validation + 1.8 deferred to pre-Epic-4 gate; jumping to Epic 2
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -51,9 +51,13 @@ development_status:
   1-3-expo-sqlite-and-tamil-ov-bible-data-bundle: done
   1-4-service-layer-domain-types-and-zustand-store-skeletons: done
   1-5-github-actions-ci-eas-build-profiles-and-sentry: done
-  1-6-react-native-track-player-background-audio-spike: in-progress
-  1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes: backlog
-  1-8-elevenlabs-audio-generation-script: backlog
+  # DEFERRED-VALIDATION GATE (decided 2026-07-03): stories 1-6/1-7 are code-complete;
+  # physical-device validation (RNTP, offline cache) + ElevenLabs/AAC + Razorpay spikes
+  # are deferred. HARD GATE: all must pass before Story 4-3 (audio player core) begins.
+  # Tamil rendering (SPIKE-1) gets a simulator smoke-check now; device confirmation rides along later.
+  1-6-react-native-track-player-background-audio-spike: in-progress # deferred: device validation gated pre-Epic-4
+  1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes: in-progress # deferred: device/ElevenLabs/Razorpay validation gated pre-Epic-4 (Razorpay pre-Epic-6)
+  1-8-elevenlabs-audio-generation-script: backlog # deferred: needed before content seeding (Story 4-6), not before Epics 2-3
   epic-1-retrospective: optional
 
   # ─────────────────────────────────────────────────────────────────

@@ -99,4 +99,4 @@ Content moves through a mandatory review workflow before it appears in the app. 
 
 ## Sprint Tracking
 
-`_bmad-output/implementation-artifacts/sprint-status.yaml` is the authoritative source of story status — always re-read it rather than trusting this summary. Story files live in `_bmad-output/implementation-artifacts/`. Current sprint state: Epic 1 (`in-progress`) — Stories 1.1–1.5 (`done`), Story 1.6 RNTP audio spike (`in-progress`, awaiting physical-device testing), Stories 1.7–1.8 (`backlog`); Epics 2–7 (`backlog`).
+`_bmad-output/implementation-artifacts/sprint-status.yaml` is the authoritative source of story status — always re-read it rather than trusting this summary. Story files live in `_bmad-output/implementation-artifacts/`. Current sprint state: Epic 1 (`in-progress`) — Stories 1.1–1.5 (`done`); Stories 1.6–1.7 code-complete with device/service validation **deferred** (hard gate: must pass before Story 4.3 audio player; Razorpay spike before Epic 6); Story 1.8 deferred until before content seeding (Story 4.6). Active development jumps to Epic 2 (Opening Vow). Epics 2–7 (`backlog`).
