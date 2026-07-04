@@ -80,6 +80,10 @@ export default function Layout() {
         onInit={initSchema}
         onError={(e) => console.error('[SQLite] DB failed to open:', e)}>
         <Stack screenOptions={{ headerShown: false }}>
+          {/* Always reachable, regardless of vow state — FR5 requires the Privacy Policy to be
+              accessible before the Opening Vow is acknowledged. This is the one deliberate
+              exception to "every screen must be in a guarded block". */}
+          <Stack.Screen name="privacy" />
           {/* Pre-vow screens (reachable before acknowledgment, or when a re-vow is required
               after a significant update — see constants/vow.ts) go here. */}
           <Stack.Protected guard={!vowSatisfied}>
@@ -91,6 +95,7 @@ export default function Layout() {
           <Stack.Protected guard={vowSatisfied}>
             <Stack.Screen name="index" />
             <Stack.Screen name="spikes" />
+            <Stack.Screen name="about" />
           </Stack.Protected>
         </Stack>
       </SQLiteProvider>

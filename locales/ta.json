@@ -21,7 +21,36 @@
   "donation": {
     "cta": "நன்கொடை",
     "glassWall": "கண்ணாடி சுவர் பட்ஜெட்",
+    "glassWallUnavailable": "பட்ஜெட் தகவல் தற்போது கிடைக்கவில்லை.",
     "payForward": "முன்கொடை 10%"
+  },
+  "about": {
+    "title": "ஆரோக்கியம் பற்றி",
+    "linkLabel": "ஆரோக்கியம் பற்றி",
+    "nameMeaning": {
+      "heading": "பெயரின் அர்த்தம்",
+      "body": "[PLACEHOLDER — Lawrence to draft: meaning of 'Arokia' (ஆரோக்கியம்) and the Arokia Matha name/heritage story]"
+    },
+    "pillars": {
+      "heading": "நான்கு தூண்கள்",
+      "word": "[PLACEHOLDER — The Word]",
+      "walk": "[PLACEHOLDER — The Walk]",
+      "hopeFaithLove": "[PLACEHOLDER — Hope · Faith · Love]",
+      "integrity": "[PLACEHOLDER — Integrity]"
+    },
+    "ecumenical": {
+      "heading": "அனைவருக்குமான அணுகுமுறை",
+      "body": "[PLACEHOLDER — Lawrence to draft: ecumenical positioning statement serving all Tamil Christians]"
+    },
+    "correctionProcess": {
+      "heading": "திருத்த வெளிப்படுத்தல் செயல்முறை",
+      "body": "[PLACEHOLDER — Lawrence to draft: correction disclosure process description]"
+    },
+    "privacyLink": "தனியுரிமைக் கொள்கை"
+  },
+  "privacy": {
+    "title": "தனியுரிமைக் கொள்கை",
+    "body": "[PLACEHOLDER — Lawrence to draft/paste the Privacy Policy text]"
   },
   "errors": {
     "offline": "இணைப்பு இல்லை",
