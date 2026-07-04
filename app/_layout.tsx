@@ -7,9 +7,14 @@ import { useEffect } from 'react';
 import { SQLiteProvider } from 'expo-sqlite';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 
 import { initSchema } from '@/lib/sqlite';
 import { usePrefsStore } from '@/store/prefsStore';
+
+// Held open until prefsStore finishes hydrating, so the vow/home guard never flashes
+// the wrong screen and the app never shows a blank frame while AsyncStorage is read.
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
@@ -61,7 +66,11 @@ export default function Layout() {
     setupRNTP();
   }, []);
 
-  if (!hasHydrated) return null;
+  useEffect(() => {
+    if (hasHydrated) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [hasHydrated]);
 
   return (
     <SafeAreaProvider>
@@ -71,9 +80,13 @@ export default function Layout() {
         onInit={initSchema}
         onError={(e) => console.error('[SQLite] DB failed to open:', e)}>
         <Stack screenOptions={{ headerShown: false }}>
+          {/* Pre-vow screens (reachable before acknowledgment) go here. */}
           <Stack.Protected guard={!vowAcknowledged}>
             <Stack.Screen name="vow" />
           </Stack.Protected>
+          {/* Post-vow content screens go here — every new route must be added to this
+              block or it renders unguarded (expo-router only excludes routes explicitly
+              listed inside a false-guarded Stack.Protected). */}
           <Stack.Protected guard={vowAcknowledged}>
             <Stack.Screen name="index" />
             <Stack.Screen name="spikes" />

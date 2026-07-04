@@ -39,7 +39,14 @@ export const usePrefsStore = create<PrefsState>()(
         vowAcknowledged: state.vowAcknowledged,
         lastVowAppVersion: state.lastVowAppVersion,
       }),
-      onRehydrateStorage: () => (state) => state?.setHasHydrated(true),
+      onRehydrateStorage: () => (state, error) => {
+        if (error) {
+          console.error('[prefsStore] Failed to rehydrate persisted state:', error);
+        }
+        // `state` is undefined on a failed rehydration — fall back to the live store so
+        // hydration always completes and the app never blanks on a corrupted storage value.
+        (state ?? usePrefsStore.getState()).setHasHydrated(true);
+      },
     }
   )
 );

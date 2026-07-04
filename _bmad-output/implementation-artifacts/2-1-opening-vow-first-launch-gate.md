@@ -200,10 +200,47 @@ Claude (Claude Code, cloud/mobile session)
   `arokia-prefs`, `partialize` excludes `_hasHydrated`. State shape/actions unchanged per scope note.
 - `components/onboarding/OpeningVow.tsx` + barrel created; dumb component, no store/router access.
 - `app/vow.tsx` route wires `acknowledgeVow(appVersion)` + `logEvent('vow_completed')`.
-- `app/_layout.tsx`: hydration gate (`return null` until `_hasHydrated`) + `Stack.Protected` guards
-  (`vow` unguarded-when-not-acknowledged, `index`/`spikes` guarded-when-acknowledged), relying on
-  Expo Router's guard-flip auto-navigation (no manual `router.replace` added).
+- `app/_layout.tsx`: `Stack.Protected` guards (`vow` unguarded-when-not-acknowledged, `index`/`spikes`
+  guarded-when-acknowledged), relying on Expo Router's guard-flip auto-navigation (no manual
+  `router.replace` added).
 - Removed the stale placeholder comment in `app/index.tsx`.
+
+### Code Review Fixes Applied (2026-07-04)
+
+An 8-angle multi-agent review found 7 findings (5 CONFIRMED, 2 PLAUSIBLE) against the
+initial implementation, each independently verified against zustand/expo-router/
+React Navigation source. Fixed all 5 CONFIRMED + re-verified tsc/lint/format/tracker-audit:
+
+- **`store/prefsStore.ts` — hydration-failure blank screen (CONFIRMED, fixed):**
+  `onRehydrateStorage` only handled the success arg; on a storage read/parse failure
+  zustand calls it as `(undefined, error)`, so `_hasHydrated` never flipped true and the
+  app blanked permanently. Now logs the error and always calls `setHasHydrated(true)` via
+  `usePrefsStore.getState()` as a fallback when `state` is undefined.
+- **`app/_layout.tsx` — cold-start splash flash + SQLite serialized behind AsyncStorage
+  (CONFIRMED, fixed):** replaced the `if (!hasHydrated) return null` gate (the story's
+  "return null" option) with the story's other documented option — "keep the splash
+  screen visible" — via `expo-splash-screen` (`preventAutoHideAsync` at module load,
+  `hideAsync()` once `_hasHydrated` flips in a `useEffect`). `SQLiteProvider`/`Stack` now
+  mount immediately instead of waiting on AsyncStorage, so DB init and prefs hydration run
+  concurrently, and there's no blank frame between native-splash-hide and first paint since
+  the splash now stays up for that whole window. Added `expo-splash-screen@~0.21.1` (the
+  version Expo SDK 54 bundles, confirmed the same way as async-storage above).
+- **`app/_layout.tsx` — `Stack.Protected` fail-open for unlisted routes (CONFIRMED,
+  documented not refactored):** any future route file not added to the guarded
+  `Stack.Protected` block renders unguarded with no compile-time signal (verified against
+  expo-router's `useScreens.js`). All current routes are correctly listed; a structural fix
+  (e.g. a route-group-owned guard) is a bigger change than this story's scope — added an
+  inline comment at the guard blocks and logged it in `deferred-work.md` for before Epic 3.
+- **`app/+not-found.tsx` — dead "back home" link pre-vow (CONFIRMED, fixed):** its
+  `<Link href="/">` targeted a route excluded from the stack while unacknowledged
+  (verified: React Navigation's `StackRouter` REPLACE handler no-ops when the target isn't
+  in the current `routeNames`, no crash/redirect). Now links to `/vow` when
+  `!vowAcknowledged`, `/` otherwise.
+- **PLAUSIBLE, not fixed (logged in `deferred-work.md`):** wasted AsyncStorage write on
+  every cold start from `setHasHydrated` going through the same persisted `set`; dual
+  `Stack.Protected` blocks encoding the same boolean twice. Both low-severity/cosmetic —
+  fixing either now would be more refactor than this story's scope warrants.
+
 - **Pending desktop verification (cannot run in this cloud session — no simulator/device access):**
   - Fresh-install walkthrough: vow shows first → tap CTA → lands on home → relaunch → home shows
     directly (no vow).
@@ -220,6 +257,9 @@ Claude (Claude Code, cloud/mobile session)
 - `app/_layout.tsx` (modified)
 - `app/index.tsx` (modified)
 - `app/vow.tsx` (new)
+- `app/+not-found.tsx` (modified — code review fix)
 - `components/onboarding/OpeningVow.tsx` (new)
 - `components/onboarding/index.ts` (new)
-- `package.json`, `package-lock.json` (modified — AsyncStorage dependency)
+- `package.json`, `package-lock.json` (modified — AsyncStorage + expo-splash-screen dependencies)
+- `_bmad-output/implementation-artifacts/deferred-work.md` (modified — logged 2 low-severity
+  review findings not fixed in this story)
