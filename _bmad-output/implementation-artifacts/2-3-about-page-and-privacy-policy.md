@@ -202,11 +202,44 @@ Claude (Claude Code, cloud/mobile session)
     runs React 19.1.0 — `npm install` accepted it without `--force`/`--legacy-peer-deps`, but
     actual rendering compatibility with React 19 hasn't been visually confirmed.
 
+### Code Review Fixes Applied (2026-07-04)
+
+A 4-angle multi-agent review (line-by-line, removed-behavior + cross-file, reuse/simplification/
+efficiency, altitude/conventions) found the same critical bug independently from 3 of the 4
+angles, plus one lower-confidence maintainability note:
+
+- **`components/donation/GlassWallBudget.tsx` — wrong `expo-file-system` API (CONFIRMED by 3
+  independent agents, fixed):** the component imported `* as FileSystem from 'expo-file-system'`
+  and called `FileSystem.readAsStringAsync(...)`. In the installed `expo-file-system@19.0.23`
+  (Expo SDK 54), that name resolves to a legacy-deprecation shim whose body unconditionally
+  throws — verified by reading the package's own `legacyWarnings` source, no simulator needed.
+  Every call would hit the `catch` block, so the Glass-Wall Budget section could never actually
+  render the markdown — only ever the "unavailable" fallback, on every platform, not just
+  offline/first-launch as the AC anticipated. `lib/audio.ts` already established the correct v2
+  pattern elsewhere in this repo (`File`, `Paths` classes); switched to `import { File } from
+  'expo-file-system'` + `new File(asset.localUri).text()` to match it. Re-verified: `tsc`/lint/
+  format/tracker-audit all still pass; the actual runtime render still needs the desktop
+  verification pass above (this class of bug is exactly why — it was invisible to every static
+  check available in this session).
+- **`privacy` as a bare unguarded `Stack.Screen` sets a second precedent (PLAUSIBLE, not
+  changed):** alongside `+not-found`/`+html`'s unguarded status, `privacy` is unguarded for a
+  different reason (FR5 requirement, not a routing special-case) with no shared abstraction
+  between them. Verified via expo-router source that this doesn't create any fail-open/ordering
+  risk (Stack's initial-route resolution doesn't depend on JSX child order) — left as-is; a
+  shared "unguarded route" concept isn't warranted for two instances.
+- **Altitude note on the Metro-asset approach (considered, not changed):** one reviewer suggested
+  a plain `.ts` string-export would have been simpler/more robust than the new Metro `md`
+  asset-extension + `expo-asset` + `expo-file-system` pipeline, given it can't be verified without
+  a real bundler run. Kept the asset-based approach because it's what `architecture/
+  infrastructure.md` explicitly specifies (git-tracked markdown → bundled → in-app render) and
+  matches the established `scripture.db` precedent — but this is exactly the kind of decision
+  worth Lawrence's desktop verification pass confirming before it's trusted.
+
 ### File List
 
 - `metro.config.js` (modified — added `'md'` to `assetExts`)
 - `docs/glass-wall-budget.md` (new — placeholder)
-- `components/donation/GlassWallBudget.tsx` (new)
+- `components/donation/GlassWallBudget.tsx` (new; revised in code review — correct `expo-file-system` API)
 - `components/donation/index.ts` (modified — barrel export)
 - `app/about.tsx` (new)
 - `app/privacy.tsx` (new)
