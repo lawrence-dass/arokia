@@ -79,7 +79,9 @@ export async function getQuotes(
 
 export async function getMeditations(
   lang: LanguageCode,
-  practicePath?: PracticePath
+  practicePath?: PracticePath,
+  moodTag?: MoodTag,
+  timeOfDay?: TimeOfDay
 ): Promise<ContentItem[]> {
   let query = supabase
     .from('content_items')
@@ -89,6 +91,10 @@ export async function getMeditations(
     .eq('content_type', 'meditation');
 
   if (practicePath) query = query.eq('practice_path', practicePath);
+  if (moodTag && moodTag !== 'none') query = query.eq('mood_tag', moodTag);
+  // v1 always passes 'any' (every MVP row's time_of_day is 'any' too, so this is a no-op filter
+  // today) — the parameter exists so v1.1's Kaalai/Maalai filtering needs no signature change.
+  if (timeOfDay) query = query.eq('time_of_day', timeOfDay);
 
   const { data, error } = await query;
   if (error) {

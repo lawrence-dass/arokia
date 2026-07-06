@@ -93,13 +93,13 @@ export default function Layout() {
               block or it renders unguarded (expo-router only excludes routes explicitly
               listed inside a false-guarded Stack.Protected). */}
           <Stack.Protected guard={vowSatisfied}>
-            <Stack.Screen name="index" />
+            <Stack.Screen name="(tabs)" />
             <Stack.Screen name="spikes" />
             <Stack.Screen name="about" />
             <Stack.Screen name="report-concern" />
-            <Stack.Screen name="word" />
             <Stack.Screen name="verse/[id]" />
             <Stack.Screen name="search" />
+            <Stack.Screen name="meditation/[id]" />
           </Stack.Protected>
         </Stack>
       </SQLiteProvider>

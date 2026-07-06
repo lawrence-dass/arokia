@@ -83,9 +83,9 @@ development_status:
   # ─────────────────────────────────────────────────────────────────
   # Epic 4: Triune Daily Practice — The Walk
   # ─────────────────────────────────────────────────────────────────
-  epic-4: backlog
-  4-1-triune-home-screen-mind-body-soul-navigation: backlog
-  4-2-meditation-library-browse-by-practice-path-and-emotional-state: backlog
+  epic-4: in-progress
+  4-1-triune-home-screen-mind-body-soul-navigation: review
+  4-2-meditation-library-browse-by-practice-path-and-emotional-state: review
   4-3-audio-player-core-playback-with-background-and-lockscreen-controls: backlog
   4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off: backlog
   4-5-offline-content-download-progressive-cache-and-manual-download: backlog
