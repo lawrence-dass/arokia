@@ -192,3 +192,18 @@ validation too lenient.
 
 - `scripts/seed-content.ts` (new; revised in code review — Unicode NFC normalization, JSON.parse
   error handling)
+
+### Update (2026-07-06) — real 50 quotes now integrated
+
+Lawrence's own commit `f48c1b3` (pushed directly to this branch, authored by Lawrence, not an
+agent session) replaced `SAMPLE_QUOTES` with `CURATED_QUOTES` — the real 50 curated red-letter
+Jesus quotes, sourced via a Codex research handoff and Lawrence's theological review sheet at
+`docs/content/CONTENT-RESEARCH-OUTPUT.md`. The dry-run validator passes all 50 (verbatim +
+verse-reference checks against `data/tamil-ov-nt.json`). AC1/2/3/4/5 are now satisfiable — what
+remains is exclusively Lawrence's `--execute` step: add `SUPABASE_SERVICE_ROLE_KEY` to
+`.env.local` and run `node --env-file=.env.local --loader tsx scripts/seed-content.ts --execute`
+per the script header's note ("only after Lawrence approves the review sheet in
+`docs/content/CONTENT-RESEARCH-OUTPUT.md`"). This cloud session merged that commit in (resolving
+one unrelated conflict on `app/index.tsx` from Story 4.1's `(tabs)` restructuring) but did not
+run `--execute` — no service-role key exists in this session, and per `CLAUDE.md` it's a
+Lawrence-handled step regardless.
