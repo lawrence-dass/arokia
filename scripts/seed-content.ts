@@ -643,6 +643,9 @@ async function main() {
     time_of_day: 'any',
     mood_tag: quote.moodTag,
     review_status: 'published',
+    // content_items_published_at_required (migration ...000002) enforces published_at is set
+    // whenever review_status = 'published'.
+    published_at: new Date().toISOString(),
     verse_reference: `${quote.book} ${quote.chapter}:${quote.verse}`,
     scripture_text: normalize(quote.scriptureText),
   }));
