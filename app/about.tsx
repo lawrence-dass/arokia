@@ -1,14 +1,15 @@
-import { ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { GlassWallBudget } from '@/components/donation';
+import { SafeScreen } from '@/components/shared';
 
 export default function AboutScreen() {
   const { t } = useTranslation();
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-8 px-6 py-10">
+    <SafeScreen scroll contentContainerClassName="gap-8 px-6 pb-10 pt-4">
       <Text className="text-3xl font-bold text-text-primary">{t('about.title')}</Text>
 
       <View className="gap-2">
@@ -63,6 +64,6 @@ export default function AboutScreen() {
       <Link href="/privacy" className="text-base font-semibold text-primary">
         {t('about.privacyLink')}
       </Link>
-    </ScrollView>
+    </SafeScreen>
   );
 }

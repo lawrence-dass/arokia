@@ -1,46 +1,32 @@
-/**
- * Story 3.4 seed script.
- * Run: node --env-file=.env.local --loader tsx scripts/seed-content.ts [--execute]
- *
- * Without --execute, this is a dry run: validates every quote in CURATED_QUOTES against the
- * bundled Tamil OV data (verbatim text + valid verse reference) and prints a report — it writes
- * nothing to Supabase and does not require any credentials.
- *
- * With --execute, it additionally inserts the validated rows into content_items. This requires
- * SUPABASE_SERVICE_ROLE_KEY in .env.local (content_items has no anon INSERT policy) — a
- * Lawrence-handled credential, never used in the app binary.
- *
- * CURATED DATA: CURATED_QUOTES holds the 50 MVP red-letter Jesus quotes, verbatim from the
- * bundled Tamil OV NT (data/tamil-ov-nt.json) and validated by the dry run below. Run --execute
- * (with SUPABASE_SERVICE_ROLE_KEY) only after Lawrence approves the review sheet in
- * docs/content/CONTENT-RESEARCH-OUTPUT.md.
- */
+## Integration instructions for Claude
 
-import { readFileSync, existsSync } from 'fs';
-import { join } from 'path';
-import { createClient } from '@supabase/supabase-js';
+Edit exactly these app files during integration:
 
-interface BundledVerse {
-  book: string;
-  chapter: number;
-  verse: number;
-  text: string;
-}
+- `scripts/seed-content.ts`: replace the entire `SAMPLE_QUOTES` array with the `SeedQuote[]` array below.
+- `locales/ta.json`: replace only the listed placeholder values under `about.*` and `privacy.body` with Lawrence-approved final copy from Task 2.
 
-interface SeedQuote {
-  book: string;
-  chapter: number;
-  verse: number;
-  scriptureText: string;
-  practicePath: 'mind' | 'body' | 'soul';
-  productPillar: 'word' | 'walk' | 'hope_faith_love' | 'integrity';
-  moodTag: 'anxious' | 'grieving' | 'angry' | 'lonely' | 'tempted' | 'none';
-}
+After pasting the quotes, run the dry-run validator until all 50 pass:
 
-// The 50 curated MVP red-letter Jesus quotes — verbatim from the bundled Tamil OV NT
-// (data/tamil-ov-nt.json), validated by the dry run in main(). Sourced via the Codex research
-// handoff docs/content/CONTENT-RESEARCH-OUTPUT.md (which holds Lawrence's theological review sheet).
-const CURATED_QUOTES: SeedQuote[] = [
+```bash
+npx tsx scripts/seed-content.ts
+npm run format
+npx tsc --noEmit
+npm run lint
+```
+
+Do not run `scripts/seed-content.ts --execute` during integration unless Lawrence explicitly provides the required service-role credential and asks for seeding. Do not alter `vow.body`. Do not edit `docs/glass-wall-budget.md`.
+
+Source basis for this handoff:
+
+- Verbatim Tamil scripture text was copied from `data/tamil-ov-nt.json` only.
+- The `SeedQuote` contract was read from `scripts/seed-content.ts`.
+- Product categories and copy intent were checked against `_bmad-output/planning-artifacts/prd.md`, `_bmad-output/planning-artifacts/architecture.md`, `_bmad-output/planning-artifacts/epics/epic-2.md`, `locales/ta.json`, `CLAUDE.md`, and `docs/content/CODEX-CONTENT-PROMPT.md`.
+- Arokia Matha / Vailankanni naming was cross-checked against the official Shrine Basilica of Our Lady of Health Vailankanni site: https://vailankannishrine.net/.
+
+## Task 1 — 50 quotes
+
+```ts
+const SAMPLE_QUOTES: SeedQuote[] = [
   {
     book: 'Matthew',
     chapter: 4,
@@ -535,125 +521,81 @@ const CURATED_QUOTES: SeedQuote[] = [
     moodTag: 'anxious',
   },
 ];
+```
 
-interface ValidationResult {
-  quote: SeedQuote;
-  ok: boolean;
-  problems: string[];
-}
+| Reference | English gloss | practicePath | productPillar | moodTag | Rationale |
+|---|---|---|---|---|---|
+| Matthew 4:4 | Human life depends on God's word, not bread alone. | body | word | tempted | Jesus answers bodily temptation by submitting appetite to Scripture. |
+| Matthew 4:7 | Do not put the Lord your God to the test. | body | integrity | tempted | Direct answer to presumption disguised as faith. |
+| Matthew 4:10 | Worship and serve God alone. | soul | integrity | tempted | Centers exclusive worship when tempted by power. |
+| Matthew 5:3 | The poor in spirit are blessed; the kingdom is theirs. | soul | hope_faith_love | none | A foundational kingdom promise for humility before God. |
+| Matthew 5:4 | Those who mourn are blessed and will be comforted. | mind | hope_faith_love | grieving | Direct pastoral comfort for sorrow. |
+| Matthew 5:9 | Peacemakers are blessed as God's children. | body | walk | angry | Turns conflict energy toward peacemaking. |
+| Matthew 5:24 | First be reconciled, then offer your gift. | body | integrity | angry | Makes reconciliation concrete and embodied. |
+| Matthew 5:28 | Lustful looking is already heart-level adultery. | body | integrity | tempted | Names inward temptation honestly before it becomes action. |
+| Matthew 5:44 | Love enemies and pray for persecutors. | body | walk | angry | Offers Jesus's clearest command for anger and hostility. |
+| Matthew 6:14 | Forgive others and your Father will forgive you. | body | integrity | angry | Connects daily forgiveness with spiritual integrity. |
+| Matthew 6:25 | Do not worry about life, food, drink, or clothing. | mind | hope_faith_love | anxious | Anchor verse for anxious provision fears. |
+| Matthew 6:33 | Seek God's kingdom and righteousness first. | soul | walk | anxious | Reorders anxious striving toward trustful priority. |
+| Matthew 6:34 | Do not worry about tomorrow. | mind | hope_faith_love | anxious | Gives a simple daily boundary for worry. |
+| Matthew 7:12 | Do for others what you want them to do for you. | body | integrity | angry | Practical relational command that cools retaliation. |
+| Matthew 10:31 | Do not fear; you are worth more than many sparrows. | mind | hope_faith_love | anxious | Grounds courage in the Father's care. |
+| Matthew 11:28 | Come to me, all who labor, and I will give rest. | mind | hope_faith_love | grieving | Core rest promise for burdened users. |
+| Matthew 11:29 | Take my yoke and learn from me; find rest for your souls. | soul | walk | grieving | Comfort is joined to discipleship under Jesus. |
+| Matthew 16:24 | Deny yourself, take up your cross, and follow me. | body | walk | tempted | Calls the tempted will into costly discipleship. |
+| Matthew 19:26 | With God all things are possible. | mind | hope_faith_love | anxious | Offers hope where human ability has reached its limit. |
+| Matthew 26:41 | Watch and pray so you do not enter temptation. | body | integrity | tempted | Required anchor; practical resistance to temptation. |
+| Matthew 28:20 | I am with you always, to the end. | soul | walk | lonely | Jesus's abiding presence answers isolation. |
+| Mark 4:40 | Why are you afraid? Have you no faith? | mind | hope_faith_love | anxious | Storm context makes it apt for fear and panic. |
+| Mark 9:23 | All things are possible to the one who believes. | mind | hope_faith_love | anxious | Encourages faith amid helplessness. |
+| Mark 10:14 | Let the little children come to me; do not hinder them. | soul | hope_faith_love | lonely | Shows Jesus welcoming the small and easily excluded. |
+| Mark 10:27 | With God all things are possible. | mind | hope_faith_love | anxious | Reinforces trust where salvation and change feel impossible. |
+| Mark 11:24 | Pray believing that you receive what you ask. | soul | hope_faith_love | anxious | Directs anxiety into prayerful trust. |
+| Mark 11:25 | When praying, forgive anyone you hold anything against. | body | integrity | angry | Pairs prayer with release of resentment. |
+| Luke 7:13 | Do not weep. | mind | hope_faith_love | grieving | Jesus speaks compassion into a widow's grief. |
+| Luke 12:15 | Beware covetousness; life is not possessions. | body | integrity | tempted | Addresses material temptation without prosperity framing. |
+| Luke 12:32 | Fear not, little flock; the Father delights to give the kingdom. | mind | hope_faith_love | lonely | Tender reassurance for small, vulnerable believers. |
+| Luke 21:19 | By patience, preserve your souls. | mind | walk | tempted | Encourages endurance under pressure. |
+| Luke 22:40 | Pray that you do not enter temptation. | body | integrity | tempted | Gethsemane form of the required temptation anchor. |
+| Luke 23:43 | Today you will be with me in Paradise. | soul | hope_faith_love | grieving | Strong comfort at death without speculation beyond Jesus's words. |
+| John 4:14 | The water I give becomes a spring of eternal life. | soul | hope_faith_love | none | Spiritual thirst is answered in Christ. |
+| John 5:24 | Whoever hears and believes has eternal life. | soul | hope_faith_love | grieving | Assurance of life beyond judgment and death. |
+| John 6:35 | I am the bread of life; whoever comes to me will not hunger. | body | hope_faith_love | lonely | Speaks to deep need and welcome in embodied imagery. |
+| John 6:37 | Whoever comes to me I will never cast out. | soul | hope_faith_love | lonely | Direct answer to rejection and abandonment. |
+| John 8:12 | I am the light of the world; followers will have the light of life. | soul | word | none | Clear identity saying of Jesus for guidance. |
+| John 10:11 | I am the good shepherd who gives his life for the sheep. | soul | hope_faith_love | grieving | Christ's sacrificial care comforts the vulnerable. |
+| John 10:27 | My sheep hear my voice; I know them and they follow me. | soul | walk | lonely | Answers loneliness through being known by Jesus. |
+| John 11:25 | I am the resurrection and the life. | soul | hope_faith_love | grieving | Required anchor for grief and death. |
+| John 14:1 | Let not your heart be troubled; believe in God and in me. | mind | hope_faith_love | anxious | Required anchor for troubled hearts. |
+| John 14:6 | I am the way, the truth, and the life. | soul | word | none | Central Christological truth, clearly non-syncretic. |
+| John 14:15 | If you love me, keep my commandments. | body | integrity | tempted | Love for Jesus becomes obedient action. |
+| John 14:18 | I will not leave you orphaned; I will come to you. | soul | hope_faith_love | lonely | Required anchor for abandonment and loneliness. |
+| John 14:27 | My peace I give you; do not be troubled or afraid. | mind | hope_faith_love | anxious | Required anchor for Christian peace. |
+| John 15:5 | I am the vine; apart from me you can do nothing. | soul | walk | lonely | Communion with Christ is the source of fruitful life. |
+| John 15:12 | Love one another as I have loved you. | body | walk | angry | Redirects relational conflict toward Christlike love. |
+| John 16:22 | Your sorrow will turn to joy no one can take away. | mind | hope_faith_love | grieving | Pastoral promise for grief with future joy. |
+| John 16:33 | Take heart; I have overcome the world. | mind | hope_faith_love | anxious | Courage for trouble without denying trouble. |
 
-function loadBundledVerses(): Map<string, BundledVerse> {
-  const dataPath = join(__dirname, '../data/tamil-ov-nt.json');
-  if (!existsSync(dataPath)) {
-    console.error(`ERROR: Source data not found at ${dataPath}`);
-    process.exit(1);
-  }
-  let verses: BundledVerse[];
-  try {
-    verses = JSON.parse(readFileSync(dataPath, 'utf-8'));
-  } catch (e) {
-    console.error(`ERROR: Failed to parse ${dataPath} as JSON:`, (e as Error).message);
-    process.exit(1);
-  }
-  const byReference = new Map<string, BundledVerse>();
-  for (const v of verses) {
-    byReference.set(`${v.book}|${v.chapter}|${v.verse}`, v);
-  }
-  return byReference;
-}
+## Task 2 — Epic 2 copy
 
-// Tamil vowel signs can be represented as a single precomposed codepoint (NFC) or a base +
-// combining-mark sequence (NFD) — visually identical, but `!==` would treat them as different
-// text. Normalize both sides before comparing so "verbatim" actually means "same text," not
-// "same byte sequence."
-function normalize(text: string): string {
-  return text.normalize('NFC');
-}
+All copy below is DRAFT for Lawrence review. Do not paste into `locales/ta.json` until Lawrence approves or edits it.
 
-function validateQuote(quote: SeedQuote, bundled: Map<string, BundledVerse>): ValidationResult {
-  const problems: string[] = [];
-  const key = `${quote.book}|${quote.chapter}|${quote.verse}`;
-  const source = bundled.get(key);
+| Key | Tamil DRAFT | English back-translation |
+|---|---|---|
+| `about.nameMeaning.body` | ஆரோக்கியம் என்பது உடல் நலத்தை மட்டும் அல்ல; கிறிஸ்துவில் முழுமை, குணமடைதல், வாழ்வின் நலம் என்பதையும் நினைவுபடுத்தும் தமிழ் சொல். இந்த பெயர் ஆரோக்கிய மாதா / வேளாங்கண்ணி மரபில் பல தமிழ் கிறிஸ்தவர்களுக்கு பரிச்சயமானது; அதே நேரத்தில், இந்த ஆப் கத்தோலிக்கர், பிராட்டஸ்டண்ட், பெந்தெகொஸ்தே, CSI/ஆங்கிலிக்கன் உட்பட எல்லா தமிழ் கிறிஸ்தவர்களுக்கும் இயேசுவின் வார்த்தைகளுக்குத் திரும்ப உதவும் எளிய கருவி. | Arokia is not only bodily health; it is a Tamil word that also recalls wholeness, healing, and well-being of life in Christ. The name is familiar to many Tamil Christians through the Arokia Matha / Vailankanni heritage; at the same time, this app is a simple tool to help all Tamil Christians, including Catholic, Protestant, Pentecostal, and CSI/Anglican believers, return to the words of Jesus. |
+| `about.pillars.word` | இயேசுவின் சொந்த வார்த்தைகளை வேதாகமத்தில் இருப்பதுபோல கேட்டு வாசிப்பது. | To hear and read Jesus's own words as they stand in Scripture. |
+| `about.pillars.walk` | அவர் சொன்னதை நாள் தோறும் வாழ்வில் நடந்து காட்ட உதவுவது. | To help people walk out what He said in daily life. |
+| `about.pillars.hopeFaithLove` | கவலை, துக்கம், தனிமை நேரங்களில் நம்பிக்கை, விசுவாசம், அன்பில் நிலைநிற்க உதவுவது. | To help people stand in hope, faith, and love during anxiety, grief, and loneliness. |
+| `about.pillars.integrity` | வசனமும் பணமும் திருத்தங்களும் வெளிப்படையாகவும் உண்மையாயும் நடத்தப்படுவது. | To handle scripture, money, and corrections transparently and truthfully. |
+| `about.ecumenical.body` | ஆரோக்கியம் எந்த ஒரு சபை மரபையும் உயர்த்தவோ தாழ்த்தவோ செய்யாது; கத்தோலிக்கர், பிராட்டஸ்டண்ட், பெந்தெகொஸ்தே, CSI/ஆங்கிலிக்கன் மற்றும் எல்லா தமிழ் கிறிஸ்தவர்களும் இயேசுவின் வார்த்தைகளில் ஒன்றுபட உதவுவதே நோக்கம். | Arokia does not raise or lower any one church tradition; its purpose is to help Catholics, Protestants, Pentecostals, CSI/Anglicans, and all Tamil Christians unite around the words of Jesus. |
+| `about.correctionProcess.body` | இறையியல் கவலை ஒன்று சமர்ப்பிக்கப்பட்டால், அது பதிவு செய்யப்பட்டு 7 நாட்களுக்குள் மதிப்பாய்வு செய்யப்படும். திருத்தம் தேவை என உறுதிசெய்யப்பட்டால், வசனம் அல்லது ஒலி திருத்தப்பட்டு, மாற்றம் வெளிப்படையாக அறிவிக்கப்படும். | When a theological concern is submitted, it is recorded and reviewed within 7 days. If a correction is confirmed as needed, the verse or audio will be corrected and the change will be disclosed transparently. |
+| `privacy.body` | LEGAL DRAFT: ஆரோக்கியம் கணக்கு, உள்நுழைவு, அல்லது அடையாள இணைப்பு இல்லாமல் பயன்படுத்தப்படும் பெயரில்லா ஆப். உங்கள் விருப்ப அமைப்புகள் சாதனத்திலேயே இருக்கும். இறையியல் கவலை படிவத்தில் மின்னஞ்சல் கொடுத்தால், அந்தக் கவலைக்கு பதில் அளிக்க மட்டுமே அது பயன்படுத்தப்படும்; விளம்பரம், சந்தைப்படுத்தல், அல்லது உங்கள் அடையாளத்துடன் உள்ளடக்கத்தை இணைக்க பயன்படுத்தப்படாது. நன்கொடைச் செயல்முறையில் ரசீதுக்குத் தேவைப்படும் தகவல் Razorpay வழியாக தனியாக கையாளப்படும். | LEGAL DRAFT: Arokia is an anonymous app used without an account, login, or identity link. Your preference settings remain on the device. If you provide an email in the theological concern form, it is used only to respond to that concern; it is not used for advertising, marketing, or linking content to your identity. Information needed for donation receipts is handled separately through Razorpay. |
 
-  if (!source) {
-    problems.push(
-      `verse_reference does not resolve: "${quote.book} ${quote.chapter}:${quote.verse}" not found in bundled Tamil OV data`
-    );
-  } else if (normalize(source.text) !== normalize(quote.scriptureText)) {
-    problems.push(
-      `scriptureText is not verbatim — does not match the bundled Tamil OV source character-for-character`
-    );
-  }
+## Open questions & uncertainties for Lawrence
 
-  return { quote, ok: problems.length === 0, problems };
-}
-
-async function main() {
-  const shouldExecute = process.argv.includes('--execute');
-  const bundled = loadBundledVerses();
-
-  console.log(`\nValidating ${CURATED_QUOTES.length} quote(s) against data/tamil-ov-nt.json...\n`);
-
-  const results = CURATED_QUOTES.map((quote) => validateQuote(quote, bundled));
-  let allValid = true;
-
-  for (const result of results) {
-    const label = `${result.quote.book} ${result.quote.chapter}:${result.quote.verse}`;
-    if (result.ok) {
-      console.log(`  PASS  ${label}`);
-    } else {
-      allValid = false;
-      console.error(`  FAIL  ${label}`);
-      for (const problem of result.problems) {
-        console.error(`          ${problem}`);
-      }
-    }
-  }
-
-  if (!allValid) {
-    console.error('\nValidation failed — fix the problems above before seeding.');
-    process.exit(1);
-  }
-
-  console.log('\nAll quotes passed validation.');
-
-  if (!shouldExecute) {
-    console.log('Dry run only (no --execute flag) — nothing was written to Supabase.\n');
-    return;
-  }
-
-  const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceRoleKey) {
-    console.error(
-      '\nERROR: --execute requires EXPO_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in .env.local.'
-    );
-    process.exit(1);
-  }
-
-  const admin = createClient(supabaseUrl, serviceRoleKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-
-  const rows = CURATED_QUOTES.map((quote) => ({
-    practice_path: quote.practicePath,
-    product_pillar: quote.productPillar,
-    content_type: 'quote',
-    language_code: 'ta',
-    time_of_day: 'any',
-    mood_tag: quote.moodTag,
-    review_status: 'published',
-    verse_reference: `${quote.book} ${quote.chapter}:${quote.verse}`,
-    scripture_text: normalize(quote.scriptureText),
-  }));
-
-  const { error } = await admin.from('content_items').insert(rows);
-  if (error) {
-    console.error('\nERROR: insert failed:', error.message);
-    process.exit(1);
-  }
-
-  console.log(`\nInserted ${rows.length} row(s) into content_items.\n`);
-}
-
-main();
+- Please review whether `about.nameMeaning.body` should use `ஆரோக்கிய மாதா`, `ஆரோக்கிய அன்னை`, or both. I used `ஆரோக்கிய மாதா / வேளாங்கண்ணி` because the prompt named Arokia Matha, but Tamil Christian usage varies by denomination and region.
+- Please confirm whether Matthew 5:28 should remain in the MVP set. It is a direct word of Jesus and pastorally useful for `tempted`, but its sexual-temptation subject may be more direct than the first-release tone you want.
+- Luke 7:13 and Luke 22:40 are direct words of Jesus, but the single Tamil OV verse text includes narrative framing and ends with a comma. They were kept because the schema is single-verse and the words are clear; remove them if you want only verses that read as complete standalone sentences in Tamil.
+- Matthew 16:24 in the bundled Tamil OV text has no closing punctuation. This is verbatim from `data/tamil-ov-nt.json`; do not add punctuation during integration.
+- John 3:16 was intentionally excluded even though many red-letter editions treat it as Jesus speaking, because the Jesus/narrator speech boundary in John 3 is debated. John 8:11 was also excluded because the single verse includes another speaker's words before Jesus's response.
+- Distribution after curation: `practicePath` = mind 16, body 16, soul 18; `moodTag` = anxious 12, grieving 9, angry 7, lonely 8, tempted 10, none 4. This satisfies every mood target, but Lawrence may want more `none` verses for general browsing.
