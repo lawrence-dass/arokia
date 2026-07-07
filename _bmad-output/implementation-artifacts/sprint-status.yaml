@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-07-03 # re-sequenced: 1.6/1.7 device validation + 1.8 deferred to pre-Epic-4 gate; story 2-1 created (ready-for-dev)
+last_updated: 2026-07-06 # PR #6 merged: Epics 2 + 3 done (vow, about/privacy/concern, scripture components, browser, search, 50 quotes seeded)
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -63,21 +63,21 @@ development_status:
   # ─────────────────────────────────────────────────────────────────
   # Epic 2: Opening Vow, Integrity Layer & About
   # ─────────────────────────────────────────────────────────────────
-  epic-2: in-progress
-  2-1-opening-vow-first-launch-gate: review
-  2-2-returning-user-re-acknowledgment-and-vow-state-management: review
-  2-3-about-page-and-privacy-policy: review
-  2-4-theological-concern-submission-form: review
+  epic-2: done # merged PR #6 2026-07-06; FOLLOW-UPS: 2.4 acknowledgment email (FR31) not built (needs Resend + Edge Function); privacy copy is legal-draft, needs legal review before store submission
+  2-1-opening-vow-first-launch-gate: done
+  2-2-returning-user-re-acknowledgment-and-vow-state-management: done
+  2-3-about-page-and-privacy-policy: done
+  2-4-theological-concern-submission-form: done # form + anon insert done; automated ack email (FR31) deferred to email-provider fast-follow
   epic-2-retrospective: optional
 
   # ─────────────────────────────────────────────────────────────────
   # Epic 3: Scripture — The Word
   # ─────────────────────────────────────────────────────────────────
-  epic-3: in-progress
-  3-1-versetext-component-and-scripture-attribution-invariant: review
-  3-2-jesus-quotes-browser: review
-  3-3-scripture-content-search: review
-  3-4-content-seeding-50-jesus-quotes: review
+  epic-3: done # merged PR #6 2026-07-06; 50 red-letter Tamil quotes seeded live to Supabase
+  3-1-versetext-component-and-scripture-attribution-invariant: done
+  3-2-jesus-quotes-browser: done
+  3-3-scripture-content-search: done
+  3-4-content-seeding-50-jesus-quotes: done
   epic-3-retrospective: optional
 
   # ─────────────────────────────────────────────────────────────────
