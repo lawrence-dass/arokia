@@ -1,0 +1,116 @@
+{
+  "vow": {
+    "title": "Arokia",
+    "body": "This app is not Jesus Christ — it is only a tool that points to Him.",
+    "cta": "Amen — Begin",
+    "updatedNotice": "This vow has been updated — please read and accept it again."
+  },
+  "home": {
+    "mind": "Mind",
+    "body": "Body",
+    "soul": "Soul",
+    "todayContent": "Today's Meditation",
+    "tabLabel": "Home"
+  },
+  "audio": {
+    "play": "Play",
+    "pause": "Pause",
+    "sleepTimer": "Sleep Timer",
+    "speed": "Speed",
+    "downloading": "Downloading..."
+  },
+  "donation": {
+    "cta": "Donate",
+    "glassWall": "Glass-Wall Budget",
+    "glassWallUnavailable": "Budget information is currently unavailable.",
+    "payForward": "Pay-It-Forward 10%"
+  },
+  "about": {
+    "title": "About Arokia",
+    "linkLabel": "About Arokia",
+    "nameMeaning": {
+      "heading": "Meaning of the Name",
+      "body": "Arokia is not only bodily health; it is a Tamil word that also recalls wholeness, healing, and well-being of life in Christ. The name is familiar to many Tamil Christians through the Arokia Matha / Vailankanni heritage; at the same time, this app is a simple tool to help all Tamil Christians — Catholic, Protestant, Pentecostal, and CSI/Anglican — return to the words of Jesus."
+    },
+    "pillars": {
+      "heading": "The Four Pillars",
+      "word": "To hear and read Jesus's own words as they stand in Scripture.",
+      "walk": "To help people walk out what He said in daily life.",
+      "hopeFaithLove": "To help people stand in hope, faith, and love through anxiety, grief, and loneliness.",
+      "integrity": "To handle scripture, money, and corrections transparently and truthfully."
+    },
+    "ecumenical": {
+      "heading": "An Approach for Everyone",
+      "body": "Arokia does not raise or lower any one church tradition; its purpose is to help Catholics, Protestants, Pentecostals, CSI/Anglicans, and all Tamil Christians unite around the words of Jesus."
+    },
+    "correctionProcess": {
+      "heading": "Correction Disclosure Process",
+      "body": "When a theological concern is submitted, it is recorded and reviewed within 7 days. If a correction is confirmed as needed, the verse or audio is corrected and the change is disclosed transparently."
+    },
+    "privacyLink": "Privacy Policy"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "body": "Arokia is an anonymous app used without an account, login, or identity link. Your preference settings stay on the device. If you provide an email in the theological concern form, it is used only to reply about that concern; it is not used for advertising, marketing, or linking content to your identity. Information needed for donation receipts is handled separately through Razorpay."
+  },
+  "concern": {
+    "title": "Report a Theological Concern",
+    "linkLabel": "Report a theological concern",
+    "descriptionLabel": "Description of the concern",
+    "descriptionPlaceholder": "Describe your concern here",
+    "emailLabel": "Email (optional)",
+    "emailPlaceholder": "Enter your email to receive a reply",
+    "invalidEmail": "The email is not valid",
+    "submitCta": "Submit",
+    "confirmationTitle": "Thank you",
+    "confirmationBody": "Your concern has been received. It will be reviewed within 7 days."
+  },
+  "errors": {
+    "offline": "No connection",
+    "notFound": "Page not found",
+    "backHome": "Return home"
+  },
+  "word": {
+    "title": "The Words of Jesus",
+    "linkLabel": "View the words of Jesus",
+    "loading": "Loading...",
+    "empty": "No quotes available yet",
+    "shareCta": "Share"
+  },
+  "walk": {
+    "title": "Meditations",
+    "loading": "Loading...",
+    "empty": "No meditations available yet"
+  },
+  "mood": {
+    "anxious": "Anxious",
+    "grieving": "Grieving",
+    "angry": "Angry",
+    "lonely": "Lonely",
+    "tempted": "Tempted"
+  },
+  "search": {
+    "title": "Search",
+    "linkLabel": "Search",
+    "placeholder": "Search for a word",
+    "searching": "Searching...",
+    "empty": "No matching verses",
+    "error": "Search failed. Please try again."
+  },
+  "spikes": {
+    "routeLabel": "Spike",
+    "title": "Technical Spikes",
+    "subtitle": "A screen to validate Tamil rendering, audio, offline cache, and the payment flow on a device.",
+    "tamilRendering": {
+      "title": "Tamil Rendering Test",
+      "phrase": "வருத்தப்பட்டுப் பாரஞ்சுமக்கிறவர்களே",
+      "instruction": "Check that this text renders correctly at 320dp width, with no glyph fallback or breakage."
+    },
+    "deviceChecklist": {
+      "title": "Device Checklist",
+      "ios": "View on a real device running iOS 16 or above.",
+      "android": "View on a real device running Android 11 or above.",
+      "record": "Record the results in docs/SPIKES_VALIDATION.md."
+    }
+  }
+}
