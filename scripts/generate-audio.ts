@@ -144,10 +144,17 @@ async function main() {
   const before = await showCredits();
   const beforeUsed = before?.used ?? null;
 
+  // Meditation-tuned: slower pacing + high stability for a calm, unhurried, consistent read.
+  // speed 0.7–1.2 (1 = normal); --speed overrides.
+  const speed = Number(opt('--speed') ?? '0.85');
   const res = await fetch(`${API}/text-to-speech/${voiceId}?output_format=${OUTPUT_FORMAT}`, {
     method: 'POST',
     headers: { 'xi-api-key': requireKey(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, model_id: MODEL }),
+    body: JSON.stringify({
+      text,
+      model_id: MODEL,
+      voice_settings: { stability: 0.6, similarity_boost: 0.75, style: 0, speed },
+    }),
   });
   if (!res.ok) {
     console.error(
