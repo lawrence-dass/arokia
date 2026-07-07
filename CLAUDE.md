@@ -7,6 +7,18 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Never add `Co-Authored-By` or any Claude/AI attribution lines to commit messages. Commits are authored by Lawrence only.
 - Never commit directly to `main`. Always create a feature branch (e.g. `feat/story-1-2-supabase-schema`) before committing, and open a PR from that branch.
 
+## Working Style & Context Hygiene
+
+Keep the working context lean — it fills fast and forces lossy summarization.
+
+- **Targeted reads.** Read only the section you need (offset/limit, or `grep` for it). Never dump whole large files (the 1000-line seed script, 600-line content docs). Don't re-read files already in context.
+- **Subagents for fan-out.** Use Explore/general-purpose subagents for multi-file investigation so their token-heavy reads stay out of the main thread — only the conclusion returns.
+- **Pipe command output** through `tail`/`grep`/`head`; never print full logs or large query dumps.
+- **Persist, don't re-derive.** Keep `_bmad-output/CURRENT.md` + memory current so a fresh session resumes cheaply.
+- **Compact at milestones.** When an epic/PR merges and context is heavy, hand off via `CURRENT.md` and start a fresh/compacted session rather than pushing one session huge.
+
+When proposing options, always end with a recommendation grounded in **production best practice** (how real teams ship: maintainability, security, standard patterns) — a slight honest steer, not a survey.
+
 ## Project Layout
 
 The repo root and the Expo app root are the same directory. All `npm` commands run from the repo root.
