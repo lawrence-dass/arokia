@@ -12,7 +12,7 @@ export type ProductPillar = 'word' | 'walk' | 'hope_faith_love' | 'integrity';
 export type ContentType = 'quote' | 'meditation' | 'lectio' | 'sleep' | 'breathwork';
 export type TimeOfDay = 'morning' | 'evening' | 'any';
 export type MoodTag = 'anxious' | 'grieving' | 'angry' | 'lonely' | 'tempted' | 'none';
-export type LanguageCode = 'ta' | 'hi' | 'te';
+export type LanguageCode = 'ta' | 'en' | 'hi' | 'te';
 export type ReviewStatus =
   | 'draft'
   | 'source_verified'
