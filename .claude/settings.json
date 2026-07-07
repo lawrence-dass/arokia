@@ -8,5 +8,16 @@
       "Bash(curl *)",
       "Bash(wget *)"
     ]
+  },
+  "extraKnownMarketplaces": {
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "juliusbrussee/caveman"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "caveman@caveman": true
   }
 }

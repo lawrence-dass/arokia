@@ -10,3 +10,33 @@
 - **No runtime schema validation at Supabase boundary**: All Supabase results are type-asserted (`data as RowType[]`) with no Zod validation layer. Schema drift will cause silent runtime failures. Consider a Zod validation pass in a future story.
 - **`logEvent` silently swallows insert errors**: Analytics insert errors are `console.error`'d but not thrown or returned. Accepted trade-off — analytics is non-critical path.
 - **Concurrent `fetchQuotes` / `fetchMeditations` share a single `isLoading` flag**: Two async store actions share one loading flag, creating a race condition when both fire concurrently (spinner dismissed while second fetch still in flight). Fix requires adding per-action loading flags, which changes the spec-mandated `ContentState` interface.
+
+## Deferred from: code review of 2-1-opening-vow-first-launch-gate (2026-07-04)
+
+- **`Stack.Protected` guard allowlist fails open for forgotten routes**: `app/_layout.tsx` gates screens by explicitly listing them inside a `guard={vowAcknowledged}` block; expo-router only excludes routes named inside a *false*-guarded `Stack.Protected` — any future route file not added to that block renders unguarded with no compile-time or runtime signal. Every new Epic 3+ content screen must be added to the guarded block by hand. Consider a structural fix (e.g. an `app/(gated)/` route group owning the guard) before Epic 3 adds enough screens that a miss becomes likely.
+- **`onRehydrateStorage` write-through on every cold start**: `setHasHydrated(true)` goes through the same `set` as persisted fields, so `persist` re-serializes and re-writes `arokia-prefs` to AsyncStorage on every launch even when no persisted value changed. Minor (one small write per launch); worth a `skipHydration`-based or non-persisted-field-aware fix if more state gets added to `prefsStore`.
+
+## Deferred from: code review of 2-2-returning-user-re-acknowledgment-and-vow-state-management (2026-07-04)
+
+- **Re-vow gate can't detect an EAS OTA update**: `constants/vow.ts`'s `needsReVow()` keys off `Constants.expoConfig?.version` (the native `app.json` version), which an EAS Update (OTA JS-bundle push) does not bump. A vow-text correction shipped via OTA without a native version bump would never trigger re-acknowledgment for already-acknowledged users. Out of Story 2.2's scope (the epic's AC only describes app-version-triggered re-vow); if OTA-only vow corrections become a real workflow, this needs a second signal (e.g. a runtime-config value bumped independently of `expo.version`).
+- **No validation that `VOW_REQUIRED_VERSIONS` entries match `app.json`'s version format**: entries are matched by exact string equality with no normalization (e.g. `'1.1'` vs `'1.1.0'`, stray whitespace). A typo silently disables the re-vow prompt for that release with no test, lint, or runtime signal. Acceptable for now given the array is operator-edited rarely and reviewed in PR; worth a lint rule or startup assertion (e.g. verifying array entries look like semver) if this becomes error-prone in practice.
+
+## Deferred from: implementation of 2-4-theological-concern-submission-form (2026-07-04)
+
+- **No automated acknowledgment email for concern submissions (FR31)**: `theological_concerns` rows insert successfully via `lib/concerns.ts:submitConcern()` and the user sees an in-app confirmation with the 7-day SLA message, but no email is actually sent to `submitter_email`. `architecture.md` already designates the fix — a `supabase/functions/concern-notification/` Edge Function triggered by a DB webhook on `theological_concerns` INSERT — but no email provider (Resend/SendGrid/etc.) has been chosen and no API key exists. Needs Lawrence to pick a provider and supply credentials before this Edge Function can be built; not blocking the form itself.
+- **No `submitter_name` field**: `epics.md`'s Story 2.4 AC lists an optional "name" field, but the already-implemented `theological_concerns` schema and `submitConcern()` signature only support `description` + optional `email` (no name column). Adding one needs a new migration — out of scope for a mobile/unattended session per policy. If a name field is wanted, add the column + update `submitConcern()`'s signature + the form together.
+
+## Deferred from: implementation of 4-2-meditation-library-browse-by-practice-path-and-emotional-state (2026-07-04)
+
+- **Lectio Divina ("Silence Between Words") not discoverable from the Soul path (AC5)**: `architecture.md` designates a dedicated `app/lectio-divina.tsx` route for this distinct silence-based practice — building it is fundamentally audio-player-core work (Story 4.3/4.4 territory), which is gated behind RNTP device validation. Revisit once that gate clears and the route can actually be built, rather than linking to a route that doesn't exist.
+- **Meditation duration not shown anywhere**: `ContentItem` has no `duration` field; it lives on `audio_assets.duration_sec`, unjoined by `getMeditations()`/`getQuotes()`. No meditation has an `audio_asset_id` yet (Story 4.6 hasn't run), so there's nothing to display regardless. Add the join + a `durationSec` field once real audio exists.
+
+## Deferred from: PR #6 walkthrough (2026-07-06)
+
+- **Epic 4 — moods must be path-specific, not the same 5 under Mind/Body/Soul.** Current meditation-library
+  scaffolding shows the emotional-state library (anxious/grieving/angry/lonely/tempted) under all three
+  practice paths. Per PRD, that mood library belongs under **Mind**; **Body** needs its own categories
+  (rest/movement/breathwork/sleep) and **Soul** its own (prayer/Lectio Divina/silence/communion).
+  practice_path and mood_tag are separate axes — the UI must reflect that. Fix in Epic 4 meditation library.
+- **Meditations not seeded.** Only the 50 `quote` rows exist; `content_type='meditation'` rows (the 21 audio
+  tracks) come with Epic 4 + the audio pipeline, so meditation lists render empty today (expected, not a bug).

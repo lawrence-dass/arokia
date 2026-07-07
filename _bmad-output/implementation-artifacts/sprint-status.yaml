@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-07-03 # re-sequenced: 1.6/1.7 device validation + 1.8 deferred to pre-Epic-4 gate; jumping to Epic 2
+last_updated: 2026-07-03 # re-sequenced: 1.6/1.7 device validation + 1.8 deferred to pre-Epic-4 gate; story 2-1 created (ready-for-dev)
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -63,29 +63,29 @@ development_status:
   # ─────────────────────────────────────────────────────────────────
   # Epic 2: Opening Vow, Integrity Layer & About
   # ─────────────────────────────────────────────────────────────────
-  epic-2: backlog
-  2-1-opening-vow-first-launch-gate: backlog
-  2-2-returning-user-re-acknowledgment-and-vow-state-management: backlog
-  2-3-about-page-and-privacy-policy: backlog
-  2-4-theological-concern-submission-form: backlog
+  epic-2: in-progress
+  2-1-opening-vow-first-launch-gate: review
+  2-2-returning-user-re-acknowledgment-and-vow-state-management: review
+  2-3-about-page-and-privacy-policy: review
+  2-4-theological-concern-submission-form: review
   epic-2-retrospective: optional
 
   # ─────────────────────────────────────────────────────────────────
   # Epic 3: Scripture — The Word
   # ─────────────────────────────────────────────────────────────────
-  epic-3: backlog
-  3-1-versetext-component-and-scripture-attribution-invariant: backlog
-  3-2-jesus-quotes-browser: backlog
-  3-3-scripture-content-search: backlog
-  3-4-content-seeding-50-jesus-quotes: backlog
+  epic-3: in-progress
+  3-1-versetext-component-and-scripture-attribution-invariant: review
+  3-2-jesus-quotes-browser: review
+  3-3-scripture-content-search: review
+  3-4-content-seeding-50-jesus-quotes: review
   epic-3-retrospective: optional
 
   # ─────────────────────────────────────────────────────────────────
   # Epic 4: Triune Daily Practice — The Walk
   # ─────────────────────────────────────────────────────────────────
-  epic-4: backlog
-  4-1-triune-home-screen-mind-body-soul-navigation: backlog
-  4-2-meditation-library-browse-by-practice-path-and-emotional-state: backlog
+  epic-4: in-progress
+  4-1-triune-home-screen-mind-body-soul-navigation: review
+  4-2-meditation-library-browse-by-practice-path-and-emotional-state: review
   4-3-audio-player-core-playback-with-background-and-lockscreen-controls: backlog
   4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off: backlog
   4-5-offline-content-download-progressive-cache-and-manual-download: backlog

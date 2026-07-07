@@ -1,6 +1,8 @@
 import * as Sentry from '@sentry/react-native';
+import type { SQLiteDatabase } from 'expo-sqlite';
 
 import { supabase } from '@/lib/supabase';
+import { searchScripture, searchScriptureByBook } from '@/lib/sqlite';
 import type {
   ContentItem,
   LanguageCode,
@@ -10,6 +12,7 @@ import type {
   ContentType,
   TimeOfDay,
   ReviewStatus,
+  ScriptureVerse,
 } from '@/types';
 
 interface ContentItemRow {
@@ -76,7 +79,9 @@ export async function getQuotes(
 
 export async function getMeditations(
   lang: LanguageCode,
-  practicePath?: PracticePath
+  practicePath?: PracticePath,
+  moodTag?: MoodTag,
+  timeOfDay?: TimeOfDay
 ): Promise<ContentItem[]> {
   let query = supabase
     .from('content_items')
@@ -86,6 +91,10 @@ export async function getMeditations(
     .eq('content_type', 'meditation');
 
   if (practicePath) query = query.eq('practice_path', practicePath);
+  if (moodTag && moodTag !== 'none') query = query.eq('mood_tag', moodTag);
+  // v1 always passes 'any' (every MVP row's time_of_day is 'any' too, so this is a no-op filter
+  // today) — the parameter exists so v1.1's Kaalai/Maalai filtering needs no signature change.
+  if (timeOfDay) query = query.eq('time_of_day', timeOfDay);
 
   const { data, error } = await query;
   if (error) {
@@ -96,20 +105,26 @@ export async function getMeditations(
   return ((data ?? []) as ContentItemRow[]).map(transformContentItem);
 }
 
-export async function searchContent(lang: LanguageCode, query: string): Promise<ContentItem[]> {
+// Searches the full bundled scripture text (Expo SQLite FTS), not the curated content_items
+// catalog — see Story 3.3's Scope Note. Tamil FTS is tried first and wins if it returns
+// anything; an English-looking query (Latin characters) that gets zero Tamil matches falls back
+// to a book-name match, since no English scripture text is bundled to search directly.
+export async function searchContent(
+  db: SQLiteDatabase,
+  lang: LanguageCode,
+  query: string
+): Promise<ScriptureVerse[]> {
   if (!query.trim()) return [];
-  const escaped = query.replace(/%/g, '\\%').replace(/_/g, '\\_');
-  const { data, error } = await supabase
-    .from('content_items')
-    .select('*')
-    .eq('language_code', lang)
-    .eq('review_status', 'published')
-    .ilike('title', `%${escaped}%`);
 
-  if (error) {
+  try {
+    const tamilResults = await searchScripture(db, query, lang);
+    if (tamilResults.length > 0 || !/[a-zA-Z]/.test(query)) {
+      return tamilResults;
+    }
+    return await searchScriptureByBook(db, query, lang);
+  } catch (error) {
     console.error('[content] searchContent error:', error);
     Sentry.captureException(error);
     throw error;
   }
-  return ((data ?? []) as ContentItemRow[]).map(transformContentItem);
 }

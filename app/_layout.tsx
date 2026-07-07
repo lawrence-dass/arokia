@@ -7,8 +7,14 @@ import { useEffect } from 'react';
 import { SQLiteProvider } from 'expo-sqlite';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Stack } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 
 import { initSchema } from '@/lib/sqlite';
+import { usePrefsStore, useVowGate } from '@/store/prefsStore';
+
+// Held open until prefsStore finishes hydrating, so the vow/home guard never flashes
+// the wrong screen and the app never shows a blank frame while AsyncStorage is read.
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 Sentry.init({
   dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
@@ -53,9 +59,18 @@ async function setupRNTP() {
 }
 
 export default function Layout() {
+  const hasHydrated = usePrefsStore((state) => state._hasHydrated);
+  const { vowSatisfied } = useVowGate();
+
   useEffect(() => {
     setupRNTP();
   }, []);
+
+  useEffect(() => {
+    if (hasHydrated) {
+      SplashScreen.hideAsync().catch(() => {});
+    }
+  }, [hasHydrated]);
 
   return (
     <SafeAreaProvider>
@@ -64,7 +79,31 @@ export default function Layout() {
         assetSource={{ assetId: require('@/assets/db/scripture.db') }}
         onInit={initSchema}
         onError={(e) => console.error('[SQLite] DB failed to open:', e)}>
-        <Stack screenOptions={{ headerShown: false }} />
+        <Stack screenOptions={{ headerShown: false }}>
+          {/* Pre-vow screens (reachable before acknowledgment, or when a re-vow is required
+              after a significant update — see constants/vow.ts) go here. Declared first so that on
+              a guarded cold start (URL "/" resolves into the guarded (tabs) group), the router's
+              fallback anchor is the vow screen, not an unguarded utility route. */}
+          <Stack.Protected guard={!vowSatisfied}>
+            <Stack.Screen name="vow" />
+          </Stack.Protected>
+          {/* Post-vow content screens go here — every new route must be added to this
+              block or it renders unguarded (expo-router only excludes routes explicitly
+              listed inside a false-guarded Stack.Protected). */}
+          <Stack.Protected guard={vowSatisfied}>
+            <Stack.Screen name="(tabs)" />
+            <Stack.Screen name="spikes" />
+            <Stack.Screen name="about" />
+            <Stack.Screen name="report-concern" />
+            <Stack.Screen name="verse/[id]" />
+            <Stack.Screen name="search" />
+            <Stack.Screen name="meditation/[id]" />
+          </Stack.Protected>
+          {/* Always reachable, regardless of vow state — FR5 requires the Privacy Policy to be
+              accessible before the Opening Vow is acknowledged. Declared LAST so it never becomes
+              the initial/fallback route; being unguarded, its position does not affect reachability. */}
+          <Stack.Screen name="privacy" />
+        </Stack>
       </SQLiteProvider>
     </SafeAreaProvider>
   );
