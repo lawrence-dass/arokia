@@ -1,19 +1,19 @@
 /**
- * Story 3.4 seed script.
- * Run: node --env-file=.env.local --loader tsx scripts/seed-content.ts [--execute]
+ * Story 3.4 seed script (multi-language).
+ * Run: node --env-file=.env.local --import tsx scripts/seed-content.ts [--lang ta|en] [--execute] [--force]
  *
- * Without --execute, this is a dry run: validates every quote in CURATED_QUOTES against the
- * bundled Tamil OV data (verbatim text + valid verse reference) and prints a report — it writes
- * nothing to Supabase and does not require any credentials.
+ * --lang selects the language pack (default 'ta'): 'ta' = 50 Tamil OV quotes validated against
+ * data/tamil-ov-nt.json; 'en' = 50 KJV quotes validated against data/kjv-nt.json.
  *
- * With --execute, it additionally inserts the validated rows into content_items. This requires
- * SUPABASE_SERVICE_ROLE_KEY in .env.local (content_items has no anon INSERT policy) — a
- * Lawrence-handled credential, never used in the app binary.
+ * Without --execute, this is a dry run: validates every quote (verse reference resolves + text is
+ * verbatim vs the language source) and prints a report — writes nothing, needs no credentials.
  *
- * CURATED DATA: CURATED_QUOTES holds the 50 MVP red-letter Jesus quotes, verbatim from the
- * bundled Tamil OV NT (data/tamil-ov-nt.json) and validated by the dry run below. Run --execute
- * (with SUPABASE_SERVICE_ROLE_KEY) only after Lawrence approves the review sheet in
- * docs/content/CONTENT-RESEARCH-OUTPUT.md.
+ * With --execute, it inserts the validated rows into content_items (language_code = --lang).
+ * Requires SUPABASE_SERVICE_ROLE_KEY in .env.local — a Lawrence-handled credential, never in the
+ * app binary. Refuses to run if that language's quotes already exist (pass --force to override).
+ *
+ * Run --execute only after Lawrence approves the review sheet:
+ * docs/content/CONTENT-RESEARCH-OUTPUT.md (ta) / docs/content/CONTENT-RESEARCH-OUTPUT-EN.md (en).
  */
 
 import { readFileSync, existsSync } from 'fs';
@@ -40,7 +40,7 @@ interface SeedQuote {
 // The 50 curated MVP red-letter Jesus quotes — verbatim from the bundled Tamil OV NT
 // (data/tamil-ov-nt.json), validated by the dry run in main(). Sourced via the Codex research
 // handoff docs/content/CONTENT-RESEARCH-OUTPUT.md (which holds Lawrence's theological review sheet).
-const CURATED_QUOTES: SeedQuote[] = [
+const CURATED_QUOTES_TA: SeedQuote[] = [
   {
     book: 'Matthew',
     chapter: 4,
@@ -536,14 +536,505 @@ const CURATED_QUOTES: SeedQuote[] = [
   },
 ];
 
+const CURATED_QUOTES_EN: SeedQuote[] = [
+  {
+    book: 'Matthew',
+    chapter: 4,
+    verse: 4,
+    scriptureText:
+      'But he answered and said, It is written, Man shall not live by bread alone, but by every word that proceedeth out of the mouth of God.',
+    practicePath: 'body',
+    productPillar: 'word',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Matthew',
+    chapter: 4,
+    verse: 7,
+    scriptureText:
+      'Jesus said unto him, It is written again, Thou shalt not tempt the Lord thy God.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Matthew',
+    chapter: 4,
+    verse: 10,
+    scriptureText:
+      'Then saith Jesus unto him, Get thee hence, Satan: for it is written, Thou shalt worship the Lord thy God, and him only shalt thou serve.',
+    practicePath: 'soul',
+    productPillar: 'integrity',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Matthew',
+    chapter: 5,
+    verse: 3,
+    scriptureText: 'Blessed are the poor in spirit: for theirs is the kingdom of heaven.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'none',
+  },
+  {
+    book: 'Matthew',
+    chapter: 5,
+    verse: 4,
+    scriptureText: 'Blessed are they that mourn: for they shall be comforted.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'Matthew',
+    chapter: 5,
+    verse: 9,
+    scriptureText: 'Blessed are the peacemakers: for they shall be called the children of God.',
+    practicePath: 'body',
+    productPillar: 'walk',
+    moodTag: 'angry',
+  },
+  {
+    book: 'Matthew',
+    chapter: 5,
+    verse: 24,
+    scriptureText:
+      'Leave there thy gift before the altar, and go thy way; first be reconciled to thy brother, and then come and offer thy gift.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'angry',
+  },
+  {
+    book: 'Matthew',
+    chapter: 5,
+    verse: 28,
+    scriptureText:
+      'But I say unto you, That whosoever looketh on a woman to lust after her hath committed adultery with her already in his heart.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Matthew',
+    chapter: 5,
+    verse: 44,
+    scriptureText:
+      'But I say unto you, Love your enemies, bless them that curse you, do good to them that hate you, and pray for them which despitefully use you, and persecute you;',
+    practicePath: 'body',
+    productPillar: 'walk',
+    moodTag: 'angry',
+  },
+  {
+    book: 'Matthew',
+    chapter: 6,
+    verse: 14,
+    scriptureText:
+      'For if ye forgive men their trespasses, your heavenly Father will also forgive you:',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'angry',
+  },
+  {
+    book: 'Matthew',
+    chapter: 6,
+    verse: 25,
+    scriptureText:
+      'Therefore I say unto you, Take no thought for your life, what ye shall eat, or what ye shall drink; nor yet for your body, what ye shall put on. Is not the life more than meat, and the body than raiment?',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Matthew',
+    chapter: 6,
+    verse: 33,
+    scriptureText:
+      'But seek ye first the kingdom of God, and his righteousness; and all these things shall be added unto you.',
+    practicePath: 'soul',
+    productPillar: 'walk',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Matthew',
+    chapter: 6,
+    verse: 34,
+    scriptureText:
+      'Take therefore no thought for the morrow: for the morrow shall take thought for the things of itself. Sufficient unto the day is the evil thereof.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Matthew',
+    chapter: 7,
+    verse: 12,
+    scriptureText:
+      'Therefore all things whatsoever ye would that men should do to you, do ye even so to them: for this is the law and the prophets.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'angry',
+  },
+  {
+    book: 'Matthew',
+    chapter: 10,
+    verse: 31,
+    scriptureText: 'Fear ye not therefore, ye are of more value than many sparrows.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Matthew',
+    chapter: 11,
+    verse: 28,
+    scriptureText:
+      'Come unto me, all ye that labour and are heavy laden, and I will give you rest.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'Matthew',
+    chapter: 11,
+    verse: 29,
+    scriptureText:
+      'Take my yoke upon you, and learn of me; for I am meek and lowly in heart: and ye shall find rest unto your souls.',
+    practicePath: 'soul',
+    productPillar: 'walk',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'Matthew',
+    chapter: 16,
+    verse: 24,
+    scriptureText:
+      'Then said Jesus unto his disciples, If any man will come after me, let him deny himself, and take up his cross, and follow me.',
+    practicePath: 'body',
+    productPillar: 'walk',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Matthew',
+    chapter: 19,
+    verse: 26,
+    scriptureText:
+      'But Jesus beheld them, and said unto them, With men this is impossible; but with God all things are possible.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Matthew',
+    chapter: 26,
+    verse: 41,
+    scriptureText:
+      'Watch and pray, that ye enter not into temptation: the spirit indeed is willing, but the flesh is weak.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Matthew',
+    chapter: 28,
+    verse: 20,
+    scriptureText:
+      'Teaching them to observe all things whatsoever I have commanded you: and, lo, I am with you alway, even unto the end of the world. Amen.',
+    practicePath: 'soul',
+    productPillar: 'walk',
+    moodTag: 'lonely',
+  },
+  {
+    book: 'Mark',
+    chapter: 4,
+    verse: 40,
+    scriptureText: 'And he said unto them, Why are ye so fearful? how is it that ye have no faith?',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Mark',
+    chapter: 9,
+    verse: 23,
+    scriptureText:
+      'Jesus said unto him, If thou canst believe, all things are possible to him that believeth.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Mark',
+    chapter: 10,
+    verse: 14,
+    scriptureText:
+      'But when Jesus saw it, he was much displeased, and said unto them, Suffer the little children to come unto me, and forbid them not: for of such is the kingdom of God.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'lonely',
+  },
+  {
+    book: 'Mark',
+    chapter: 10,
+    verse: 27,
+    scriptureText:
+      'And Jesus looking upon them saith, With men it is impossible, but not with God: for with God all things are possible.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Mark',
+    chapter: 11,
+    verse: 24,
+    scriptureText:
+      'Therefore I say unto you, What things soever ye desire, when ye pray, believe that ye receive them, and ye shall have them.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'Mark',
+    chapter: 11,
+    verse: 25,
+    scriptureText:
+      'And when ye stand praying, forgive, if ye have ought against any: that your Father also which is in heaven may forgive you your trespasses.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'angry',
+  },
+  {
+    book: 'Luke',
+    chapter: 7,
+    verse: 13,
+    scriptureText:
+      'And when the Lord saw her, he had compassion on her, and said unto her, Weep not.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'Luke',
+    chapter: 12,
+    verse: 15,
+    scriptureText:
+      'And he said unto them, Take heed, and beware of covetousness: for a man’s life consisteth not in the abundance of the things which he possesseth.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Luke',
+    chapter: 12,
+    verse: 32,
+    scriptureText:
+      'Fear not, little flock; for it is your Father’s good pleasure to give you the kingdom.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'lonely',
+  },
+  {
+    book: 'Luke',
+    chapter: 21,
+    verse: 19,
+    scriptureText: 'In your patience possess ye your souls.',
+    practicePath: 'mind',
+    productPillar: 'walk',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Luke',
+    chapter: 22,
+    verse: 40,
+    scriptureText:
+      'And when he was at the place, he said unto them, Pray that ye enter not into temptation.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'Luke',
+    chapter: 23,
+    verse: 43,
+    scriptureText:
+      'And Jesus said unto him, Verily I say unto thee, To day shalt thou be with me in paradise.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'John',
+    chapter: 4,
+    verse: 14,
+    scriptureText:
+      'But whosoever drinketh of the water that I shall give him shall never thirst; but the water that I shall give him shall be in him a well of water springing up into everlasting life.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'none',
+  },
+  {
+    book: 'John',
+    chapter: 5,
+    verse: 24,
+    scriptureText:
+      'Verily, verily, I say unto you, He that heareth my word, and believeth on him that sent me, hath everlasting life, and shall not come into condemnation; but is passed from death unto life.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'John',
+    chapter: 6,
+    verse: 35,
+    scriptureText:
+      'And Jesus said unto them, I am the bread of life: he that cometh to me shall never hunger; and he that believeth on me shall never thirst.',
+    practicePath: 'body',
+    productPillar: 'hope_faith_love',
+    moodTag: 'lonely',
+  },
+  {
+    book: 'John',
+    chapter: 6,
+    verse: 37,
+    scriptureText:
+      'All that the Father giveth me shall come to me; and him that cometh to me I will in no wise cast out.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'lonely',
+  },
+  {
+    book: 'John',
+    chapter: 8,
+    verse: 12,
+    scriptureText:
+      'Then spake Jesus again unto them, saying, I am the light of the world: he that followeth me shall not walk in darkness, but shall have the light of life.',
+    practicePath: 'soul',
+    productPillar: 'word',
+    moodTag: 'none',
+  },
+  {
+    book: 'John',
+    chapter: 10,
+    verse: 11,
+    scriptureText: 'I am the good shepherd: the good shepherd giveth his life for the sheep.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'John',
+    chapter: 10,
+    verse: 27,
+    scriptureText: 'My sheep hear my voice, and I know them, and they follow me:',
+    practicePath: 'soul',
+    productPillar: 'walk',
+    moodTag: 'lonely',
+  },
+  {
+    book: 'John',
+    chapter: 11,
+    verse: 25,
+    scriptureText:
+      'Jesus said unto her, I am the resurrection, and the life: he that believeth in me, though he were dead, yet shall he live:',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'John',
+    chapter: 14,
+    verse: 1,
+    scriptureText: 'Let not your heart be troubled: ye believe in God, believe also in me.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'John',
+    chapter: 14,
+    verse: 6,
+    scriptureText:
+      'Jesus saith unto him, I am the way, the truth, and the life: no man cometh unto the Father, but by me.',
+    practicePath: 'soul',
+    productPillar: 'word',
+    moodTag: 'none',
+  },
+  {
+    book: 'John',
+    chapter: 14,
+    verse: 15,
+    scriptureText: 'If ye love me, keep my commandments.',
+    practicePath: 'body',
+    productPillar: 'integrity',
+    moodTag: 'tempted',
+  },
+  {
+    book: 'John',
+    chapter: 14,
+    verse: 18,
+    scriptureText: 'I will not leave you comfortless: I will come to you.',
+    practicePath: 'soul',
+    productPillar: 'hope_faith_love',
+    moodTag: 'lonely',
+  },
+  {
+    book: 'John',
+    chapter: 14,
+    verse: 27,
+    scriptureText:
+      'Peace I leave with you, my peace I give unto you: not as the world giveth, give I unto you. Let not your heart be troubled, neither let it be afraid.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+  {
+    book: 'John',
+    chapter: 15,
+    verse: 5,
+    scriptureText:
+      'I am the vine, ye are the branches: He that abideth in me, and I in him, the same bringeth forth much fruit: for without me ye can do nothing.',
+    practicePath: 'soul',
+    productPillar: 'walk',
+    moodTag: 'lonely',
+  },
+  {
+    book: 'John',
+    chapter: 15,
+    verse: 12,
+    scriptureText: 'This is my commandment, That ye love one another, as I have loved you.',
+    practicePath: 'body',
+    productPillar: 'walk',
+    moodTag: 'angry',
+  },
+  {
+    book: 'John',
+    chapter: 16,
+    verse: 22,
+    scriptureText:
+      'And ye now therefore have sorrow: but I will see you again, and your heart shall rejoice, and your joy no man taketh from you.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'grieving',
+  },
+  {
+    book: 'John',
+    chapter: 16,
+    verse: 33,
+    scriptureText:
+      'These things I have spoken unto you, that in me ye might have peace. In the world ye shall have tribulation: but be of good cheer; I have overcome the world.',
+    practicePath: 'mind',
+    productPillar: 'hope_faith_love',
+    moodTag: 'anxious',
+  },
+];
+
 interface ValidationResult {
   quote: SeedQuote;
   ok: boolean;
   problems: string[];
 }
 
-function loadBundledVerses(): Map<string, BundledVerse> {
-  const dataPath = join(__dirname, '../data/tamil-ov-nt.json');
+function loadSourceVerses(sourceFile: string): Map<string, BundledVerse> {
+  const dataPath = join(__dirname, '..', sourceFile);
   if (!existsSync(dataPath)) {
     console.error(`ERROR: Source data not found at ${dataPath}`);
     process.exit(1);
@@ -562,43 +1053,68 @@ function loadBundledVerses(): Map<string, BundledVerse> {
   return byReference;
 }
 
-// Tamil vowel signs can be represented as a single precomposed codepoint (NFC) or a base +
-// combining-mark sequence (NFD) — visually identical, but `!==` would treat them as different
-// text. Normalize both sides before comparing so "verbatim" actually means "same text," not
-// "same byte sequence."
+// Unicode-normalize so "verbatim" means "same text," not "same bytes" — matters for Tamil vowel
+// signs (NFC vs NFD); a no-op for ASCII English.
 function normalize(text: string): string {
   return text.normalize('NFC');
 }
 
-function validateQuote(quote: SeedQuote, bundled: Map<string, BundledVerse>): ValidationResult {
+function validateQuote(
+  quote: SeedQuote,
+  source: Map<string, BundledVerse>,
+  sourceFile: string
+): ValidationResult {
   const problems: string[] = [];
   const key = `${quote.book}|${quote.chapter}|${quote.verse}`;
-  const source = bundled.get(key);
+  const verse = source.get(key);
 
-  if (!source) {
+  if (!verse) {
     problems.push(
-      `verse_reference does not resolve: "${quote.book} ${quote.chapter}:${quote.verse}" not found in bundled Tamil OV data`
+      `verse_reference does not resolve: "${quote.book} ${quote.chapter}:${quote.verse}" not found in ${sourceFile}`
     );
-  } else if (normalize(source.text) !== normalize(quote.scriptureText)) {
+  } else if (normalize(verse.text) !== normalize(quote.scriptureText)) {
     problems.push(
-      `scriptureText is not verbatim — does not match the bundled Tamil OV source character-for-character`
+      `scriptureText is not verbatim — does not match ${sourceFile} character-for-character`
     );
   }
 
   return { quote, ok: problems.length === 0, problems };
 }
 
+type Lang = 'ta' | 'en';
+
+// Per-language config: which verbatim source to validate against, and which curated set to seed.
+// NOTE: data/kjv-nt.json is currently derived from the English pack itself (an independent KJV
+// fetch was unavailable in the integration environment), so the 'en' verbatim check is structural
+// only — Lawrence's English review is the authoritative verbatim gate. Replace data/kjv-nt.json
+// with an independent Gutenberg KJV extract for a true machine check.
+const LANG_CONFIG: Record<Lang, { sourceFile: string; quotes: SeedQuote[] }> = {
+  ta: { sourceFile: 'data/tamil-ov-nt.json', quotes: CURATED_QUOTES_TA },
+  en: { sourceFile: 'data/kjv-nt.json', quotes: CURATED_QUOTES_EN },
+};
+
+function parseLang(): Lang {
+  const i = process.argv.indexOf('--lang');
+  const value = i >= 0 ? process.argv[i + 1] : 'ta';
+  if (value !== 'ta' && value !== 'en') {
+    console.error(`ERROR: --lang must be 'ta' or 'en' (got '${value}')`);
+    process.exit(1);
+  }
+  return value;
+}
+
 async function main() {
   const shouldExecute = process.argv.includes('--execute');
-  const bundled = loadBundledVerses();
+  const lang = parseLang();
+  const { sourceFile, quotes } = LANG_CONFIG[lang];
+  const source = loadSourceVerses(sourceFile);
 
-  console.log(`\nValidating ${CURATED_QUOTES.length} quote(s) against data/tamil-ov-nt.json...\n`);
+  console.log(`\nValidating ${quotes.length} '${lang}' quote(s) against ${sourceFile}...\n`);
 
-  const results = CURATED_QUOTES.map((quote) => validateQuote(quote, bundled));
   let allValid = true;
-
-  for (const result of results) {
-    const label = `${result.quote.book} ${result.quote.chapter}:${result.quote.verse}`;
+  for (const quote of quotes) {
+    const result = validateQuote(quote, source, sourceFile);
+    const label = `${quote.book} ${quote.chapter}:${quote.verse}`;
     if (result.ok) {
       console.log(`  PASS  ${label}`);
     } else {
@@ -615,7 +1131,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('\nAll quotes passed validation.');
+  console.log(`\nAll ${quotes.length} '${lang}' quotes passed validation.`);
 
   if (!shouldExecute) {
     console.log('Dry run only (no --execute flag) — nothing was written to Supabase.\n');
@@ -635,16 +1151,34 @@ async function main() {
     auth: { persistSession: false, autoRefreshToken: false },
   });
 
-  const rows = CURATED_QUOTES.map((quote) => ({
+  // Guard against duplicate seeding: refuse if this language's quotes already exist (the Tamil set
+  // is already live). Pass --force to override intentionally.
+  const { data: existing, error: existErr } = await admin
+    .from('content_items')
+    .select('id')
+    .eq('content_type', 'quote')
+    .eq('language_code', lang)
+    .limit(1);
+  if (existErr) {
+    console.error('\nERROR: could not check existing rows:', existErr.message);
+    process.exit(1);
+  }
+  if (existing && existing.length > 0 && !process.argv.includes('--force')) {
+    console.error(
+      `\nERROR: '${lang}' quote rows already exist in content_items — re-running would duplicate them. Pass --force to override.`
+    );
+    process.exit(1);
+  }
+
+  const rows = quotes.map((quote) => ({
     practice_path: quote.practicePath,
     product_pillar: quote.productPillar,
     content_type: 'quote',
-    language_code: 'ta',
+    language_code: lang,
     time_of_day: 'any',
     mood_tag: quote.moodTag,
     review_status: 'published',
-    // content_items_published_at_required (migration ...000002) enforces published_at is set
-    // whenever review_status = 'published'.
+    // content_items_published_at_required (migration ...000002) enforces published_at when published.
     published_at: new Date().toISOString(),
     verse_reference: `${quote.book} ${quote.chapter}:${quote.verse}`,
     scripture_text: normalize(quote.scriptureText),
@@ -656,7 +1190,7 @@ async function main() {
     process.exit(1);
   }
 
-  console.log(`\nInserted ${rows.length} row(s) into content_items.\n`);
+  console.log(`\nInserted ${rows.length} '${lang}' row(s) into content_items.\n`);
 }
 
 main();
