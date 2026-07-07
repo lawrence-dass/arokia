@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "Back"
+    "back": "Back",
+    "appName": "Arokia"
   },
   "vow": {
     "title": "Arokia",

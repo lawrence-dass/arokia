@@ -1,6 +1,7 @@
 {
   "common": {
-    "back": "பின்செல்"
+    "back": "பின்செல்",
+    "appName": "Arokia"
   },
   "vow": {
     "title": "ஆரோக்கியம்",
