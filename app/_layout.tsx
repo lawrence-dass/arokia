@@ -1,6 +1,11 @@
 import '@/lib/i18n'; // must be first — initialises i18next before any component renders
 import * as Sentry from '@sentry/react-native';
-import TrackPlayer, { AppKilledPlaybackBehavior, Capability } from 'react-native-track-player';
+import TrackPlayer, {
+  AppKilledPlaybackBehavior,
+  Capability,
+  Event,
+  State,
+} from 'react-native-track-player';
 import '../global.css';
 
 import { useEffect } from 'react';
@@ -11,6 +16,7 @@ import * as SplashScreen from 'expo-splash-screen';
 
 import { initSchema } from '@/lib/sqlite';
 import { usePrefsStore, useVowGate } from '@/store/prefsStore';
+import { useAudioStore } from '@/store/audioStore';
 
 // Held open until prefsStore finishes hydrating, so the vow/home guard never flashes
 // the wrong screen and the app never shows a blank frame while AsyncStorage is read.
@@ -64,6 +70,25 @@ export default function Layout() {
 
   useEffect(() => {
     setupRNTP();
+  }, []);
+
+  // Keep audioStore.isPlaying in sync with real RNTP playback state — most importantly, flip the
+  // play/pause buttons back to "play" when a track finishes on its own (State.Ended), not just on
+  // a manual pause.
+  useEffect(() => {
+    const sub = TrackPlayer.addEventListener(Event.PlaybackState, ({ state }) => {
+      if (state === State.Playing) {
+        useAudioStore.getState().setPlaying(true);
+      } else if (
+        state === State.Paused ||
+        state === State.Stopped ||
+        state === State.Ended ||
+        state === State.None
+      ) {
+        useAudioStore.getState().setPlaying(false);
+      }
+    });
+    return () => sub.remove();
   }, []);
 
   useEffect(() => {

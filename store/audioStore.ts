@@ -16,6 +16,9 @@ interface AudioState {
   playTrack: (content: ContentItem) => Promise<void>;
   pauseAudio: () => Promise<void>;
   resumeAudio: () => Promise<void>;
+  // Syncs isPlaying from real RNTP playback state (e.g. flips back to false when a track ends
+  // on its own). Wired to Event.PlaybackState in app/_layout.tsx.
+  setPlaying: (playing: boolean) => void;
   setSpeed: (speed: AudioState['speed']) => void;
   setSleepTimer: (minutes: AudioState['sleepTimerMinutes']) => void;
   addDownload: (contentId: string, localPath: string) => void;
@@ -67,6 +70,7 @@ export const useAudioStore = create<AudioState>()((set, get) => ({
     }
   },
 
+  setPlaying: (playing) => set({ isPlaying: playing }),
   setSpeed: (speed) => set({ speed }),
   setSleepTimer: (minutes) => set({ sleepTimerMinutes: minutes }),
   addDownload: (contentId, localPath) =>
