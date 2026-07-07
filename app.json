@@ -26,14 +26,21 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.lawrencedass.arokia"
+      "bundleIdentifier": "com.lawrencedass.arokia",
+      "infoPlist": {
+        "UIBackgroundModes": ["audio"]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#F5EFE6"
       },
-      "package": "com.lawrencedass.arokia"
+      "package": "com.lawrencedass.arokia",
+      "permissions": [
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
     }
   }
 }
