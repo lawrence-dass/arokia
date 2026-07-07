@@ -4,11 +4,11 @@ import { useTranslation } from 'react-i18next';
 
 import { QuoteList } from '@/components/scripture';
 import { SafeScreen } from '@/components/shared';
-import { useQuotesFetch } from '@/store/contentStore';
+import { useContentLanguage, useQuotesFetch } from '@/store/contentStore';
 
 export default function WordScreen() {
   const { t } = useTranslation();
-  const { isPending } = useQuotesFetch('ta');
+  const { isPending } = useQuotesFetch(useContentLanguage());
 
   return (
     <SafeScreen className="px-6 pt-4">

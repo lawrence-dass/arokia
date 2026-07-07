@@ -1,7 +1,20 @@
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
 import type { ContentItem, LanguageCode, PracticePath, MoodTag, TimeOfDay } from '@/types';
 import { getQuotes, getMeditations } from '@/lib/content';
+
+// Maps the active UI language (i18next / device locale) to the content language to fetch, so an
+// English device gets English scripture and a Tamil device gets Tamil. Falls back to 'ta' (the
+// shipped default) for any locale we don't yet have a content pack for.
+export function useContentLanguage(): LanguageCode {
+  const { i18n } = useTranslation();
+  const lang = i18n.language ?? 'ta';
+  if (lang.startsWith('en')) return 'en';
+  if (lang.startsWith('hi')) return 'hi';
+  if (lang.startsWith('te')) return 'te';
+  return 'ta';
+}
 
 interface ContentState {
   quotes: ContentItem[];

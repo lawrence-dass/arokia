@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { QuoteList, ScriptureCard } from '@/components/scripture';
 import { SafeScreen } from '@/components/shared';
 import { searchContent } from '@/lib/content';
-import { useQuotesFetch } from '@/store/contentStore';
+import { useContentLanguage, useQuotesFetch } from '@/store/contentStore';
 import type { ScriptureVerse } from '@/types';
 
 type SearchStatus = 'idle' | 'searching' | 'error';
@@ -14,7 +14,7 @@ type SearchStatus = 'idle' | 'searching' | 'error';
 export default function SearchScreen() {
   const { t } = useTranslation();
   const db = useSQLiteContext();
-  const { isPending } = useQuotesFetch('ta');
+  const { isPending } = useQuotesFetch(useContentLanguage());
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ScriptureVerse[]>([]);
   const [status, setStatus] = useState<SearchStatus>('idle');

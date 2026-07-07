@@ -5,14 +5,14 @@ import { useTranslation } from 'react-i18next';
 import { VerseText } from '@/components/scripture';
 import { Button, SafeScreen } from '@/components/shared';
 import { useAudioStore } from '@/store/audioStore';
-import { useContentStore, useQuotesFetch } from '@/store/contentStore';
+import { useContentLanguage, useContentStore, useQuotesFetch } from '@/store/contentStore';
 
 export default function VerseScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
   // Self-hydrate the quotes store so a deep link or cold start straight to /verse/[id] works even
   // when neither /word nor /search has triggered the fetch yet.
-  const { isPending } = useQuotesFetch('ta');
+  const { isPending } = useQuotesFetch(useContentLanguage());
   const quote = useContentStore((state) => state.quotes.find((item) => item.id === id));
   const currentTrack = useAudioStore((state) => state.currentTrack);
   const isPlaying = useAudioStore((state) => state.isPlaying);
