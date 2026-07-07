@@ -1,7 +1,17 @@
 # Handover — 2026-07-07 | Claude (Winston session)
 
+## ⚠️ Pending device rebuild (batch when convenient)
+**Stories 5-1 + 5-2 added two native modules** (`react-native-view-shot`, `expo-sharing`) — the verse-card
+PNG capture + share sheet need `SENTRY_DISABLE_AUTO_UPLOAD=true npx expo run:ios --device` (a Metro reload
+won't pick them up). Test together: open a verse (Word tab → tap a quote) → the branded card shows → tap
+Share → system share sheet with the card image.
+
 ## Next task (start here)
-**Epic 4 dev-work is essentially DONE (4-1…4-5).** The two remaining Epic-4 stories are NOT autonomous:
+**Story 5-3 — Optional Sunday Church Attendance Tracker.** Pure UI, unblocked. `prefsStore` already has
+Sunday-tracker fields. Read `_bmad-output/planning-artifacts/epics/epic-5.md` (Story 5.3). After 5-3,
+Epic 5 is done → Epic 6 (donations/Razorpay = Lawrence-gated) + Epic 7 (operator tools) remain.
+
+**Epic 4 dev-work is DONE (4-1…4-5).** The two remaining Epic-4 stories are NOT autonomous:
 - **4-6 (content seeding, 21 tracks)** — needs Tamil content pack + ElevenLabs Tamil audio generation
   (credits; Lawrence said "don't generate more"). Also the DB `mood_tag` CHECK widening + YouVersion
   Bible hand-off are tied here. **Lawrence-gated.**
@@ -13,8 +23,11 @@ Read `_bmad-output/planning-artifacts/epics/epic-5.md`. A `VerseCardView` compon
 stubbed (`components/scripture/index.ts` exports it) — check before building.
 
 ## Project state (all on `main`)
-- **Done:** Epic 1 (1.1–1.6, 1.8; 1-7 partial — SPIKE-1/4 pass, SPIKE-3/5 deferred), Epic 2, Epic 3,
-  **Epic 4: 4-1, 4-2, 4-3, 4-4, 4-5** (4-6 content-gated, 4-7 device-gated). Bilingual (Tamil + English).
+- **Done:** Epic 1 (1.1–1.6, 1.8; 1-7 partial), Epic 2, Epic 3, **Epic 4: 4-1…4-5** (4-6 content-gated,
+  4-7 device-gated), **Epic 5: 5-1, 5-2** (5-3 next). Bilingual (Tamil + English).
+- **Share (5-1/5-2, PR #29/#30):** `VerseCardView` = branded, ref-forwarding, capturable card;
+  `lib/verseCard.ts:captureVerseCard` (PNG, on-device); `lib/share.ts:shareVerseCard` (→ expo-sharing,
+  logs `share_triggered`); wired on `app/verse/[id].tsx` Share button. Needs device rebuild (above).
 - **Offline (4-5, PR #27):** `audioStore` cache manifest now PERSISTED (zustand persist + AsyncStorage,
   partialized to `downloadedTracks`). Auto-download on play + prefetch next 2 (`playTrack(content, queueIds)`,
   `prefetchQueue` returns uris) + manual `downloadWeek` (`OfflineDownloadCard` on walk screen).
