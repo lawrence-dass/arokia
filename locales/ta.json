@@ -85,12 +85,20 @@
     "loading": "ஏற்றுகிறது...",
     "empty": "தற்போது தியானங்கள் எதுவும் இல்லை"
   },
-  "mood": {
+  "category": {
     "anxious": "கவலை",
     "grieving": "துக்கம்",
     "angry": "கோபம்",
     "lonely": "தனிமை",
-    "tempted": "சோதனை"
+    "tempted": "சோதனை",
+    "rest": "ஓய்வு",
+    "movement": "அசைவு",
+    "breathwork": "மூச்சுப் பயிற்சி",
+    "sleep": "உறக்கம்",
+    "prayer": "ஜெபம்",
+    "lectio": "வேத தியானம்",
+    "silence": "மௌனம்",
+    "communion": "ஐக்கியம்"
   },
   "search": {
     "title": "தேடல்",

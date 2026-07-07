@@ -8,6 +8,7 @@ import type {
   LanguageCode,
   PracticePath,
   MoodTag,
+  CategoryTag,
   ProductPillar,
   ContentType,
   TimeOfDay,
@@ -42,7 +43,7 @@ function transformContentItem(row: ContentItemRow): ContentItem {
     contentType: row.content_type as ContentType,
     languageCode: row.language_code as LanguageCode,
     timeOfDay: row.time_of_day as TimeOfDay,
-    moodTag: row.mood_tag as MoodTag,
+    moodTag: row.mood_tag as CategoryTag | 'none',
     reviewStatus: row.review_status as ReviewStatus,
     verseReference: row.verse_reference,
     scriptureText: row.scripture_text,
@@ -80,7 +81,7 @@ export async function getQuotes(
 export async function getMeditations(
   lang: LanguageCode,
   practicePath?: PracticePath,
-  moodTag?: MoodTag,
+  category?: CategoryTag,
   timeOfDay?: TimeOfDay
 ): Promise<ContentItem[]> {
   let query = supabase
@@ -91,7 +92,8 @@ export async function getMeditations(
     .eq('content_type', 'meditation');
 
   if (practicePath) query = query.eq('practice_path', practicePath);
-  if (moodTag && moodTag !== 'none') query = query.eq('mood_tag', moodTag);
+  // Path-aware category axis (mind = emotional MoodTag; body/soul = own sets). Stored in mood_tag.
+  if (category) query = query.eq('mood_tag', category);
   // v1 always passes 'any' (every MVP row's time_of_day is 'any' too, so this is a no-op filter
   // today) — the parameter exists so v1.1's Kaalai/Maalai filtering needs no signature change.
   if (timeOfDay) query = query.eq('time_of_day', timeOfDay);

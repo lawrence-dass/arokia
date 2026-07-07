@@ -1,7 +1,14 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { create } from 'zustand';
-import type { ContentItem, LanguageCode, PracticePath, MoodTag, TimeOfDay } from '@/types';
+import type {
+  ContentItem,
+  LanguageCode,
+  PracticePath,
+  MoodTag,
+  CategoryTag,
+  TimeOfDay,
+} from '@/types';
 import { getQuotes, getMeditations } from '@/lib/content';
 
 // Maps the active UI language (i18next / device locale) to the content language to fetch, so an
@@ -21,14 +28,15 @@ interface ContentState {
   meditations: ContentItem[];
   activeFilters: {
     practicePath: PracticePath | null;
-    moodTag: MoodTag | null;
+    moodTag: MoodTag | null; // emotional-state filter for the scripture (quote) browser
+    category: CategoryTag | null; // path-aware filter for the meditation library
   };
   isLoading: boolean;
   error: string | null;
   // True once fetchQuotes has completed at least once (success or failure) this session —
   // lets useQuotesFetch avoid a redundant re-fetch every time a new screen mounts.
   hasFetchedQuotes: boolean;
-  // The `practicePath|moodTag` combination `meditations` currently reflects (null before the
+  // The `practicePath|category` combination `meditations` currently reflects (null before the
   // first fetch) — unlike quotes, meditations are filtered, so "already fetched" must be scoped
   // to a specific filter combination, not a single one-time flag.
   meditationsFetchedFilterKey: string | null;
@@ -37,7 +45,7 @@ interface ContentState {
   fetchMeditations: (
     lang: LanguageCode,
     practicePath?: PracticePath,
-    moodTag?: MoodTag,
+    category?: CategoryTag,
     timeOfDay?: TimeOfDay
   ) => Promise<void>;
   setFilter: (filter: Partial<ContentState['activeFilters']>) => void;
@@ -47,7 +55,7 @@ interface ContentState {
 export const useContentStore = create<ContentState>()((set, get) => ({
   quotes: [],
   meditations: [],
-  activeFilters: { practicePath: null, moodTag: null },
+  activeFilters: { practicePath: null, moodTag: null, category: null },
   isLoading: false,
   error: null,
   hasFetchedQuotes: false,
@@ -68,18 +76,22 @@ export const useContentStore = create<ContentState>()((set, get) => ({
     }
   },
 
-  fetchMeditations: async (lang, practicePath, moodTag, timeOfDay) => {
-    set({
+  fetchMeditations: async (lang, practicePath, category, timeOfDay) => {
+    set((state) => ({
       isLoading: true,
       error: null,
-      activeFilters: { practicePath: practicePath ?? null, moodTag: moodTag ?? null },
-    });
+      activeFilters: {
+        ...state.activeFilters,
+        practicePath: practicePath ?? null,
+        category: category ?? null,
+      },
+    }));
     try {
-      const meditations = await getMeditations(lang, practicePath, moodTag, timeOfDay);
+      const meditations = await getMeditations(lang, practicePath, category, timeOfDay);
       set({
         meditations,
         isLoading: false,
-        meditationsFetchedFilterKey: `${practicePath ?? ''}|${moodTag ?? ''}|${timeOfDay ?? ''}`,
+        meditationsFetchedFilterKey: `${practicePath ?? ''}|${category ?? ''}|${timeOfDay ?? ''}`,
       });
     } catch {
       set({ error: 'errors.offline', isLoading: false });
@@ -90,7 +102,7 @@ export const useContentStore = create<ContentState>()((set, get) => ({
     set((state) => ({
       activeFilters: { ...state.activeFilters, ...filter },
     })),
-  clearFilters: () => set({ activeFilters: { practicePath: null, moodTag: null } }),
+  clearFilters: () => set({ activeFilters: { practicePath: null, moodTag: null, category: null } }),
 }));
 
 // Triggers fetchQuotes on mount ONLY if it hasn't already run this session (`hasFetchedQuotes`
@@ -112,25 +124,25 @@ export function useQuotesFetch(lang: LanguageCode) {
 }
 
 // Same purpose as useQuotesFetch, but meditations are filtered — "already fetched" is scoped to
-// the specific practicePath/moodTag combination requested, not a one-time flag, so changing the
+// the specific practicePath/category combination requested, not a one-time flag, so changing the
 // filter correctly triggers a re-fetch instead of showing stale results for a different filter.
 export function useMeditationsFetch(
   lang: LanguageCode,
   practicePath?: PracticePath,
-  moodTag?: MoodTag,
+  category?: CategoryTag,
   timeOfDay?: TimeOfDay
 ) {
   const fetchMeditations = useContentStore((state) => state.fetchMeditations);
   const isLoading = useContentStore((state) => state.isLoading);
   const fetchedFilterKey = useContentStore((state) => state.meditationsFetchedFilterKey);
-  const requestedKey = `${practicePath ?? ''}|${moodTag ?? ''}|${timeOfDay ?? ''}`;
+  const requestedKey = `${practicePath ?? ''}|${category ?? ''}|${timeOfDay ?? ''}`;
   const isCurrent = fetchedFilterKey === requestedKey;
 
   useEffect(() => {
     if (!isCurrent) {
-      fetchMeditations(lang, practicePath, moodTag, timeOfDay);
+      fetchMeditations(lang, practicePath, category, timeOfDay);
     }
-  }, [fetchMeditations, lang, practicePath, moodTag, timeOfDay, isCurrent]);
+  }, [fetchMeditations, lang, practicePath, category, timeOfDay, isCurrent]);
 
   return { isPending: isLoading || !isCurrent };
 }

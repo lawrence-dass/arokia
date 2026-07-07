@@ -3,23 +3,28 @@ import { FlatList, Pressable, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { MoodFilter } from '@/components/home';
+import { CategoryFilter } from '@/components/home';
 import { useContentStore, useMeditationsFetch } from '@/store/contentStore';
-import type { MoodTag, PracticePath } from '@/types';
+import type { CategoryTag, PracticePath } from '@/types';
 
 export default function WalkScreen() {
   const { t } = useTranslation();
   const { practicePath } = useLocalSearchParams<{ practicePath?: PracticePath }>();
-  const [moodTag, setMoodTag] = useState<MoodTag | null>(null);
+  const [category, setCategory] = useState<CategoryTag | null>(null);
 
-  const { isPending } = useMeditationsFetch('ta', practicePath, moodTag ?? undefined, 'any');
+  const { isPending } = useMeditationsFetch('ta', practicePath, category ?? undefined, 'any');
   const meditations = useContentStore((state) => state.meditations);
   const error = useContentStore((state) => state.error);
 
   return (
     <View className="flex-1 bg-background px-6 pt-10">
-      <Text className="mb-4 text-3xl font-bold text-text-primary">{t('walk.title')}</Text>
-      <MoodFilter selected={moodTag} onSelect={setMoodTag} />
+      <Text className="mb-4 text-3xl font-bold text-text-primary">
+        {practicePath ? t(`home.${practicePath}`) : t('walk.title')}
+      </Text>
+      {/* Emotional states only make sense for Mind; Body/Soul browse by their own categories. */}
+      {practicePath && (
+        <CategoryFilter practicePath={practicePath} selected={category} onSelect={setCategory} />
+      )}
 
       <View className="mt-4 flex-1">
         {isPending ? (
@@ -36,7 +41,9 @@ export default function WalkScreen() {
                 className="rounded-card border border-border-light bg-surface p-4">
                 <Text className="text-lg font-semibold text-text-primary">{item.title}</Text>
                 {item.moodTag !== 'none' && (
-                  <Text className="text-sm text-text-secondary">{t(`mood.${item.moodTag}`)}</Text>
+                  <Text className="text-sm text-text-secondary">
+                    {t(`category.${item.moodTag}`)}
+                  </Text>
                 )}
               </Pressable>
             )}
