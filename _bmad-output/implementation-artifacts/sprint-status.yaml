@@ -88,7 +88,7 @@ development_status:
   epic-4: in-progress
   4-1-triune-home-screen-mind-body-soul-navigation: done # PR #15 (2026-07-07)
   4-2-meditation-library-browse-by-practice-path-and-emotional-state: done # PR #15 (2026-07-07): path-specific categories (Mind=emotional, Body/Soul=own sets). DB CHECK widening + Lectio route + duration deferred (see deferred-work.md)
-  4-3-audio-player-core-playback-with-background-and-lockscreen-controls: backlog
+  4-3-audio-player-core-playback-with-background-and-lockscreen-controls: review # implemented 2026-07-07: PlayerBar + PlayerControls + full player + meditation_started; device NFR checks pending
   4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off: backlog
   4-5-offline-content-download-progressive-cache-and-manual-download: backlog
   4-6-meditation-content-seeding-21-tracks: backlog

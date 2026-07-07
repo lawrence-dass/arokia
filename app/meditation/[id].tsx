@@ -1,21 +1,35 @@
-import { ScrollView, Text, View } from 'react-native';
+import { useEffect } from 'react';
+import { Text, View } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@/components/shared';
+import { PlayerControls } from '@/components/audio';
+import { VerseText } from '@/components/scripture';
+import { SafeScreen } from '@/components/shared';
 import { useAudioStore } from '@/store/audioStore';
 import { useContentStore } from '@/store/contentStore';
 
 export default function MeditationScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const meditation = useContentStore((state) => state.meditations.find((item) => item.id === id));
+  const meditationInList = useContentStore((state) =>
+    state.meditations.find((item) => item.id === id)
+  );
   const currentTrack = useAudioStore((state) => state.currentTrack);
-  const isPlaying = useAudioStore((state) => state.isPlaying);
   const playTrack = useAudioStore((state) => state.playTrack);
-  const pauseAudio = useAudioStore((state) => state.pauseAudio);
 
-  if (!meditation) {
+  // The player can be opened for the currently-playing track (e.g. a quote opened from the
+  // PlayerBar) that isn't in contentStore.meditations — fall back to currentTrack when the id matches.
+  const track = meditationInList ?? (currentTrack?.id === id ? currentTrack : undefined);
+
+  // Start playback on open if this track has audio and isn't already the active track.
+  useEffect(() => {
+    if (track?.audioAssetId && currentTrack?.id !== track.id) {
+      playTrack(track);
+    }
+  }, [track, currentTrack?.id, playTrack]);
+
+  if (!track) {
     return (
       <View className="flex-1 items-center justify-center gap-4 bg-background px-6">
         <Text className="text-text-secondary">{t('errors.notFound')}</Text>
@@ -26,27 +40,21 @@ export default function MeditationScreen() {
     );
   }
 
-  const isThisPlaying = isPlaying && currentTrack?.id === meditation.id;
-
-  const handlePlayToggle = () => {
-    if (isThisPlaying) {
-      pauseAudio();
-    } else {
-      playTrack(meditation);
-    }
-  };
-
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-6 px-6 py-10">
-      <Text className="text-2xl font-bold text-text-primary">{meditation.title}</Text>
-      <Text className="text-base text-text-secondary">{meditation.verseReference}</Text>
+    <SafeScreen scroll back className="px-6" contentContainerClassName="gap-6 pb-10">
+      {!!track.title && <Text className="text-2xl font-bold text-text-primary">{track.title}</Text>}
 
-      {meditation.audioAssetId && (
-        <Button
-          label={t(isThisPlaying ? 'audio.pause' : 'audio.play')}
-          onPress={handlePlayToggle}
-        />
+      <VerseText
+        text={track.scriptureText}
+        reference={track.verseReference}
+        languageCode={track.languageCode}
+      />
+
+      {track.audioAssetId ? (
+        <PlayerControls />
+      ) : (
+        <Text className="text-sm text-text-muted">{t('audio.noAudio')}</Text>
       )}
-    </ScrollView>
+    </SafeScreen>
   );
 }

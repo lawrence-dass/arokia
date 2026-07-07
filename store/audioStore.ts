@@ -3,6 +3,7 @@ import TrackPlayer from 'react-native-track-player';
 import * as Sentry from '@sentry/react-native';
 import type { ContentItem } from '@/types';
 import { resolveAudioUrl } from '@/lib/audio';
+import { logEvent } from '@/lib/analytics';
 
 interface AudioState {
   currentTrack: ContentItem | null;
@@ -16,6 +17,7 @@ interface AudioState {
   playTrack: (content: ContentItem) => Promise<void>;
   pauseAudio: () => Promise<void>;
   resumeAudio: () => Promise<void>;
+  seekTo: (seconds: number) => Promise<void>;
   // Syncs isPlaying from real RNTP playback state (e.g. flips back to false when a track ends
   // on its own). Wired to Event.PlaybackState in app/_layout.tsx.
   setPlaying: (playing: boolean) => void;
@@ -42,6 +44,8 @@ export const useAudioStore = create<AudioState>()((set, get) => ({
       await TrackPlayer.add({ id: content.id, url, title: content.title, artist: 'Arokia' });
       await TrackPlayer.play();
       set({ currentTrack: content, isPlaying: true });
+      // Log once per fresh play (not resume). Scoped to meditations so quote plays don't over-count.
+      if (content.contentType === 'meditation') logEvent('meditation_started', content.id);
     } catch (e) {
       Sentry.captureException(e);
       console.error('[audioStore] playTrack failed:', e);
@@ -62,11 +66,25 @@ export const useAudioStore = create<AudioState>()((set, get) => ({
     const { currentTrack } = get();
     if (!currentTrack) return;
     try {
+      // If the track ran to the end, restart from the top instead of resuming at the end (which
+      // is a silent no-op). Centralised here so every play surface (list, mini-player, full player)
+      // behaves the same.
+      const { position, duration } = await TrackPlayer.getProgress();
+      if (duration > 0 && position >= duration - 0.5) await TrackPlayer.seekTo(0);
       await TrackPlayer.play();
       set({ isPlaying: true });
     } catch (e) {
       Sentry.captureException(e);
       console.error('[audioStore] resumeAudio failed:', e);
+    }
+  },
+
+  seekTo: async (seconds) => {
+    try {
+      await TrackPlayer.seekTo(seconds);
+    } catch (e) {
+      Sentry.captureException(e);
+      console.error('[audioStore] seekTo failed:', e);
     }
   },
 
