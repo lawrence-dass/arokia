@@ -1,16 +1,24 @@
 # Handover — 2026-07-07 | Claude (Winston session)
 
 ## Next task (start here)
-**Story 4-5 — Offline Content Download: Progressive Cache & Manual Download.** Next in sprint order,
-unblocked. `lib/audio.ts` already has `downloadTrack` (device-validated) + `prefetchQueue`; `audioStore`
-has `downloadedTracks`/`addDownload`/`clearDownloads`. Build: auto-download on first play, silent
-prefetch of the next tracks, a manual "download this week" action, and download/offline-availability UI.
-Read the epic AC fresh: `_bmad-output/planning-artifacts/epics/epic-4.md` (Story 4.5, ~line 133).
-Note: 0 meditation rows seeded (4-6) — exercisable via the voiced English quotes.
+**Epic 4 dev-work is essentially DONE (4-1…4-5).** The two remaining Epic-4 stories are NOT autonomous:
+- **4-6 (content seeding, 21 tracks)** — needs Tamil content pack + ElevenLabs Tamil audio generation
+  (credits; Lawrence said "don't generate more"). Also the DB `mood_tag` CHECK widening + YouVersion
+  Bible hand-off are tied here. **Lawrence-gated.**
+- **4-7 (cold-start perf)** — device-measured (NFR). Batched into the device pass.
+
+**So the next AUTONOMOUS story is Epic 5-1 — Verse Card Generation (`VerseCardView`).** Pure UI, a
+signature feature (shareable Jesus-quote cards). Then 5-2 (WhatsApp/system share), 5-3 (Sunday tracker).
+Read `_bmad-output/planning-artifacts/epics/epic-5.md`. A `VerseCardView` component may already be
+stubbed (`components/scripture/index.ts` exports it) — check before building.
 
 ## Project state (all on `main`)
 - **Done:** Epic 1 (1.1–1.6, 1.8; 1-7 partial — SPIKE-1/4 pass, SPIKE-3/5 deferred), Epic 2, Epic 3,
-  **Epic 4: 4-1, 4-2, 4-3, 4-4**. Bilingual (Tamil + English UI + content).
+  **Epic 4: 4-1, 4-2, 4-3, 4-4, 4-5** (4-6 content-gated, 4-7 device-gated). Bilingual (Tamil + English).
+- **Offline (4-5, PR #27):** `audioStore` cache manifest now PERSISTED (zustand persist + AsyncStorage,
+  partialized to `downloadedTracks`). Auto-download on play + prefetch next 2 (`playTrack(content, queueIds)`,
+  `prefetchQueue` returns uris) + manual `downloadWeek` (`OfflineDownloadCard` on walk screen).
+  Caveat: persisted `file://` uris can stale after an iOS app update (deferred-work).
 - **Epic 4 player extras (4-4, PR #25):** `SleepTimer` (15/30/45, JS setTimeout → pauses), `SpeedControl`
   (0.75/1/1.25 → `TrackPlayer.setRate` + persisted to prefsStore), `BibleHandoff` (link on track end →
   `scripture_link_opened` → `Linking.openURL`). `lib/bible.ts` = external URL, currently BibleGateway
