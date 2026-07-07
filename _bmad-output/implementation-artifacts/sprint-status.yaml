@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-07-06 # PR #6 merged: Epics 2 + 3 done (vow, about/privacy/concern, scripture components, browser, search, 50 quotes seeded)
+last_updated: 2026-07-07 # PR #15 merged: Stories 4-1 + 4-2 done (triune home nav + path-specific meditation categories)
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -84,8 +84,8 @@ development_status:
   # Epic 4: Triune Daily Practice — The Walk
   # ─────────────────────────────────────────────────────────────────
   epic-4: in-progress
-  4-1-triune-home-screen-mind-body-soul-navigation: review
-  4-2-meditation-library-browse-by-practice-path-and-emotional-state: review
+  4-1-triune-home-screen-mind-body-soul-navigation: done # PR #15 (2026-07-07)
+  4-2-meditation-library-browse-by-practice-path-and-emotional-state: done # PR #15 (2026-07-07): path-specific categories (Mind=emotional, Body/Soul=own sets). DB CHECK widening + Lectio route + duration deferred (see deferred-work.md)
   4-3-audio-player-core-playback-with-background-and-lockscreen-controls: backlog
   4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off: backlog
   4-5-offline-content-download-progressive-cache-and-manual-download: backlog
