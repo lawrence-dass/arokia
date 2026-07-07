@@ -22,7 +22,9 @@
     "miniPlayerLabel": "இயக்கியைத் திற",
     "noAudio": "இந்தத் தடத்திற்கு இன்னும் ஒலி இல்லை.",
     "sleepTimer": "தூக்க நேரமானி",
+    "sleepMinutes": "{{count}} நிமிடம்",
     "speed": "வேகம்",
+    "readFullPassage": "முழு வேதப்பகுதியையும் வாசிக்க",
     "downloading": "பதிவிறக்குகிறது..."
   },
   "donation": {

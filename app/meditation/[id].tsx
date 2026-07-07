@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { PlayerControls } from '@/components/audio';
+import { BibleHandoff, PlayerControls, SleepTimer, SpeedControl } from '@/components/audio';
 import { VerseText } from '@/components/scripture';
 import { SafeScreen } from '@/components/shared';
 import { useAudioStore } from '@/store/audioStore';
@@ -51,7 +51,12 @@ export default function MeditationScreen() {
       />
 
       {track.audioAssetId ? (
-        <PlayerControls />
+        <>
+          <PlayerControls />
+          <SpeedControl />
+          <SleepTimer />
+          <BibleHandoff reference={track.verseReference} contentId={track.id} />
+        </>
       ) : (
         <Text className="text-sm text-text-muted">{t('audio.noAudio')}</Text>
       )}
