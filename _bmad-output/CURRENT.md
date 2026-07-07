@@ -1,65 +1,55 @@
 # Handover — 2026-07-07 | Claude (Winston session)
 
 ## Next task (start here)
-**Run the RNTP device gate on physical hardware**, then unblock Epic 4-3. Everything is staged on
-`main` and turnkey — this is a Lawrence-hardware step (cloud/simulator can't build iOS/Android).
+**Story 4-4 — Audio Player: Sleep Timer, Speed Control & Bible Hand-off.** Next in sprint order,
+unblocked (no device gate), pure JS, builds directly on the 4-3 player. In progress this session.
 
-### How to run the gate
-```bash
-git pull
-SENTRY_DISABLE_AUTO_UPLOAD=true npx expo run:ios --device
-# Android: SENTRY_DISABLE_AUTO_UPLOAD=true npx expo run:android --device
-```
-- `SENTRY_DISABLE_AUTO_UPLOAD=true` sidesteps the old `sentry-cli org slug` build error (skips
-  sourcemap upload — fine for a dev build).
-- If app.json native config doesn't take: `npx expo prebuild --clean` then rebuild.
-- Home screen → tap dev-only **"Technical Spikes"** link → `/spikes` harness.
-
-### Four checks (record in `docs/SPIKE_RNTP.md` + `docs/SPIKES_VALIDATION.md`)
-1. **Tamil rendering** — phrase box: correct ligatures, no tofu, no overflow at 320dp.
-2. **Background/lockscreen** — Play → lock phone → Now Playing card shows; play/pause/seek from
-   lockscreen; audio continues backgrounded.
-3. **Interruption** — call the phone while playing → pauses on call, resumes after.
-4. **Offline** — Download for offline → Airplane Mode → Play offline → starts <0.5s, no network.
-
-On results: fill the two docs, flip Stories **1-6 + 1-7 → `done`** in sprint-status, which **unblocks
-Story 4-3** (audio player core). SPIKE-5 (Razorpay) stays deferred to pre-Epic-6 — NOT part of this gate.
-
-## What's staged for the gate (all merged to `main`)
-- **PR #17** — `/spikes` turned into a real RNTP harness: `getFirstAudioTrack()` loads a seeded voiced
-  track; Play/Pause (background + lockscreen + call-duck), Download → Play-offline (Airplane Mode).
-  Dev-only home link (`__DEV__`). New `spikes.audio.*` i18n keys (ta + en).
-- **PR #18** — native config: iOS `UIBackgroundModes:["audio"]` + Android FOREGROUND_SERVICE(_MEDIA_PLAYBACK).
-  Without these the gate fails regardless of code. Applies on next native rebuild.
-- RNTP already fully wired pre-session: `registerPlaybackService`, `setupPlayer`, Play/Pause/SeekTo
-  capabilities, call-duck handler (`lib/trackPlayerService.ts`), `lib/audio.ts` download/cache.
+Likely surface: `components/audio/SleepTimer.tsx` + `SpeedControl.tsx` (new, barrel via
+`components/audio/index.ts`), wire into the full player (`app/meditation/[id].tsx`) and/or PlayerBar.
+`audioStore` already has `speed` (0.75|1|1.25), `sleepTimerMinutes` (0|15|30|45), `setSpeed`,
+`setSleepTimer` fields — build the UI + the actual RNTP speed (`TrackPlayer.setRate`) and sleep-timer
+countdown behind them. `prefsStore.playbackSpeed` persists speed. "Bible hand-off" = a link from a
+meditation to the corresponding scripture in the Word section. Read the epic AC fresh:
+`_bmad-output/planning-artifacts/epics/epic-4.md` (Story 4.4).
 
 ## Project state (all on `main`)
-- **Done:** Epic 1 (1.1–1.5, 1.8), Epic 2, Epic 3, **Epic 4-1 + 4-2** (PR #15/#16). Bilingual (Ta + En).
-- **Epic 4-1/4-2 close (PR #15):** path-specific meditation categories. `CategoryFilter` +
-  `CATEGORIES_BY_PATH` (mind=emotional, body=rest/movement/breathwork/sleep,
-  soul=prayer/lectio/silence/communion). New `CategoryTag` type; `category` i18n namespace (dropped `mood`).
-- **1-6/1-7:** code-complete; blocked ONLY on the device gate above. **4-3/4-4/4-5 blocked until gate passes.**
-- **Supabase:** ref `jwghoqpoidcvcuveheae`; `.env.local` has URL/anon/service-role/ElevenLabs. 50 Ta + 50 En
-  quotes seeded; ~10 En quotes voiced (Brian); `audio` bucket public. DO NOT generate more audio unless asked.
+- **Done:** Epic 1 (1.1–1.6, 1.8; 1-7 partial — SPIKE-1/4 pass, SPIKE-3/5 deferred), Epic 2, Epic 3,
+  **Epic 4: 4-1, 4-2, 4-3**. Bilingual (Tamil + English UI + content).
+- **Epic 4 audio player (4-3, PR #22):** `components/audio/PlayerBar` (persistent mini-player above tab
+  bar, thin progress line) + `PlayerControls` (play/pause + tap-to-seek scrubber) + full player
+  (`app/meditation/[id].tsx`, shows VerseText + back chevron, auto-plays on open) + `audioStore.seekTo`
+  + `meditation_started` analytics. RNTP progress read via `useAudioProgress` re-exported from
+  `lib/audio.ts` (components never import RNTP directly). `resumeAudio` restarts from 0 if track ended.
+  **Device-tested on iPhone/iOS 26.5.**
+- **RNTP device gate CLEARED (2026-07-07):** background + lockscreen + offline all PASS on device.
+  Two build fixes came out of it: iOS `UIBackgroundModes` (PR #18) + `downloadTrack` lookup (PR #20).
+  See `docs/SPIKE_RNTP.md` + `docs/SPIKES_VALIDATION.md`. Call-interruption tap-test still pending (handler coded).
+- **Supabase:** ref `jwghoqpoidcvcuveheae`; `.env.local` has URL/anon/service-role/ElevenLabs. 50 Ta +
+  50 En quotes seeded; ~10 En quotes voiced (Brian); `audio` bucket public. DO NOT generate more audio unless asked.
+
+## Device build (Lawrence, working) — reproduce anytime
+`git pull` → `SENTRY_DISABLE_AUTO_UPLOAD=true npx expo run:ios --device`. One-time device setup done:
+signing (Personal Team), Developer Mode ON, `ENABLE_USER_SCRIPT_SANDBOXING=NO` (Xcode build setting),
+iOS 26.5 platform installed. JS-only changes need just a Metro reload (`r`), no rebuild.
 
 ## Guardrails / working style
 - Never commit to `main` — branch → PR → merge. CI = tsc + lint + tracker audit.
-- Recurring stale `.git/index.lock` (VS Code) — `rm -f .git/index.lock` if a commit fails.
-- Stale `.expo/types` → phantom typed-route errors locally (`rm -rf .expo/types` before tsc; CI unaffected).
-- Context hygiene: targeted reads, subagents for fan-out, pipe outputs. Recommend options with a
-  production-best-practice steer.
+- **Don't over-ask** (Lawrence 2026-07-07): routine/non-sensitive ops are pre-approved — clear stale
+  `.git/index.lock`, tsc/lint, commit/push/PR/merge. Only confirm genuinely risky actions.
+- Context hygiene: targeted reads, subagents for fan-out, pipe outputs. Recommend with a production steer.
+- All audio access through `lib/audio.ts`/`audioStore` — components never touch RNTP directly.
 
-## Open follow-ups (tracked, not this task — see `deferred-work.md`)
-- DB `mood_tag` CHECK must widen for Body/Soul categories **before Story 4-6 seeding** (Lawrence-run migration).
-- Tamil Body/Soul category labels = draft, pending linguistic review.
-- Concern-ack email (Resend), privacy legal review, English full-text search bundle, Tamil audio voice,
-  full English audio batch, Hindi content pack, walk.tsx hardcoded `'ta'` → `useContentLanguage()` at 4-6.
+## Open follow-ups (tracked, not blocking — see `deferred-work.md`)
+- Device NFR measurements: 4-3 cold-start <500 ms (NFR-P2) + ≤150 MB memory (NFR-P3); call-interruption tap-test.
+- Player UI polish (Lawrence has unspecified tweaks in mind — ask for the list).
+- DB `mood_tag` CHECK widening for Body/Soul categories before Story 4-6 seeding (Lawrence-run migration).
+- Tamil Body/Soul category labels draft review; concern-ack email (Resend); SPIKE-3 AAC/.m4a transcode
+  (needs ffmpeg); SPIKE-5 Razorpay (Epic 6); Hindi content pack; `walk.tsx` hardcoded `'ta'` → `useContentLanguage()` at 4-6.
 
 ## References
 - Sprint: `_bmad-output/implementation-artifacts/sprint-status.yaml` (authoritative)
 - Deferred: `_bmad-output/implementation-artifacts/deferred-work.md`
-- `main` tip: PR #18 merged (RNTP native config).
+- `main` tip: PR #23 merged (4-3 done).
 
 ---
-*Generated 2026-07-07 — next task = run the RNTP device gate, then unblock Epic 4-3.*
+*Generated 2026-07-07 — next task = Story 4-4 (sleep timer, speed, Bible hand-off).*
