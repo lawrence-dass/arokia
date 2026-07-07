@@ -1,20 +1,21 @@
 # Handover — 2026-07-07 | Claude (Winston session)
 
 ## Next task (start here)
-**Story 4-4 — Audio Player: Sleep Timer, Speed Control & Bible Hand-off.** Next in sprint order,
-unblocked (no device gate), pure JS, builds directly on the 4-3 player. In progress this session.
-
-Likely surface: `components/audio/SleepTimer.tsx` + `SpeedControl.tsx` (new, barrel via
-`components/audio/index.ts`), wire into the full player (`app/meditation/[id].tsx`) and/or PlayerBar.
-`audioStore` already has `speed` (0.75|1|1.25), `sleepTimerMinutes` (0|15|30|45), `setSpeed`,
-`setSleepTimer` fields — build the UI + the actual RNTP speed (`TrackPlayer.setRate`) and sleep-timer
-countdown behind them. `prefsStore.playbackSpeed` persists speed. "Bible hand-off" = a link from a
-meditation to the corresponding scripture in the Word section. Read the epic AC fresh:
-`_bmad-output/planning-artifacts/epics/epic-4.md` (Story 4.4).
+**Story 4-5 — Offline Content Download: Progressive Cache & Manual Download.** Next in sprint order,
+unblocked. `lib/audio.ts` already has `downloadTrack` (device-validated) + `prefetchQueue`; `audioStore`
+has `downloadedTracks`/`addDownload`/`clearDownloads`. Build: auto-download on first play, silent
+prefetch of the next tracks, a manual "download this week" action, and download/offline-availability UI.
+Read the epic AC fresh: `_bmad-output/planning-artifacts/epics/epic-4.md` (Story 4.5, ~line 133).
+Note: 0 meditation rows seeded (4-6) — exercisable via the voiced English quotes.
 
 ## Project state (all on `main`)
 - **Done:** Epic 1 (1.1–1.6, 1.8; 1-7 partial — SPIKE-1/4 pass, SPIKE-3/5 deferred), Epic 2, Epic 3,
-  **Epic 4: 4-1, 4-2, 4-3**. Bilingual (Tamil + English UI + content).
+  **Epic 4: 4-1, 4-2, 4-3, 4-4**. Bilingual (Tamil + English UI + content).
+- **Epic 4 player extras (4-4, PR #25):** `SleepTimer` (15/30/45, JS setTimeout → pauses), `SpeedControl`
+  (0.75/1/1.25 → `TrackPlayer.setRate` + persisted to prefsStore), `BibleHandoff` (link on track end →
+  `scripture_link_opened` → `Linking.openURL`). `lib/bible.ts` = external URL, currently BibleGateway
+  ERV-TA placeholder. **DECISION PENDING:** switch to YouVersion Tamil O.V. before Story 4-6 (needs
+  bilingual book→USFM map; BibleGateway free-text doesn't parse Tamil book names) — see deferred-work.md.
 - **Epic 4 audio player (4-3, PR #22):** `components/audio/PlayerBar` (persistent mini-player above tab
   bar, thin progress line) + `PlayerControls` (play/pause + tap-to-seek scrubber) + full player
   (`app/meditation/[id].tsx`, shows VerseText + back chevron, auto-plays on open) + `audioStore.seekTo`
