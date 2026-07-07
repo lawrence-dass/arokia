@@ -33,10 +33,18 @@
 
 ## Deferred from: PR #6 walkthrough (2026-07-06)
 
-- **Epic 4 — moods must be path-specific, not the same 5 under Mind/Body/Soul.** Current meditation-library
-  scaffolding shows the emotional-state library (anxious/grieving/angry/lonely/tempted) under all three
-  practice paths. Per PRD, that mood library belongs under **Mind**; **Body** needs its own categories
-  (rest/movement/breathwork/sleep) and **Soul** its own (prayer/Lectio Divina/silence/communion).
-  practice_path and mood_tag are separate axes — the UI must reflect that. Fix in Epic 4 meditation library.
+- ~~**Epic 4 — moods must be path-specific, not the same 5 under Mind/Body/Soul.**~~ **RESOLVED**
+  (2026-07-07, story 4-1/4-2 close). `components/home/CategoryFilter.tsx` now owns `CATEGORIES_BY_PATH`:
+  Mind = emotional states, Body = rest/movement/breathwork/sleep, Soul = prayer/lectio/silence/communion.
+  `walk.tsx` renders only the active path's chips. New `CategoryTag` type + `category` i18n namespace.
+- **DB `mood_tag` CHECK must widen to hold Body/Soul categories (do at Story 4-6 seeding).** The
+  path-aware filter is frontend-only right now: `content_items.mood_tag` still only allows the 5
+  emotional values (`20260603000001_add_check_constraints.sql`). This is fine today because 0 meditation
+  rows exist, so Body/Soul filters just return empty. **Before Story 4-6 seeds any Body/Soul meditation**,
+  a migration must expand the CHECK to include `rest/movement/breathwork/sleep/prayer/lectio/silence/communion`
+  — otherwise the insert fails the constraint. (Lawrence-run migration; not an unattended-session step.)
+- **Tamil Body/Soul category labels are draft, pending linguistic review** (same treatment `mood.*` got):
+  `category.rest/movement/breathwork/sleep/prayer/lectio/silence/communion` in `ta.json` use standard
+  Tamil Christian vocabulary (ஜெபம், மௌனம், ஐக்கியம், etc.) but Lawrence should confirm phrasing.
 - **Meditations not seeded.** Only the 50 `quote` rows exist; `content_type='meditation'` rows (the 21 audio
   tracks) come with Epic 4 + the audio pipeline, so meditation lists render empty today (expected, not a bug).

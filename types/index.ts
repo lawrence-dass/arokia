@@ -6,6 +6,9 @@ export type {
   ContentType,
   TimeOfDay,
   MoodTag,
+  BodyCategory,
+  SoulCategory,
+  CategoryTag,
   LanguageCode,
   ReviewStatus,
 } from './content';

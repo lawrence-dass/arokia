@@ -85,12 +85,20 @@
     "loading": "Loading...",
     "empty": "No meditations available yet"
   },
-  "mood": {
+  "category": {
     "anxious": "Anxious",
     "grieving": "Grieving",
     "angry": "Angry",
     "lonely": "Lonely",
-    "tempted": "Tempted"
+    "tempted": "Tempted",
+    "rest": "Rest",
+    "movement": "Movement",
+    "breathwork": "Breathwork",
+    "sleep": "Sleep",
+    "prayer": "Prayer",
+    "lectio": "Lectio Divina",
+    "silence": "Silence",
+    "communion": "Communion"
   },
   "search": {
     "title": "Search",
