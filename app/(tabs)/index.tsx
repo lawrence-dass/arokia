@@ -19,6 +19,13 @@ export default function HomeScreen() {
       <Link href="/about" className="text-center text-base font-semibold text-primary">
         {t('about.linkLabel')}
       </Link>
+
+      {/* Dev-only entry to the RNTP/offline/Tamil validation harness — stripped from prod builds. */}
+      {__DEV__ && (
+        <Link href="/spikes" className="text-center text-sm text-text-muted">
+          {t('spikes.title')}
+        </Link>
+      )}
     </SafeScreen>
   );
 }

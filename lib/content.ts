@@ -54,6 +54,24 @@ function transformContentItem(row: ContentItemRow): ContentItem {
   };
 }
 
+// Returns the first published content item that has an audio asset, or null if none is voiced yet.
+// Used by the /spikes RNTP validation harness to load a real, playable track on a physical device.
+export async function getFirstAudioTrack(): Promise<ContentItem | null> {
+  const { data, error } = await supabase
+    .from('content_items')
+    .select('*')
+    .eq('review_status', 'published')
+    .not('audio_asset_id', 'is', null)
+    .limit(1);
+  if (error) {
+    console.error('[content] getFirstAudioTrack error:', error);
+    Sentry.captureException(error);
+    throw error;
+  }
+  const rows = (data ?? []) as ContentItemRow[];
+  return rows.length ? transformContentItem(rows[0]) : null;
+}
+
 export async function getQuotes(
   lang: LanguageCode,
   practicePath?: PracticePath,
