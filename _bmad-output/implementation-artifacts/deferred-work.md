@@ -30,3 +30,13 @@
 
 - **Lectio Divina ("Silence Between Words") not discoverable from the Soul path (AC5)**: `architecture.md` designates a dedicated `app/lectio-divina.tsx` route for this distinct silence-based practice — building it is fundamentally audio-player-core work (Story 4.3/4.4 territory), which is gated behind RNTP device validation. Revisit once that gate clears and the route can actually be built, rather than linking to a route that doesn't exist.
 - **Meditation duration not shown anywhere**: `ContentItem` has no `duration` field; it lives on `audio_assets.duration_sec`, unjoined by `getMeditations()`/`getQuotes()`. No meditation has an `audio_asset_id` yet (Story 4.6 hasn't run), so there's nothing to display regardless. Add the join + a `durationSec` field once real audio exists.
+
+## Deferred from: PR #6 walkthrough (2026-07-06)
+
+- **Epic 4 — moods must be path-specific, not the same 5 under Mind/Body/Soul.** Current meditation-library
+  scaffolding shows the emotional-state library (anxious/grieving/angry/lonely/tempted) under all three
+  practice paths. Per PRD, that mood library belongs under **Mind**; **Body** needs its own categories
+  (rest/movement/breathwork/sleep) and **Soul** its own (prayer/Lectio Divina/silence/communion).
+  practice_path and mood_tag are separate axes — the UI must reflect that. Fix in Epic 4 meditation library.
+- **Meditations not seeded.** Only the 50 `quote` rows exist; `content_type='meditation'` rows (the 21 audio
+  tracks) come with Epic 4 + the audio pipeline, so meditation lists render empty today (expected, not a bug).
