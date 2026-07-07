@@ -20,7 +20,9 @@ interface CategoryFilterProps {
 
 export function CategoryFilter({ practicePath, selected, onSelect }: CategoryFilterProps) {
   const { t } = useTranslation();
-  const categories = CATEGORIES_BY_PATH[practicePath];
+  // `?? []` guards against a malformed practicePath (e.g. a deep link `/walk?practicePath=foo`),
+  // which arrives as a raw string despite the PracticePath type — indexing would otherwise crash.
+  const categories = CATEGORIES_BY_PATH[practicePath] ?? [];
 
   return (
     <View className="flex-row flex-wrap gap-2">

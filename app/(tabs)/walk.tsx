@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FlatList, Pressable, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,12 @@ export default function WalkScreen() {
   const { t } = useTranslation();
   const { practicePath } = useLocalSearchParams<{ practicePath?: PracticePath }>();
   const [category, setCategory] = useState<CategoryTag | null>(null);
+
+  // Clear the selected category when the path changes — a category from one path (e.g. Mind's
+  // 'anxious') is meaningless under another and would silently filter the list to nothing.
+  useEffect(() => {
+    setCategory(null);
+  }, [practicePath]);
 
   const { isPending } = useMeditationsFetch('ta', practicePath, category ?? undefined, 'any');
   const meditations = useContentStore((state) => state.meditations);
