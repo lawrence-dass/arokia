@@ -27,6 +27,12 @@
     "readFullPassage": "முழு வேதப்பகுதியையும் வாசிக்க",
     "downloading": "பதிவிறக்குகிறது..."
   },
+  "offline": {
+    "title": "ஆஃப்லைன்",
+    "downloadWeek": "இந்த வாரத்தைப் பதிவிறக்கு (~{{size}} MB)",
+    "downloading": "{{total}} இல் {{completed}} பதிவிறக்கப்படுகிறது…",
+    "available": "ஆஃப்லைனில் கிடைக்கிறது ✓"
+  },
   "donation": {
     "cta": "நன்கொடை",
     "glassWall": "கண்ணாடி சுவர் பட்ஜெட்",

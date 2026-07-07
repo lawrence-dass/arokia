@@ -27,6 +27,12 @@
     "readFullPassage": "Read the full passage",
     "downloading": "Downloading..."
   },
+  "offline": {
+    "title": "Offline",
+    "downloadWeek": "Download this week (~{{size}} MB)",
+    "downloading": "Downloading {{completed}} of {{total}}…",
+    "available": "Available offline ✓"
+  },
   "donation": {
     "cta": "Donate",
     "glassWall": "Glass-Wall Budget",

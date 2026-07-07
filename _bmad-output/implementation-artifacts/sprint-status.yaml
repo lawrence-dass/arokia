@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-07-07 # PR #25: Story 4-4 done (sleep timer, speed control, Bible hand-off)
+last_updated: 2026-07-07 # PR #27: Story 4-5 done (offline download — persisted manifest, auto/prefetch/manual)
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -91,7 +91,7 @@ development_status:
   4-3-audio-player-core-playback-with-background-and-lockscreen-controls: done # PR #22 (2026-07-07): PlayerBar + PlayerControls + full player + meditation_started; device-tested on iPhone. Device NFR measurements (500ms/150MB) + UI polish pending desktop pass
 
   4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off: done # PR #25 (2026-07-07): sleep timer + speed + Bible hand-off. Bible resource=ERV-TA placeholder; YouVersion Tamil O.V. deferred to Story 4-6 (see deferred-work.md). Device behaviour pending
-  4-5-offline-content-download-progressive-cache-and-manual-download: backlog
+  4-5-offline-content-download-progressive-cache-and-manual-download: done # PR #27 (2026-07-07): persisted cache manifest, auto-download on play, prefetch next 2, manual downloadWeek. iOS container-path + size-estimate caveats in deferred-work. Device size/timing pending
   4-6-meditation-content-seeding-21-tracks: backlog
   4-7-app-launch-performance-and-cold-start-validation: backlog
   epic-4-retrospective: optional

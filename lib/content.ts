@@ -72,6 +72,23 @@ export async function getFirstAudioTrack(): Promise<ContentItem | null> {
   return rows.length ? transformContentItem(rows[0]) : null;
 }
 
+// All published content items that have an audio asset — the set eligible for the manual
+// "Download This Week" bulk download. Capped at 30 (one week of content is ≤21 tracks).
+export async function getDownloadableTracks(): Promise<ContentItem[]> {
+  const { data, error } = await supabase
+    .from('content_items')
+    .select('*')
+    .eq('review_status', 'published')
+    .not('audio_asset_id', 'is', null)
+    .limit(30);
+  if (error) {
+    console.error('[content] getDownloadableTracks error:', error);
+    Sentry.captureException(error);
+    throw error;
+  }
+  return ((data ?? []) as ContentItemRow[]).map(transformContentItem);
+}
+
 export async function getQuotes(
   lang: LanguageCode,
   practicePath?: PracticePath,
