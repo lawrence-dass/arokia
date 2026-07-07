@@ -17,13 +17,24 @@ export async function resolveAudioUrl(audioAssetId: string): Promise<string> {
 }
 
 export async function downloadTrack(contentItemId: string): Promise<string> {
+  // Resolve via content_items.audio_asset_id — the direction the content pipeline actually links
+  // (audio_assets.content_item_id is not populated). Mirrors resolveAudioUrl's lookup.
+  const { data: item, error: itemError } = await supabase
+    .from('content_items')
+    .select('audio_asset_id')
+    .eq('id', contentItemId)
+    .single();
+  if (itemError) throw itemError;
+  if (!item?.audio_asset_id) throw new Error(`no audio asset for content item: ${contentItemId}`);
+
   const { data, error } = await supabase
     .from('audio_assets')
     .select('storage_path')
-    .eq('content_item_id', contentItemId)
+    .eq('id', item.audio_asset_id)
     .single();
   if (error) throw error;
-  if (!data?.storage_path) throw new Error(`no audio asset for content item: ${contentItemId}`);
+  if (!data?.storage_path)
+    throw new Error(`audio asset has no storage_path: ${item.audio_asset_id}`);
 
   const { data: urlData } = supabase.storage.from('audio').getPublicUrl(data.storage_path);
   if (!urlData.publicUrl) throw new Error(`could not resolve public URL for: ${data.storage_path}`);

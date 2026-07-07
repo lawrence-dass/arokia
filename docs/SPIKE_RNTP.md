@@ -10,15 +10,20 @@
 
 ---
 
-## iOS Validation
+## iOS Validation — 2026-07-07
 
-- Device: _____________________ (e.g. iPhone 15 Pro)
-- OS: _____________________ (e.g. iOS 17.4)
-- Lockscreen Now Playing card visible: PASS / FAIL
-- Play/pause from lockscreen: PASS / FAIL
-- Seek from lockscreen: PASS / FAIL
-- Phone call interruption — audio pauses on call start: PASS / FAIL
-- Phone call interruption — audio resumes after call ends: PASS / FAIL
+- Device: Lawrence's iPhone
+- OS: iOS 26.5
+- Background playback continues while backgrounded/locked: **PASS**
+- Lockscreen Now Playing card visible: **PASS**
+- Play/pause from lockscreen: PASS / FAIL — *not individually re-confirmed; card + transport present*
+- Seek from lockscreen: PASS / FAIL — *not individually re-confirmed*
+- Phone call interruption — audio pauses on call start: **PENDING** (Lawrence to test)
+- Phone call interruption — audio resumes after call ends: **PENDING** (Lawrence to test)
+
+> Required build fix found during validation: `ios.infoPlist.UIBackgroundModes=["audio"]` was missing
+> from the built Info.plist (stale native project) — audio stopped on lock. Fixed via PR #18 (app.json)
+> + local Info.plist add; a clean prebuild now reproduces it. Background/lockscreen PASS after the fix.
 
 ## Android Validation
 
