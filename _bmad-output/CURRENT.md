@@ -1,54 +1,46 @@
-# Handover — 2026-07-06 | Claude (Winston session)
+# Handover — 2026-07-07 | Claude (Winston session)
 
-## Mode
-**Epics 2 + 3 DONE and merged to `main` (PR #6, `4c39e3a`).** App verified in simulator (English UI).
-50 red-letter Tamil quotes seeded live to the new Supabase project. Next: English content pack.
+## Next task (start here)
+**Finish Epic 4-1 (Triune home nav) + 4-2 (meditation library browse)** — both at `review` in
+sprint-status. Close the known defect, review, mark done.
 
-## Integration State (READ FIRST)
-- Base branch `main`, tip `4c39e3a` (PR #6 merged, CI green). Branch `claude/project-readiness-check-czwheo` deleted.
-- **Supabase project CHANGED** (2026-07-06) → ref `jwghoqpoidcvcuveheae`. `.env.local` has correct
-  `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
-  Migrations applied via SQL editor (CLI link was stuck on the old project — see `supabase/apply-all-migrations.sql`).
-  50 `content_type='quote'` rows seeded (`review_status='published'`). No meditations seeded.
-- **App is now multilingual-capable:** `en.json` + `ta.json` (device locale drives language, ta fallback).
-  English UI works; scripture content is Tamil-only until content packs land.
+**Known defect (the main work): moods are not path-specific.** The emotional-state library
+(anxious/grieving/angry/lonely/tempted) currently shows identically under all three practice paths.
+Per PRD it belongs under **Mind**; **Body** needs its own categories (rest/movement/breathwork/sleep)
+and **Soul** its own (prayer/Lectio Divina/silence/communion). `practice_path` and `mood_tag` are
+SEPARATE axes — the UI must reflect that. See `deferred-work.md` (PR #6 walkthrough entry).
 
-## What shipped in PR #6
-- Epic 2: vow gate (2.1), re-ack (2.2), About/Privacy with approved Tamil copy (2.3), concern form (2.4).
-- Epic 3: VerseText/ScriptureCard invariant (3.1), quotes browser (3.2), SQLite FTS search (3.3),
-  50-quote seed (3.4, seeded live).
-- Code-review fixes (verse hydration, resume-not-restart, FTS AND-match, search debounce/error, LIKE escaping,
-  VerseCardView reuse, shared email validator).
-- SafeScreen (safe-area + back button), routing fix (land on vow/home not privacy), English locale.
-- Partial Epic 4 scaffolding rode along (tabs, meditation/mood) — inert (empty lists), not final.
+Likely files: `app/(tabs)/index.tsx` (triune home), `app/(tabs)/walk.tsx`, `app/meditation/[id].tsx`,
+the mood-filter UI, `store/contentStore.ts` filters, `lib/content.ts:getMeditations`. Read them fresh
+(targeted) — don't trust this list blindly.
 
-## Open Follow-ups
-- **2.4 acknowledgment email (FR31)** — NOT built. Needs Resend + Supabase Edge Function. Ops email:
-  lawrence.ai.engineer@gmail.com. Small fast-follow.
-- **Privacy copy is legal-draft** — needs real legal review before App Store / Play submission.
-- **Epic 4 design:** moods must be path-specific (mind vs body vs soul), not the same 5 everywhere; meditations
-  not seeded. See deferred-work.md.
-- **Pre-Epic-4 device gate:** RNTP background audio + offline cache validation on a physical device
-  (docs/SPIKE_RNTP.md, docs/SPIKES_VALIDATION.md) before Story 4.3. Also `UIBackgroundModes: audio` config.
+Note: no meditations are seeded (`content_type='meditation'` rows = 0), so the library renders empty
+until Epic 4-6 content. The nav + category DESIGN can be built/reviewed without content.
 
-## Next Course of Action (agreed)
-1. **English content pack** — 50 KJV red-letter quotes (public domain, Lawrence reviews), same
-   Codex-research → Claude-integrate → seed pipeline as Tamil. Delivers bilingual reach without Epic 4's weight.
-   English content packs use `language_code='en'` rows; app already filters content by language.
-2. Then schedule the device gate + Epic 4 (meditations + audio).
-3. Small anytime: concern-ack email (Resend).
+## Project state (all on `main`)
+- **Done:** Epic 1 (1.1–1.5, 1.8), Epic 2, Epic 3. Bilingual (Tamil + English UI + content).
+- **Audio (Story 1.8):** ElevenLabs pipeline (`scripts/generate-audio.ts`, `scripts/generate-and-upload-audio.ts`),
+  credit-frugal. ~10 English quotes voiced (Brian), in-app play-from-list works, playback-state synced.
+  Testing only — DO NOT generate more audio unless asked. Follow-ups: Tamil voice (Brian's Tamil
+  pronunciation poor), `.m4a` transcode (needs `brew install ffmpeg`), device gate.
+- **Supabase:** project ref `jwghoqpoidcvcuveheae`; `.env.local` has URL, anon, `SUPABASE_SERVICE_ROLE_KEY`,
+  `ELEVENLABS_API_KEY`. 50 Tamil + 50 English quote rows seeded; `audio` storage bucket (public).
 
-## Multilingual direction (2026-07-06)
-Tamil / English / Hindi all shipped user languages. Architect for N, ship Tamil first, English fast-follow
-(KJV public domain), Hindi later (needs source Bible + reviewer). Scripture is per-language verbatim — never
-machine-translated. See memory project_multilingual.
+## Guardrails / working style
+- Never commit to `main` — branch → PR → merge (merge-commit style). CI = tsc + lint + tracker audit.
+- Local git shows recurring stale `.git/index.lock` (VS Code) — `rm -f .git/index.lock` if commit fails.
+- Stale `.expo/types` causes phantom typed-route errors locally — `rm -rf .expo/types` before tsc.
+- Context hygiene: targeted reads, subagents for fan-out, pipe outputs (see CLAUDE.md). Recommend
+  options with a production-best-practice steer.
+
+## Open follow-ups (tracked, not this task)
+- Concern-ack email (Resend), privacy legal review, device gate (RNTP background/lockscreen/offline),
+  English full-text search bundle, Tamil audio voice, full English audio batch, Hindi content pack.
 
 ## References
-- Sprint: `_bmad-output/implementation-artifacts/sprint-status.yaml`
-- Content pipeline prompt: `docs/content/CODEX-CONTENT-PROMPT.md`; Tamil output: `docs/content/CONTENT-RESEARCH-OUTPUT.md`
-- Migrations helper: `supabase/apply-all-migrations.sql`
-- Deferred work: `_bmad-output/implementation-artifacts/deferred-work.md`
-- PR #6 (merged): https://github.com/lawrence-dass/arokia/pull/6
+- Sprint: `_bmad-output/implementation-artifacts/sprint-status.yaml` (authoritative)
+- Deferred: `_bmad-output/implementation-artifacts/deferred-work.md`
+- `main` tip: PR #13 merged (working-style docs).
 
 ---
-*Generated 2026-07-06 — Epics 2 + 3 merged; app verified; 50 Tamil quotes live; next = English content pack.*
+*Generated 2026-07-07 — ready to compact; next task = finish Epic 4-1/4-2 (path-specific moods).*
