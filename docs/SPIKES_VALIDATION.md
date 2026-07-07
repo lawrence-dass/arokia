@@ -8,10 +8,10 @@ Story: 1.7 — Tamil Rendering, AAC Format, Offline Cache & Razorpay Device Spik
 
 | Spike | Result | Notes |
 |---|---|---|
-| SPIKE-1 Tamil rendering | [ ] PASS [ ] FAIL | |
-| SPIKE-3 AAC format + size | [ ] PASS [ ] FAIL | |
-| SPIKE-4 Offline cache playback | [ ] PASS [ ] FAIL | |
-| SPIKE-5 Razorpay test payment + webhook | [ ] PASS [ ] FAIL | |
+| SPIKE-1 Tamil rendering | [x] PASS | iPhone / iOS 26.5, 2026-07-07 — clean glyphs, no fallback/overflow |
+| SPIKE-3 AAC format + size | [ ] PASS [ ] FAIL | Deferred — using mp3 for now; .m4a transcode needs ffmpeg (not a 4-3 blocker) |
+| SPIKE-4 Offline cache playback | [x] PASS | iPhone / iOS 26.5, 2026-07-07 — download → Airplane Mode → plays offline (after downloadTrack fix) |
+| SPIKE-5 Razorpay test payment + webhook | [ ] PASS [ ] FAIL | Deferred to pre-Epic-6 |
 
 ## SPIKE-1: Tamil Rendering
 
