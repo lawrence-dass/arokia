@@ -4,6 +4,16 @@ import * as Sentry from '@sentry/react-native';
 import type { ContentItem } from '@/types';
 import { resolveAudioUrl } from '@/lib/audio';
 import { logEvent } from '@/lib/analytics';
+import { usePrefsStore } from '@/store/prefsStore';
+
+// Sleep-timer handle lives at module scope (not store state) — it's not serialisable or renderable.
+let sleepTimeoutId: ReturnType<typeof setTimeout> | null = null;
+function clearSleepTimeout() {
+  if (sleepTimeoutId) {
+    clearTimeout(sleepTimeoutId);
+    sleepTimeoutId = null;
+  }
+}
 
 interface AudioState {
   currentTrack: ContentItem | null;
@@ -43,6 +53,8 @@ export const useAudioStore = create<AudioState>()((set, get) => ({
       await TrackPlayer.reset();
       await TrackPlayer.add({ id: content.id, url, title: content.title, artist: 'Arokia' });
       await TrackPlayer.play();
+      // Rate resets per track, so re-apply the active playback speed after starting.
+      await TrackPlayer.setRate(get().speed);
       set({ currentTrack: content, isPlaying: true });
       // Log once per fresh play (not resume). Scoped to meditations so quote plays don't over-count.
       if (content.contentType === 'meditation') logEvent('meditation_started', content.id);
@@ -89,8 +101,31 @@ export const useAudioStore = create<AudioState>()((set, get) => ({
   },
 
   setPlaying: (playing) => set({ isPlaying: playing }),
-  setSpeed: (speed) => set({ speed }),
-  setSleepTimer: (minutes) => set({ sleepTimerMinutes: minutes }),
+
+  setSpeed: (speed) => {
+    set({ speed });
+    // Persist the preference and apply immediately to the current track.
+    usePrefsStore.getState().setPlaybackSpeed(speed);
+    TrackPlayer.setRate(speed).catch((e) => {
+      Sentry.captureException(e);
+      console.error('[audioStore] setRate failed:', e);
+    });
+  },
+
+  setSleepTimer: (minutes) => {
+    clearSleepTimeout();
+    set({ sleepTimerMinutes: minutes });
+    if (minutes > 0) {
+      sleepTimeoutId = setTimeout(
+        () => {
+          sleepTimeoutId = null;
+          set({ sleepTimerMinutes: 0 });
+          get().pauseAudio();
+        },
+        minutes * 60 * 1000
+      );
+    }
+  },
   addDownload: (contentId, localPath) =>
     set((state) => ({
       downloadedTracks: { ...state.downloadedTracks, [contentId]: localPath },

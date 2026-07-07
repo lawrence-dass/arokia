@@ -22,7 +22,9 @@
     "miniPlayerLabel": "Open player",
     "noAudio": "No audio available for this track yet.",
     "sleepTimer": "Sleep Timer",
+    "sleepMinutes": "{{count}} min",
     "speed": "Speed",
+    "readFullPassage": "Read the full passage",
     "downloading": "Downloading..."
   },
   "donation": {
