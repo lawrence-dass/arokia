@@ -1,46 +1,65 @@
 # Handover — 2026-07-07 | Claude (Winston session)
 
 ## Next task (start here)
-**Finish Epic 4-1 (Triune home nav) + 4-2 (meditation library browse)** — both at `review` in
-sprint-status. Close the known defect, review, mark done.
+**Run the RNTP device gate on physical hardware**, then unblock Epic 4-3. Everything is staged on
+`main` and turnkey — this is a Lawrence-hardware step (cloud/simulator can't build iOS/Android).
 
-**Known defect (the main work): moods are not path-specific.** The emotional-state library
-(anxious/grieving/angry/lonely/tempted) currently shows identically under all three practice paths.
-Per PRD it belongs under **Mind**; **Body** needs its own categories (rest/movement/breathwork/sleep)
-and **Soul** its own (prayer/Lectio Divina/silence/communion). `practice_path` and `mood_tag` are
-SEPARATE axes — the UI must reflect that. See `deferred-work.md` (PR #6 walkthrough entry).
+### How to run the gate
+```bash
+git pull
+SENTRY_DISABLE_AUTO_UPLOAD=true npx expo run:ios --device
+# Android: SENTRY_DISABLE_AUTO_UPLOAD=true npx expo run:android --device
+```
+- `SENTRY_DISABLE_AUTO_UPLOAD=true` sidesteps the old `sentry-cli org slug` build error (skips
+  sourcemap upload — fine for a dev build).
+- If app.json native config doesn't take: `npx expo prebuild --clean` then rebuild.
+- Home screen → tap dev-only **"Technical Spikes"** link → `/spikes` harness.
 
-Likely files: `app/(tabs)/index.tsx` (triune home), `app/(tabs)/walk.tsx`, `app/meditation/[id].tsx`,
-the mood-filter UI, `store/contentStore.ts` filters, `lib/content.ts:getMeditations`. Read them fresh
-(targeted) — don't trust this list blindly.
+### Four checks (record in `docs/SPIKE_RNTP.md` + `docs/SPIKES_VALIDATION.md`)
+1. **Tamil rendering** — phrase box: correct ligatures, no tofu, no overflow at 320dp.
+2. **Background/lockscreen** — Play → lock phone → Now Playing card shows; play/pause/seek from
+   lockscreen; audio continues backgrounded.
+3. **Interruption** — call the phone while playing → pauses on call, resumes after.
+4. **Offline** — Download for offline → Airplane Mode → Play offline → starts <0.5s, no network.
 
-Note: no meditations are seeded (`content_type='meditation'` rows = 0), so the library renders empty
-until Epic 4-6 content. The nav + category DESIGN can be built/reviewed without content.
+On results: fill the two docs, flip Stories **1-6 + 1-7 → `done`** in sprint-status, which **unblocks
+Story 4-3** (audio player core). SPIKE-5 (Razorpay) stays deferred to pre-Epic-6 — NOT part of this gate.
+
+## What's staged for the gate (all merged to `main`)
+- **PR #17** — `/spikes` turned into a real RNTP harness: `getFirstAudioTrack()` loads a seeded voiced
+  track; Play/Pause (background + lockscreen + call-duck), Download → Play-offline (Airplane Mode).
+  Dev-only home link (`__DEV__`). New `spikes.audio.*` i18n keys (ta + en).
+- **PR #18** — native config: iOS `UIBackgroundModes:["audio"]` + Android FOREGROUND_SERVICE(_MEDIA_PLAYBACK).
+  Without these the gate fails regardless of code. Applies on next native rebuild.
+- RNTP already fully wired pre-session: `registerPlaybackService`, `setupPlayer`, Play/Pause/SeekTo
+  capabilities, call-duck handler (`lib/trackPlayerService.ts`), `lib/audio.ts` download/cache.
 
 ## Project state (all on `main`)
-- **Done:** Epic 1 (1.1–1.5, 1.8), Epic 2, Epic 3. Bilingual (Tamil + English UI + content).
-- **Audio (Story 1.8):** ElevenLabs pipeline (`scripts/generate-audio.ts`, `scripts/generate-and-upload-audio.ts`),
-  credit-frugal. ~10 English quotes voiced (Brian), in-app play-from-list works, playback-state synced.
-  Testing only — DO NOT generate more audio unless asked. Follow-ups: Tamil voice (Brian's Tamil
-  pronunciation poor), `.m4a` transcode (needs `brew install ffmpeg`), device gate.
-- **Supabase:** project ref `jwghoqpoidcvcuveheae`; `.env.local` has URL, anon, `SUPABASE_SERVICE_ROLE_KEY`,
-  `ELEVENLABS_API_KEY`. 50 Tamil + 50 English quote rows seeded; `audio` storage bucket (public).
+- **Done:** Epic 1 (1.1–1.5, 1.8), Epic 2, Epic 3, **Epic 4-1 + 4-2** (PR #15/#16). Bilingual (Ta + En).
+- **Epic 4-1/4-2 close (PR #15):** path-specific meditation categories. `CategoryFilter` +
+  `CATEGORIES_BY_PATH` (mind=emotional, body=rest/movement/breathwork/sleep,
+  soul=prayer/lectio/silence/communion). New `CategoryTag` type; `category` i18n namespace (dropped `mood`).
+- **1-6/1-7:** code-complete; blocked ONLY on the device gate above. **4-3/4-4/4-5 blocked until gate passes.**
+- **Supabase:** ref `jwghoqpoidcvcuveheae`; `.env.local` has URL/anon/service-role/ElevenLabs. 50 Ta + 50 En
+  quotes seeded; ~10 En quotes voiced (Brian); `audio` bucket public. DO NOT generate more audio unless asked.
 
 ## Guardrails / working style
-- Never commit to `main` — branch → PR → merge (merge-commit style). CI = tsc + lint + tracker audit.
-- Local git shows recurring stale `.git/index.lock` (VS Code) — `rm -f .git/index.lock` if commit fails.
-- Stale `.expo/types` causes phantom typed-route errors locally — `rm -rf .expo/types` before tsc.
-- Context hygiene: targeted reads, subagents for fan-out, pipe outputs (see CLAUDE.md). Recommend
-  options with a production-best-practice steer.
+- Never commit to `main` — branch → PR → merge. CI = tsc + lint + tracker audit.
+- Recurring stale `.git/index.lock` (VS Code) — `rm -f .git/index.lock` if a commit fails.
+- Stale `.expo/types` → phantom typed-route errors locally (`rm -rf .expo/types` before tsc; CI unaffected).
+- Context hygiene: targeted reads, subagents for fan-out, pipe outputs. Recommend options with a
+  production-best-practice steer.
 
-## Open follow-ups (tracked, not this task)
-- Concern-ack email (Resend), privacy legal review, device gate (RNTP background/lockscreen/offline),
-  English full-text search bundle, Tamil audio voice, full English audio batch, Hindi content pack.
+## Open follow-ups (tracked, not this task — see `deferred-work.md`)
+- DB `mood_tag` CHECK must widen for Body/Soul categories **before Story 4-6 seeding** (Lawrence-run migration).
+- Tamil Body/Soul category labels = draft, pending linguistic review.
+- Concern-ack email (Resend), privacy legal review, English full-text search bundle, Tamil audio voice,
+  full English audio batch, Hindi content pack, walk.tsx hardcoded `'ta'` → `useContentLanguage()` at 4-6.
 
 ## References
 - Sprint: `_bmad-output/implementation-artifacts/sprint-status.yaml` (authoritative)
 - Deferred: `_bmad-output/implementation-artifacts/deferred-work.md`
-- `main` tip: PR #13 merged (working-style docs).
+- `main` tip: PR #18 merged (RNTP native config).
 
 ---
-*Generated 2026-07-07 — ready to compact; next task = finish Epic 4-1/4-2 (path-specific moods).*
+*Generated 2026-07-07 — next task = run the RNTP device gate, then unblock Epic 4-3.*
