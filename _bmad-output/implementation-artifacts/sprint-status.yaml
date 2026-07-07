@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-07-07 # PR #15 merged: Stories 4-1 + 4-2 done (triune home nav + path-specific meditation categories)
+last_updated: 2026-07-07 # RNTP device gate cleared (bg/lockscreen/offline PASS on iPhone iOS 26.5); Story 1-6 done; Story 4-3 unblocked
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -51,12 +51,14 @@ development_status:
   1-3-expo-sqlite-and-tamil-ov-bible-data-bundle: done
   1-4-service-layer-domain-types-and-zustand-store-skeletons: done
   1-5-github-actions-ci-eas-build-profiles-and-sentry: done
-  # DEFERRED-VALIDATION GATE (decided 2026-07-03): stories 1-6/1-7 are code-complete;
-  # physical-device validation (RNTP, offline cache) + ElevenLabs/AAC + Razorpay spikes
-  # are deferred. HARD GATE: all must pass before Story 4-3 (audio player core) begins.
-  # Tamil rendering (SPIKE-1) gets a simulator smoke-check now; device confirmation rides along later.
-  1-6-react-native-track-player-background-audio-spike: in-progress # deferred: device validation gated pre-Epic-4
-  1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes: in-progress # deferred: device/ElevenLabs/Razorpay validation gated pre-Epic-4 (Razorpay pre-Epic-6)
+  # DEFERRED-VALIDATION GATE — CLEARED for Story 4-3 (2026-07-07): RNTP background + lockscreen +
+  # offline cache all validated on physical device (iPhone / iOS 26.5). See docs/SPIKE_RNTP.md +
+  # docs/SPIKES_VALIDATION.md. Two build fixes surfaced + merged (UIBackgroundModes PR #18,
+  # downloadTrack PR #20). Call-interruption handler is coded (RemoteDuck) — 60s device confirm still
+  # pending, low risk. STILL deferred (NOT 4-3 blockers): SPIKE-3 AAC/.m4a transcode (needs ffmpeg),
+  # SPIKE-5 Razorpay (gates Epic 6).
+  1-6-react-native-track-player-background-audio-spike: done # device-validated 2026-07-07: background + lockscreen PASS. Call-interruption quick-verify pending (handler coded)
+  1-7-tamil-rendering-aac-format-offline-cache-and-razorpay-device-spikes: in-progress # SPIKE-1 Tamil + SPIKE-4 offline PASS on device 2026-07-07; SPIKE-3 AAC + SPIKE-5 Razorpay still deferred (not 4-3 blockers)
   1-8-elevenlabs-audio-generation-script: done # PR #11 (2026-07-07): generate-audio.ts + generate-and-upload-audio.ts (batch); English quotes voiced (Brian), in-app play-from-list working. Follow-ups: Tamil voice (Brian's Tamil pronunciation poor), .m4a transcode (needs ffmpeg), full English batch, device gate for background/lockscreen
   epic-1-retrospective: optional
 
