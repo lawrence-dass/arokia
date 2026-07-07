@@ -117,6 +117,24 @@
       "phrase": "வருத்தப்பட்டுப் பாரஞ்சுமக்கிறவர்களே",
       "instruction": "Check that this text renders correctly at 320dp width, with no glyph fallback or breakage."
     },
+    "audio": {
+      "title": "Audio, Background & Offline (RNTP)",
+      "loading": "Loading sample track…",
+      "noTrack": "No voiced track found. Seed audio first (Story 1.8) before running this spike.",
+      "track": "Sample: {{title}}",
+      "statusPlaying": "Status: playing",
+      "statusPaused": "Status: paused",
+      "statusIdle": "Status: idle",
+      "play": "Play",
+      "pause": "Pause",
+      "instruction": "While playing: lock the phone and background the app — confirm the lockscreen Now Playing card shows, play/pause/seek work from it, and a phone call pauses then resumes playback.",
+      "downloadOffline": "Download for offline",
+      "downloading": "Downloading…",
+      "downloaded": "Downloaded ✓ — re-download",
+      "playOffline": "Play offline (cached file)",
+      "offlineInstruction": "Now enable Airplane Mode, then tap Play offline — playback should start in under half a second with no network.",
+      "error": "Something went wrong. Check the connection and try again."
+    },
     "deviceChecklist": {
       "title": "Device Checklist",
       "ios": "View on a real device running iOS 16 or above.",
