@@ -31,6 +31,20 @@
 - **Lectio Divina ("Silence Between Words") not discoverable from the Soul path (AC5)**: `architecture.md` designates a dedicated `app/lectio-divina.tsx` route for this distinct silence-based practice — building it is fundamentally audio-player-core work (Story 4.3/4.4 territory), which is gated behind RNTP device validation. Revisit once that gate clears and the route can actually be built, rather than linking to a route that doesn't exist.
 - **Meditation duration not shown anywhere**: `ContentItem` has no `duration` field; it lives on `audio_assets.duration_sec`, unjoined by `getMeditations()`/`getQuotes()`. No meditation has an `audio_asset_id` yet (Story 4.6 hasn't run), so there's nothing to display regardless. Add the join + a `durationSec` field once real audio exists.
 
+## Deferred from: implementation of 4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off (2026-07-07)
+
+- **Bible hand-off resource → switch to YouVersion Tamil O.V. before Tamil audio ships (Story 4-6).**
+  `lib/bible.ts` currently opens BibleGateway `ERV-TA` (Easy-to-Read Tamil) via free-text reference —
+  fine for today's only content (English-referenced voiced quotes), but (a) the translation differs
+  from the bundled Tamil **O.V.**, and (b) BibleGateway free-text search does NOT reliably resolve
+  **Tamil-script** book names (e.g. "யோவான் 3:16"). The production target is YouVersion Tamil O.V.
+  (matches the bundled translation, opens the user's native Bible app), which needs a bilingual
+  book-name→USFM code map (66 books × Ta/En). Build it when Story 4-6 seeds Tamil meditation content.
+  Lawrence to confirm the final resource/translation. Single constant in `lib/bible.ts`.
+- **Sleep timer is a JS `setTimeout`** — may not fire precisely in deep background on iOS (RNTP has no
+  native sleep timer). Acceptable for MVP; revisit with a background-capable mechanism if users report
+  the timer not stopping audio overnight.
+
 ## Deferred from: PR #6 walkthrough (2026-07-06)
 
 - ~~**Epic 4 — moods must be path-specific, not the same 5 under Mind/Body/Soul.**~~ **RESOLVED**

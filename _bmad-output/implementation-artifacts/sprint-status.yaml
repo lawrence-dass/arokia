@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-07-07 # PR #22 merged: Story 4-3 done (audio player core — PlayerBar, full player, seek, meditation_started), device-tested on iPhone
+last_updated: 2026-07-07 # PR #25: Story 4-4 done (sleep timer, speed control, Bible hand-off)
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -90,7 +90,7 @@ development_status:
   4-2-meditation-library-browse-by-practice-path-and-emotional-state: done # PR #15 (2026-07-07): path-specific categories (Mind=emotional, Body/Soul=own sets). DB CHECK widening + Lectio route + duration deferred (see deferred-work.md)
   4-3-audio-player-core-playback-with-background-and-lockscreen-controls: done # PR #22 (2026-07-07): PlayerBar + PlayerControls + full player + meditation_started; device-tested on iPhone. Device NFR measurements (500ms/150MB) + UI polish pending desktop pass
 
-  4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off: backlog
+  4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off: done # PR #25 (2026-07-07): sleep timer + speed + Bible hand-off. Bible resource=ERV-TA placeholder; YouVersion Tamil O.V. deferred to Story 4-6 (see deferred-work.md). Device behaviour pending
   4-5-offline-content-download-progressive-cache-and-manual-download: backlog
   4-6-meditation-content-seeding-21-tracks: backlog
   4-7-app-launch-performance-and-cold-start-validation: backlog
