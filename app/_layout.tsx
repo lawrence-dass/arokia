@@ -80,12 +80,10 @@ export default function Layout() {
         onInit={initSchema}
         onError={(e) => console.error('[SQLite] DB failed to open:', e)}>
         <Stack screenOptions={{ headerShown: false }}>
-          {/* Always reachable, regardless of vow state — FR5 requires the Privacy Policy to be
-              accessible before the Opening Vow is acknowledged. This is the one deliberate
-              exception to "every screen must be in a guarded block". */}
-          <Stack.Screen name="privacy" />
           {/* Pre-vow screens (reachable before acknowledgment, or when a re-vow is required
-              after a significant update — see constants/vow.ts) go here. */}
+              after a significant update — see constants/vow.ts) go here. Declared first so that on
+              a guarded cold start (URL "/" resolves into the guarded (tabs) group), the router's
+              fallback anchor is the vow screen, not an unguarded utility route. */}
           <Stack.Protected guard={!vowSatisfied}>
             <Stack.Screen name="vow" />
           </Stack.Protected>
@@ -101,6 +99,10 @@ export default function Layout() {
             <Stack.Screen name="search" />
             <Stack.Screen name="meditation/[id]" />
           </Stack.Protected>
+          {/* Always reachable, regardless of vow state — FR5 requires the Privacy Policy to be
+              accessible before the Opening Vow is acknowledged. Declared LAST so it never becomes
+              the initial/fallback route; being unguarded, its position does not affect reachability. */}
+          <Stack.Screen name="privacy" />
         </Stack>
       </SQLiteProvider>
     </SafeAreaProvider>
