@@ -9,7 +9,7 @@ export default function AboutScreen() {
   const { t } = useTranslation();
 
   return (
-    <SafeScreen scroll contentContainerClassName="gap-8 px-6 pb-10 pt-4">
+    <SafeScreen scroll back contentContainerClassName="gap-8 px-6 pb-10 pt-4">
       <Text className="text-3xl font-bold text-text-primary">{t('about.title')}</Text>
 
       <View className="gap-2">

@@ -85,7 +85,7 @@ export default function SearchScreen() {
   }
 
   return (
-    <SafeScreen className="px-6 pt-4">
+    <SafeScreen back className="px-6 pt-4">
       <Text className="mb-6 text-3xl font-bold text-text-primary">{t('search.title')}</Text>
 
       <TextInput

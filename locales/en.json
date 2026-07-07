@@ -1,4 +1,7 @@
 {
+  "common": {
+    "back": "Back"
+  },
   "vow": {
     "title": "Arokia",
     "body": "This app is not Jesus Christ — it is only a tool that points to Him.",

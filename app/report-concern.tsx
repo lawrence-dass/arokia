@@ -36,7 +36,7 @@ export default function ReportConcernScreen() {
 
   if (submitted) {
     return (
-      <SafeScreen className="items-center justify-center gap-4 px-6">
+      <SafeScreen back className="items-center justify-center gap-4 px-6">
         <Text className="text-center text-2xl font-bold text-text-primary">
           {t('concern.confirmationTitle')}
         </Text>
@@ -48,7 +48,7 @@ export default function ReportConcernScreen() {
   }
 
   return (
-    <SafeScreen scroll contentContainerClassName="gap-6 px-6 pb-10 pt-4">
+    <SafeScreen scroll back contentContainerClassName="gap-6 px-6 pb-10 pt-4">
       <Text className="text-3xl font-bold text-text-primary">{t('concern.title')}</Text>
       <ConcernForm onSubmit={handleSubmit} submitting={submitting} errorMessage={errorMessage} />
     </SafeScreen>

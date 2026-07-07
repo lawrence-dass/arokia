@@ -22,7 +22,7 @@ export default function VerseScreen() {
 
   if (isPending) {
     return (
-      <SafeScreen className="items-center justify-center px-6">
+      <SafeScreen back className="items-center justify-center px-6">
         <Text className="text-text-secondary">{t('word.loading')}</Text>
       </SafeScreen>
     );
@@ -30,7 +30,7 @@ export default function VerseScreen() {
 
   if (!quote) {
     return (
-      <SafeScreen className="items-center justify-center gap-4 px-6">
+      <SafeScreen back className="items-center justify-center gap-4 px-6">
         <Text className="text-text-secondary">{t('errors.notFound')}</Text>
         <Link href="/word" replace className="text-primary">
           {t('errors.backHome')}
@@ -58,7 +58,7 @@ export default function VerseScreen() {
   };
 
   return (
-    <SafeScreen scroll contentContainerClassName="gap-8 px-6 pb-10 pt-4">
+    <SafeScreen scroll back contentContainerClassName="gap-8 px-6 pb-10 pt-4">
       <VerseText
         text={quote.scriptureText}
         reference={quote.verseReference}
