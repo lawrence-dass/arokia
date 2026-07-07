@@ -97,6 +97,27 @@
     "loading": "Loading...",
     "empty": "No meditations available yet"
   },
+  "worship": {
+    "title": "Sunday Worship",
+    "linkLabel": "Mark Sunday worship",
+    "invitation": "If you like, you can quietly mark the Sundays you attended worship.",
+    "markedA11y": "{{date}} — marked as attended",
+    "unmarkedA11y": "{{date}} — not marked",
+    "months": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
+  },
   "category": {
     "anxious": "Anxious",
     "grieving": "Grieving",

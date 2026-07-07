@@ -14,6 +14,11 @@ export default function HomeScreen() {
       <TimeOfDayBanner timeFilter={TIME_FILTER} />
       <TriuneGrid timeFilter={TIME_FILTER} />
 
+      {/* Optional Sunday worship tracker (Story 5.3) — a quiet, private invitation, not a tab. */}
+      <Link href="/worship" className="text-center text-base font-semibold text-primary">
+        {t('worship.linkLabel')}
+      </Link>
+
       {/* Not a tab (About isn't a daily-practice destination) — kept reachable here since it has
           no other entry point in the app yet. */}
       <Link href="/about" className="text-center text-base font-semibold text-primary">
