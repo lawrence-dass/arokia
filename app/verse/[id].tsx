@@ -1,15 +1,19 @@
-import { Share, Text, View } from 'react-native';
+import { useRef } from 'react';
+import { Text, View } from 'react-native';
+import type { View as RNView } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { VerseText } from '@/components/scripture';
+import { VerseCardView } from '@/components/scripture';
 import { Button, SafeScreen } from '@/components/shared';
+import { shareVerseCard } from '@/lib/share';
 import { useAudioStore } from '@/store/audioStore';
 import { useContentLanguage, useContentStore, useQuotesFetch } from '@/store/contentStore';
 
 export default function VerseScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const cardRef = useRef<RNView>(null);
   // Self-hydrate the quotes store so a deep link or cold start straight to /verse/[id] works even
   // when neither /word nor /search has triggered the fetch yet.
   const { isPending } = useQuotesFetch(useContentLanguage());
@@ -54,12 +58,13 @@ export default function VerseScreen() {
   };
 
   const handleShare = () => {
-    Share.share({ message: `${quote.scriptureText}\n\n— ${quote.verseReference}\n\nArokia` });
+    shareVerseCard(cardRef, quote.id);
   };
 
   return (
     <SafeScreen scroll back contentContainerClassName="gap-8 px-6 pb-10 pt-4">
-      <VerseText
+      <VerseCardView
+        ref={cardRef}
         text={quote.scriptureText}
         reference={quote.verseReference}
         languageCode={quote.languageCode}
