@@ -66,6 +66,11 @@ export const useAudioStore = create<AudioState>()((set, get) => ({
     const { currentTrack } = get();
     if (!currentTrack) return;
     try {
+      // If the track ran to the end, restart from the top instead of resuming at the end (which
+      // is a silent no-op). Centralised here so every play surface (list, mini-player, full player)
+      // behaves the same.
+      const { position, duration } = await TrackPlayer.getProgress();
+      if (duration > 0 && position >= duration - 0.5) await TrackPlayer.seekTo(0);
       await TrackPlayer.play();
       set({ isPlaying: true });
     } catch (e) {

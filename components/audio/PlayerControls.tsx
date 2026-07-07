@@ -43,7 +43,7 @@ export function PlayerControls() {
 
   const onPlayToggle = () => {
     if (isPlaying) pauseAudio();
-    else if (currentTrack) resumeAudio();
+    else if (currentTrack) resumeAudio(); // resumeAudio restarts from 0 if the track has ended
   };
 
   return (

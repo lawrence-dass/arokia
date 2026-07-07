@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { PlayerControls } from '@/components/audio';
+import { VerseText } from '@/components/scripture';
+import { SafeScreen } from '@/components/shared';
 import { useAudioStore } from '@/store/audioStore';
 import { useContentStore } from '@/store/contentStore';
 
@@ -39,15 +41,20 @@ export default function MeditationScreen() {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="gap-6 px-6 py-10">
-      <Text className="text-2xl font-bold text-text-primary">{track.title}</Text>
-      <Text className="text-base text-text-secondary">{track.verseReference}</Text>
+    <SafeScreen scroll back className="px-6" contentContainerClassName="gap-6 pb-10">
+      {!!track.title && <Text className="text-2xl font-bold text-text-primary">{track.title}</Text>}
+
+      <VerseText
+        text={track.scriptureText}
+        reference={track.verseReference}
+        languageCode={track.languageCode}
+      />
 
       {track.audioAssetId ? (
         <PlayerControls />
       ) : (
         <Text className="text-sm text-text-muted">{t('audio.noAudio')}</Text>
       )}
-    </ScrollView>
+    </SafeScreen>
   );
 }
