@@ -2,6 +2,11 @@ import { File, Paths } from 'expo-file-system';
 import * as Sentry from '@sentry/react-native';
 import { supabase } from '@/lib/supabase';
 
+// Re-export RNTP's progress hook from the audio service layer so components read playback progress
+// through `@/lib/audio` instead of importing react-native-track-player directly (CLAUDE.md: all RNTP
+// interaction lives in lib/audio.ts; components never touch RNTP directly).
+export { useProgress as useAudioProgress } from 'react-native-track-player';
+
 export async function resolveAudioUrl(audioAssetId: string): Promise<string> {
   const { data, error } = await supabase
     .from('audio_assets')

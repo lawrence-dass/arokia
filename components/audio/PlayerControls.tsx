@@ -3,9 +3,9 @@ import { Pressable, Text, View } from 'react-native';
 import type { LayoutChangeEvent } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { useProgress } from 'react-native-track-player';
 
 import { colors } from '@/constants/colors';
+import { useAudioProgress } from '@/lib/audio';
 import { useAudioStore } from '@/store/audioStore';
 
 function formatTime(seconds: number): string {
@@ -22,7 +22,7 @@ function formatTime(seconds: number): string {
  */
 export function PlayerControls() {
   const { t } = useTranslation();
-  const { position, duration } = useProgress(500);
+  const { position, duration } = useAudioProgress(500);
   const [trackWidth, setTrackWidth] = useState(0);
 
   const isPlaying = useAudioStore((s) => s.isPlaying);

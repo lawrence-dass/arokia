@@ -2,9 +2,9 @@ import { Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
-import { useProgress } from 'react-native-track-player';
 
 import { colors } from '@/constants/colors';
+import { useAudioProgress } from '@/lib/audio';
 import { useAudioStore } from '@/store/audioStore';
 
 /**
@@ -14,7 +14,7 @@ import { useAudioStore } from '@/store/audioStore';
  */
 export function PlayerBar() {
   const { t } = useTranslation();
-  const { position, duration } = useProgress(1000);
+  const { position, duration } = useAudioProgress(1000);
   const currentTrack = useAudioStore((s) => s.currentTrack);
   const isPlaying = useAudioStore((s) => s.isPlaying);
   const pauseAudio = useAudioStore((s) => s.pauseAudio);
