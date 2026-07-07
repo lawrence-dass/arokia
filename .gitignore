@@ -33,3 +33,5 @@ android
 
 # Review pipeline — ephemeral sentinel state (review reports in _bmad-output/reviews/ are committed)
 .claude/review-sentinels/
+# Generated audio samples (ElevenLabs) — not committed
+audio-out/
