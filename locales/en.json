@@ -18,6 +18,9 @@
   "audio": {
     "play": "Play",
     "pause": "Pause",
+    "seek": "Seek",
+    "miniPlayerLabel": "Open player",
+    "noAudio": "No audio available for this track yet.",
     "sleepTimer": "Sleep Timer",
     "speed": "Speed",
     "downloading": "Downloading..."
