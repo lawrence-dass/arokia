@@ -48,7 +48,12 @@ export function QuoteList({ isPending }: QuoteListProps) {
               onPlayToggle={() => {
                 if (isThisPlaying) pauseAudio();
                 else if (isCurrent) resumeAudio();
-                else playTrack(item);
+                // Pass the list order so the next 2 tracks prefetch silently (Story 4.5).
+                else
+                  playTrack(
+                    item,
+                    quotes.map((q) => q.id)
+                  );
               }}
             />
           );

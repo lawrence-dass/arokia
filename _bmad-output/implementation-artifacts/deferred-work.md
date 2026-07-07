@@ -31,6 +31,18 @@
 - **Lectio Divina ("Silence Between Words") not discoverable from the Soul path (AC5)**: `architecture.md` designates a dedicated `app/lectio-divina.tsx` route for this distinct silence-based practice — building it is fundamentally audio-player-core work (Story 4.3/4.4 territory), which is gated behind RNTP device validation. Revisit once that gate clears and the route can actually be built, rather than linking to a route that doesn't exist.
 - **Meditation duration not shown anywhere**: `ContentItem` has no `duration` field; it lives on `audio_assets.duration_sec`, unjoined by `getMeditations()`/`getQuotes()`. No meditation has an `audio_asset_id` yet (Story 4.6 hasn't run), so there's nothing to display regardless. Add the join + a `durationSec` field once real audio exists.
 
+## Deferred from: implementation of 4-5-offline-content-download-progressive-cache-and-manual-download (2026-07-07)
+
+- **Persisted offline uris are absolute `file://` paths — can go stale after an iOS app update.** The
+  cache manifest (`audioStore.downloadedTracks`, now persisted) stores full `documentDirectory` uris.
+  iOS can change the app container path across app updates, invalidating persisted uris → offline
+  playback of an "already downloaded" track fails until re-downloaded (online). Within a single install
+  (incl. OS restarts) it's fine. Robust fix: persist only the filename and reconstruct
+  `new File(Paths.document, filename).uri` (+ `.exists` check) at play time. Do when hardening offline
+  before launch. Low severity (self-heals on next online play).
+- **"Download This Week" size estimate is `count × 3.3 MB`** (no `size` column on `audio_assets`).
+  Replace with real sizes once 4-6 seeds tracks with known durations, or add a `size_bytes` column.
+
 ## Deferred from: implementation of 4-4-audio-player-sleep-timer-speed-control-and-bible-hand-off (2026-07-07)
 
 - **Bible hand-off resource → switch to YouVersion Tamil O.V. before Tamil audio ships (Story 4-6).**

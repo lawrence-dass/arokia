@@ -4,3 +4,4 @@ export { PlayerControls } from './PlayerControls';
 export { SleepTimer } from './SleepTimer';
 export { SpeedControl } from './SpeedControl';
 export { BibleHandoff } from './BibleHandoff';
+export { OfflineDownloadCard } from './OfflineDownloadCard';

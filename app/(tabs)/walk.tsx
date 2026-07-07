@@ -3,6 +3,7 @@ import { FlatList, Pressable, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
+import { OfflineDownloadCard } from '@/components/audio';
 import { CategoryFilter } from '@/components/home';
 import { useContentStore, useMeditationsFetch } from '@/store/contentStore';
 import type { CategoryTag, PracticePath } from '@/types';
@@ -31,6 +32,10 @@ export default function WalkScreen() {
       {practicePath && (
         <CategoryFilter practicePath={practicePath} selected={category} onSelect={setCategory} />
       )}
+
+      <View className="mt-4">
+        <OfflineDownloadCard />
+      </View>
 
       <View className="mt-4 flex-1">
         {isPending ? (

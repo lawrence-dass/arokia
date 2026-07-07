@@ -54,13 +54,17 @@ export async function downloadTrack(contentItemId: string): Promise<string> {
   return downloaded.uri;
 }
 
-export async function prefetchQueue(contentItemIds: string[]): Promise<void> {
+// Silently downloads each track to the cache and returns a map of the ones that succeeded
+// (contentId -> local uri) so the caller can record them in the offline manifest.
+export async function prefetchQueue(contentItemIds: string[]): Promise<Record<string, string>> {
+  const cached: Record<string, string> = {};
   for (const id of contentItemIds) {
     try {
-      await downloadTrack(id);
+      cached[id] = await downloadTrack(id);
     } catch (e) {
       Sentry.captureException(e);
       console.warn('[audio] prefetchQueue: failed to prefetch', id, e);
     }
   }
+  return cached;
 }
