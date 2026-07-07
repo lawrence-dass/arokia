@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ScriptureCard } from './ScriptureCard';
 import { useContentStore } from '@/store/contentStore';
+import { useAudioStore } from '@/store/audioStore';
 
 interface QuoteListProps {
   isPending: boolean;
@@ -15,6 +16,11 @@ export function QuoteList({ isPending }: QuoteListProps) {
   const { t } = useTranslation();
   const quotes = useContentStore((state) => state.quotes);
   const error = useContentStore((state) => state.error);
+  const currentTrack = useAudioStore((state) => state.currentTrack);
+  const isPlaying = useAudioStore((state) => state.isPlaying);
+  const playTrack = useAudioStore((state) => state.playTrack);
+  const pauseAudio = useAudioStore((state) => state.pauseAudio);
+  const resumeAudio = useAudioStore((state) => state.resumeAudio);
 
   if (isPending) {
     return <Text className="text-base text-text-secondary">{t('word.loading')}</Text>;
@@ -28,14 +34,25 @@ export function QuoteList({ isPending }: QuoteListProps) {
         data={quotes}
         keyExtractor={(item) => item.id}
         contentContainerClassName="gap-4 pb-10"
-        renderItem={({ item }) => (
-          <ScriptureCard
-            text={item.scriptureText}
-            reference={item.verseReference}
-            languageCode={item.languageCode}
-            onPress={() => router.push(`/verse/${item.id}`)}
-          />
-        )}
+        renderItem={({ item }) => {
+          const isCurrent = currentTrack?.id === item.id;
+          const isThisPlaying = isPlaying && isCurrent;
+          return (
+            <ScriptureCard
+              text={item.scriptureText}
+              reference={item.verseReference}
+              languageCode={item.languageCode}
+              onPress={() => router.push(`/verse/${item.id}`)}
+              hasAudio={!!item.audioAssetId}
+              isPlaying={isThisPlaying}
+              onPlayToggle={() => {
+                if (isThisPlaying) pauseAudio();
+                else if (isCurrent) resumeAudio();
+                else playTrack(item);
+              }}
+            />
+          );
+        }}
       />
     );
   }
