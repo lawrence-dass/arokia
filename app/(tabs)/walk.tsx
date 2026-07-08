@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { OfflineDownloadCard } from '@/components/audio';
 import { CategoryFilter } from '@/components/home';
-import { useContentStore, useMeditationsFetch } from '@/store/contentStore';
+import { useContentLanguage, useContentStore, useMeditationsFetch } from '@/store/contentStore';
 import type { CategoryTag, PracticePath } from '@/types';
 
 export default function WalkScreen() {
@@ -19,7 +19,12 @@ export default function WalkScreen() {
     setCategory(null);
   }, [practicePath]);
 
-  const { isPending } = useMeditationsFetch('ta', practicePath, category ?? undefined, 'any');
+  const { isPending } = useMeditationsFetch(
+    useContentLanguage(),
+    practicePath,
+    category ?? undefined,
+    'any'
+  );
   const meditations = useContentStore((state) => state.meditations);
   const error = useContentStore((state) => state.error);
 

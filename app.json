@@ -4,7 +4,10 @@
     "slug": "arokia",
     "version": "1.0.0",
     "scheme": "arokia",
-    "platforms": ["ios", "android"],
+    "platforms": [
+      "ios",
+      "android"
+    ],
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -15,7 +18,8 @@
       "expo-localization",
       "expo-sqlite",
       "@sentry/react-native",
-      "expo-font"
+      "expo-font",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -29,12 +33,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#F5EFE6"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lawrencedass.arokia",
       "infoPlist": {
-        "UIBackgroundModes": ["audio"]
+        "UIBackgroundModes": [
+          "audio"
+        ]
       }
     },
     "android": {
@@ -45,8 +53,17 @@
       "package": "com.lawrencedass.arokia",
       "permissions": [
         "android.permission.FOREGROUND_SERVICE",
-        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d64964bb-230f-490b-968a-9fbf55220870"
+      }
+    },
+    "owner": "lawrence-dasss-team"
   }
 }

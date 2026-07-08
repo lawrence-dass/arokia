@@ -13,6 +13,8 @@ interface PrefsState {
   // on an English phone can still choose Tamil without changing their device settings. Applied to
   // i18next on change and re-applied on rehydration.
   language: LanguageCode;
+  // Optional soothing background music under meditations (spike). Default on.
+  backgroundMusicEnabled: boolean;
   vowAcknowledged: boolean;
   lastVowAppVersion: string;
   // Sunday church attendance (Story 5.3) — attended Sundays as local 'YYYY-MM-DD' strings.
@@ -23,6 +25,7 @@ interface PrefsState {
   // Actions
   setPlaybackSpeed: (speed: PrefsState['playbackSpeed']) => void;
   setLanguage: (language: LanguageCode) => void;
+  setBackgroundMusicEnabled: (enabled: boolean) => void;
   acknowledgeVow: (appVersion: string) => void;
   resetVow: () => void;
   toggleSundayAttendance: (date: string) => void;
@@ -34,6 +37,7 @@ export const usePrefsStore = create<PrefsState>()(
     (set) => ({
       playbackSpeed: 1,
       language: 'ta',
+      backgroundMusicEnabled: true,
       vowAcknowledged: false,
       lastVowAppVersion: '',
       sundayAttendance: [],
@@ -44,6 +48,7 @@ export const usePrefsStore = create<PrefsState>()(
         set({ language });
         i18n.changeLanguage(language);
       },
+      setBackgroundMusicEnabled: (enabled) => set({ backgroundMusicEnabled: enabled }),
       acknowledgeVow: (appVersion) => {
         if (!appVersion) return;
         set({ vowAcknowledged: true, lastVowAppVersion: appVersion });
@@ -63,6 +68,7 @@ export const usePrefsStore = create<PrefsState>()(
       partialize: (state) => ({
         playbackSpeed: state.playbackSpeed,
         language: state.language,
+        backgroundMusicEnabled: state.backgroundMusicEnabled,
         vowAcknowledged: state.vowAcknowledged,
         lastVowAppVersion: state.lastVowAppVersion,
         sundayAttendance: state.sundayAttendance,

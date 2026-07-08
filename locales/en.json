@@ -26,7 +26,8 @@
     "sleepMinutes": "{{count}} min",
     "speed": "Speed",
     "readFullPassage": "Read the full passage",
-    "downloading": "Downloading..."
+    "downloading": "Downloading...",
+    "backgroundMusic": "Background music"
   },
   "offline": {
     "title": "Offline",
