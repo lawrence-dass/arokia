@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: 2026-04-26
-last_updated: 2026-07-07 # Story 5-3 implemented → review: optional Sunday attendance tracker
+last_updated: 2026-07-07 # PR #33: Story 5-3 done → Epic 5 complete (Sunday attendance tracker)
 project: arokia
 project_key: NOKEY
 tracking_system: file-system
@@ -99,10 +99,10 @@ development_status:
   # ─────────────────────────────────────────────────────────────────
   # Epic 5: Share & Community Seed
   # ─────────────────────────────────────────────────────────────────
-  epic-5: in-progress
+  epic-5: done # merged PR #33 2026-07-07 (5-3); all Epic 5 stories complete
   5-1-verse-card-generation-versecardview-component: done # PR #29 (2026-07-07): branded ref-forwarding VerseCardView + captureVerseCard (react-native-view-shot). PNG capture pending device rebuild (native module)
   5-2-share-to-whatsapp-and-system-share-sheet: done # PR #30 (2026-07-07): shareVerseCard (view-shot PNG + expo-sharing) on verse screen; share_triggered logged. Native capture/share pending device rebuild
-  5-3-optional-sunday-church-attendance-tracker: review # tracker + prefsStore attendance; tsc+lint clean; device persist-check pending desktop
+  5-3-optional-sunday-church-attendance-tracker: done # PR #33 (2026-07-07): SundayTracker + prefsStore attendance; ta+en i18n; tsc+lint clean. Device persist-check pending desktop (JS-only, no rebuild)
   epic-5-retrospective: optional
 
   # ─────────────────────────────────────────────────────────────────
