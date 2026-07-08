@@ -39,3 +39,8 @@ operate from this single root — there is no inner app subdirectory.
 - **The content pipeline links `content_items.audio_asset_id → audio_assets` only** — `audio_assets.content_item_id` is never populated. Resolve audio via `content_items.audio_asset_id` (as `resolveAudioUrl`/`downloadTrack` now do); querying `audio_assets` by `content_item_id` returns nothing.
 - **Adding a native module (react-native-view-shot, expo-sharing, RNTP) requires a device rebuild** — a Metro reload won't load it. Batch native-module stories so Lawrence rebuilds once. JS-only changes just need `r` in Metro.
 - **`useProgress` (RNTP) is re-exported as `useAudioProgress` from `lib/audio.ts`** — components must import it from there, never from `react-native-track-player` directly (CLAUDE.md: all RNTP interaction lives in the service layer).
+
+## Learnings from Story 5-3 code review — 2026-07-07
+
+- **The app is bilingual at runtime — add every new UI string to BOTH `locales/ta.json` AND `locales/en.json`.** `lib/i18n.ts` loads both resources, selects language by device locale, and sets `fallbackLng: 'ta'`. A key added to `ta.json` only will render as **Tamil on an English-locale device** (the dev simulator) — the fallback silently masks the missing English key instead of erroring, so `tsc`/lint won't catch it. CLAUDE.md's "Tamil only in MVP / all strings live in ta.json" invariant is **stale**; en.json already carries every namespace and is required. (Caught in 5-3: `worship` namespace was ta-only; fixed by adding the English translations.)
+- **i18n array values (e.g. month-name lists) work via `t('key', { returnObjects: true }) as string[]`** — per-call `returnObjects` is honored even without a global setting, and resolves across `fallbackLng`.
