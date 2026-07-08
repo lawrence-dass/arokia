@@ -33,9 +33,10 @@ interface ContentState {
   };
   isLoading: boolean;
   error: string | null;
-  // True once fetchQuotes has completed at least once (success or failure) this session —
-  // lets useQuotesFetch avoid a redundant re-fetch every time a new screen mounts.
-  hasFetchedQuotes: boolean;
+  // The language `quotes` currently reflects (null before the first fetch). Scoping "already
+  // fetched" to a language — not a one-time boolean — lets the in-app language switcher trigger a
+  // re-fetch when the user changes language, instead of showing stale content for the old language.
+  quotesFetchedLang: LanguageCode | null;
   // The `practicePath|category` combination `meditations` currently reflects (null before the
   // first fetch) — unlike quotes, meditations are filtered, so "already fetched" must be scoped
   // to a specific filter combination, not a single one-time flag.
@@ -58,7 +59,7 @@ export const useContentStore = create<ContentState>()((set, get) => ({
   activeFilters: { practicePath: null, moodTag: null, category: null },
   isLoading: false,
   error: null,
-  hasFetchedQuotes: false,
+  quotesFetchedLang: null,
   meditationsFetchedFilterKey: null,
 
   fetchQuotes: async (lang) => {
@@ -70,9 +71,9 @@ export const useContentStore = create<ContentState>()((set, get) => ({
         activeFilters.practicePath ?? undefined,
         activeFilters.moodTag ?? undefined
       );
-      set({ quotes, isLoading: false, hasFetchedQuotes: true });
+      set({ quotes, isLoading: false, quotesFetchedLang: lang });
     } catch {
-      set({ error: 'errors.offline', isLoading: false, hasFetchedQuotes: true });
+      set({ error: 'errors.offline', isLoading: false, quotesFetchedLang: lang });
     }
   },
 
@@ -91,7 +92,7 @@ export const useContentStore = create<ContentState>()((set, get) => ({
       set({
         meditations,
         isLoading: false,
-        meditationsFetchedFilterKey: `${practicePath ?? ''}|${category ?? ''}|${timeOfDay ?? ''}`,
+        meditationsFetchedFilterKey: `${lang}|${practicePath ?? ''}|${category ?? ''}|${timeOfDay ?? ''}`,
       });
     } catch {
       set({ error: 'errors.offline', isLoading: false });
@@ -105,22 +106,23 @@ export const useContentStore = create<ContentState>()((set, get) => ({
   clearFilters: () => set({ activeFilters: { practicePath: null, moodTag: null, category: null } }),
 }));
 
-// Triggers fetchQuotes on mount ONLY if it hasn't already run this session (`hasFetchedQuotes`
-// lives in the store, shared across every screen using this hook) — otherwise navigating between
-// /word and /search would re-fetch and flash the loading state every time, even though the data
-// is already cached. Also covers the one-frame gap before the very first fetch actually starts.
+// Triggers fetchQuotes on mount only if the cached quotes aren't already for `lang`
+// (`quotesFetchedLang` lives in the store, shared across every screen using this hook) — so
+// navigating between /word and /search doesn't re-fetch and flash the loading state, but changing
+// language (via the in-app switcher) does re-fetch. Also covers the gap before the first fetch.
 export function useQuotesFetch(lang: LanguageCode) {
   const fetchQuotes = useContentStore((state) => state.fetchQuotes);
   const isLoading = useContentStore((state) => state.isLoading);
-  const hasFetchedQuotes = useContentStore((state) => state.hasFetchedQuotes);
+  const quotesFetchedLang = useContentStore((state) => state.quotesFetchedLang);
+  const isCurrent = quotesFetchedLang === lang;
 
   useEffect(() => {
-    if (!hasFetchedQuotes) {
+    if (!isCurrent) {
       fetchQuotes(lang);
     }
-  }, [fetchQuotes, hasFetchedQuotes, lang]);
+  }, [fetchQuotes, isCurrent, lang]);
 
-  return { isPending: isLoading || !hasFetchedQuotes };
+  return { isPending: isLoading || !isCurrent };
 }
 
 // Same purpose as useQuotesFetch, but meditations are filtered — "already fetched" is scoped to
@@ -135,7 +137,7 @@ export function useMeditationsFetch(
   const fetchMeditations = useContentStore((state) => state.fetchMeditations);
   const isLoading = useContentStore((state) => state.isLoading);
   const fetchedFilterKey = useContentStore((state) => state.meditationsFetchedFilterKey);
-  const requestedKey = `${practicePath ?? ''}|${category ?? ''}|${timeOfDay ?? ''}`;
+  const requestedKey = `${lang}|${practicePath ?? ''}|${category ?? ''}|${timeOfDay ?? ''}`;
   const isCurrent = fetchedFilterKey === requestedKey;
 
   useEffect(() => {
