@@ -9,11 +9,16 @@ interface PrefsState {
   playbackSpeed: 0.75 | 1 | 1.25;
   vowAcknowledged: boolean;
   lastVowAppVersion: string;
+  // Sunday church attendance (Story 5.3) — attended Sundays as local 'YYYY-MM-DD' strings.
+  // A date's presence IS the "attended" record; unmarking removes it. Deliberately no streak,
+  // count, or aggregate is derived or exposed here (FR35), and no identity/PII is stored (NFR-PR1).
+  sundayAttendance: string[];
   _hasHydrated: boolean;
   // Actions
   setPlaybackSpeed: (speed: PrefsState['playbackSpeed']) => void;
   acknowledgeVow: (appVersion: string) => void;
   resetVow: () => void;
+  toggleSundayAttendance: (date: string) => void;
   setHasHydrated: (hasHydrated: boolean) => void;
 }
 
@@ -23,6 +28,7 @@ export const usePrefsStore = create<PrefsState>()(
       playbackSpeed: 1,
       vowAcknowledged: false,
       lastVowAppVersion: '',
+      sundayAttendance: [],
       _hasHydrated: false,
 
       setPlaybackSpeed: (speed) => set({ playbackSpeed: speed }),
@@ -31,6 +37,12 @@ export const usePrefsStore = create<PrefsState>()(
         set({ vowAcknowledged: true, lastVowAppVersion: appVersion });
       },
       resetVow: () => set({ vowAcknowledged: false, lastVowAppVersion: '' }),
+      toggleSundayAttendance: (date) =>
+        set((state) => ({
+          sundayAttendance: state.sundayAttendance.includes(date)
+            ? state.sundayAttendance.filter((d) => d !== date)
+            : [...state.sundayAttendance, date],
+        })),
       setHasHydrated: (hasHydrated) => set({ _hasHydrated: hasHydrated }),
     }),
     {
@@ -40,6 +52,7 @@ export const usePrefsStore = create<PrefsState>()(
         playbackSpeed: state.playbackSpeed,
         vowAcknowledged: state.vowAcknowledged,
         lastVowAppVersion: state.lastVowAppVersion,
+        sundayAttendance: state.sundayAttendance,
       }),
       onRehydrateStorage: () => (state, error) => {
         if (error) {
