@@ -2,7 +2,7 @@ import { Link } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { TimeOfDayBanner, TriuneGrid } from '@/components/home';
-import { SafeScreen } from '@/components/shared';
+import { LanguageToggle, SafeScreen } from '@/components/shared';
 
 const TIME_FILTER = 'any' as const;
 
@@ -11,6 +11,9 @@ export default function HomeScreen() {
 
   return (
     <SafeScreen className="justify-center gap-6 px-6">
+      {/* In-app language switcher (UI + content) — Tamil-first, user choice over device locale. */}
+      <LanguageToggle />
+
       <TimeOfDayBanner timeFilter={TIME_FILTER} />
       <TriuneGrid timeFilter={TIME_FILTER} />
 
