@@ -21,6 +21,14 @@
         "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
+    "testflight": {
+      "extends": "preview",
+      "distribution": "store",
+      "autoIncrement": true,
+      "ios": {
+        "simulator": false
+      }
+    },
     "production": {
       "autoIncrement": true,
       "env": {

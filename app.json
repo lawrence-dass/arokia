@@ -4,10 +4,7 @@
     "slug": "arokia",
     "version": "1.0.0",
     "scheme": "arokia",
-    "platforms": [
-      "ios",
-      "android"
-    ],
+    "platforms": ["ios", "android"],
     "web": {
       "bundler": "metro",
       "output": "static",
@@ -33,16 +30,13 @@
       "resizeMode": "contain",
       "backgroundColor": "#F5EFE6"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.lawrencedass.arokia",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "audio"
-        ]
+        "UIBackgroundModes": ["audio"],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
