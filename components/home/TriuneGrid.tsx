@@ -2,7 +2,7 @@ import { Pressable, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { useContentLanguage, useContentStore, useMeditationsFetch } from '@/store/contentStore';
+import { useContentLanguage, useMeditationsFetch } from '@/store/contentStore';
 import type { PracticePath, TimeOfDay } from '@/types';
 
 interface TriuneGridProps {
@@ -17,10 +17,14 @@ const TILES: { practicePath: PracticePath; emoji: string; labelKey: string }[] =
 
 export function TriuneGrid({ timeFilter }: TriuneGridProps) {
   const { t } = useTranslation();
-  const meditations = useContentStore((state) => state.meditations);
   // Unfiltered-by-path fetch — needed so the Soul tile can check for an available Soul
   // meditation to jump straight to (see app/(tabs)/index.tsx's Scope Note on "today's featured").
-  useMeditationsFetch(useContentLanguage(), undefined, undefined, timeFilter);
+  const { meditations } = useMeditationsFetch(
+    useContentLanguage(),
+    undefined,
+    undefined,
+    timeFilter
+  );
 
   const handlePress = (practicePath: PracticePath) => {
     if (practicePath === 'soul') {

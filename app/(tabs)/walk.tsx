@@ -19,13 +19,12 @@ export default function WalkScreen() {
     setCategory(null);
   }, [practicePath]);
 
-  const { isPending } = useMeditationsFetch(
+  const { meditations, isPending } = useMeditationsFetch(
     useContentLanguage(),
     practicePath,
     category ?? undefined,
     'any'
   );
-  const meditations = useContentStore((state) => state.meditations);
   const error = useContentStore((state) => state.error);
 
   return (
