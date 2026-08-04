@@ -3,10 +3,18 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 import { getCurrentAppVersion, isVowSatisfied, needsReVow } from '@/constants/vow';
+import i18n from '@/lib/i18n';
+import type { LanguageCode } from '@/types';
 
 interface PrefsState {
   // Persisted user preference. On app start, seed audioStore.speed from this value (Story 1.6/2.1).
   playbackSpeed: 0.75 | 1 | 1.25;
+  // User-chosen app language (UI + content). Tamil-first default; overrides device locale so a user
+  // on an English phone can still choose Tamil without changing their device settings. Applied to
+  // i18next on change and re-applied on rehydration.
+  language: LanguageCode;
+  // Optional soothing background music under meditations (spike). Default on.
+  backgroundMusicEnabled: boolean;
   vowAcknowledged: boolean;
   lastVowAppVersion: string;
   // Sunday church attendance (Story 5.3) — attended Sundays as local 'YYYY-MM-DD' strings.
@@ -16,6 +24,8 @@ interface PrefsState {
   _hasHydrated: boolean;
   // Actions
   setPlaybackSpeed: (speed: PrefsState['playbackSpeed']) => void;
+  setLanguage: (language: LanguageCode) => void;
+  setBackgroundMusicEnabled: (enabled: boolean) => void;
   acknowledgeVow: (appVersion: string) => void;
   resetVow: () => void;
   toggleSundayAttendance: (date: string) => void;
@@ -26,12 +36,19 @@ export const usePrefsStore = create<PrefsState>()(
   persist(
     (set) => ({
       playbackSpeed: 1,
+      language: 'ta',
+      backgroundMusicEnabled: true,
       vowAcknowledged: false,
       lastVowAppVersion: '',
       sundayAttendance: [],
       _hasHydrated: false,
 
       setPlaybackSpeed: (speed) => set({ playbackSpeed: speed }),
+      setLanguage: (language) => {
+        set({ language });
+        i18n.changeLanguage(language);
+      },
+      setBackgroundMusicEnabled: (enabled) => set({ backgroundMusicEnabled: enabled }),
       acknowledgeVow: (appVersion) => {
         if (!appVersion) return;
         set({ vowAcknowledged: true, lastVowAppVersion: appVersion });
@@ -50,6 +67,8 @@ export const usePrefsStore = create<PrefsState>()(
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         playbackSpeed: state.playbackSpeed,
+        language: state.language,
+        backgroundMusicEnabled: state.backgroundMusicEnabled,
         vowAcknowledged: state.vowAcknowledged,
         lastVowAppVersion: state.lastVowAppVersion,
         sundayAttendance: state.sundayAttendance,
@@ -60,7 +79,11 @@ export const usePrefsStore = create<PrefsState>()(
         }
         // `state` is undefined on a failed rehydration — fall back to the live store so
         // hydration always completes and the app never blanks on a corrupted storage value.
-        (state ?? usePrefsStore.getState()).setHasHydrated(true);
+        const hydrated = state ?? usePrefsStore.getState();
+        // Apply the saved language to i18next so a returning user keeps their choice (i18n
+        // initializes to the Tamil-first default before persisted state is available).
+        if (hydrated.language) i18n.changeLanguage(hydrated.language);
+        hydrated.setHasHydrated(true);
       },
     }
   )

@@ -3,11 +3,19 @@ import { Text, View } from 'react-native';
 import { Link, useLocalSearchParams } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { BibleHandoff, PlayerControls, SleepTimer, SpeedControl } from '@/components/audio';
+import {
+  BackgroundMusicToggle,
+  BibleHandoff,
+  PlayerControls,
+  SleepTimer,
+  SpeedControl,
+} from '@/components/audio';
 import { VerseText } from '@/components/scripture';
 import { SafeScreen } from '@/components/shared';
+import { pauseBed, startBed, stopBed } from '@/lib/backgroundMusic';
 import { useAudioStore } from '@/store/audioStore';
 import { useContentStore } from '@/store/contentStore';
+import { usePrefsStore } from '@/store/prefsStore';
 
 export default function MeditationScreen() {
   const { t } = useTranslation();
@@ -17,6 +25,8 @@ export default function MeditationScreen() {
   );
   const currentTrack = useAudioStore((state) => state.currentTrack);
   const playTrack = useAudioStore((state) => state.playTrack);
+  const isPlaying = useAudioStore((state) => state.isPlaying);
+  const backgroundMusicEnabled = usePrefsStore((state) => state.backgroundMusicEnabled);
 
   // The player can be opened for the currently-playing track (e.g. a quote opened from the
   // PlayerBar) that isn't in contentStore.meditations — fall back to currentTrack when the id matches.
@@ -28,6 +38,18 @@ export default function MeditationScreen() {
       playTrack(track);
     }
   }, [track, currentTrack?.id, playTrack]);
+
+  // SPIKE: sync the optional soothing bed to playback — meditations only, only when enabled.
+  useEffect(() => {
+    if (track?.contentType === 'meditation' && isPlaying && backgroundMusicEnabled) {
+      void startBed();
+    } else {
+      pauseBed();
+    }
+  }, [track?.contentType, isPlaying, backgroundMusicEnabled]);
+
+  // Stop the bed when leaving the player so it doesn't bleed into the next screen.
+  useEffect(() => () => void stopBed(), []);
 
   if (!track) {
     return (
@@ -55,6 +77,7 @@ export default function MeditationScreen() {
           <PlayerControls />
           <SpeedControl />
           <SleepTimer />
+          {track.contentType === 'meditation' && <BackgroundMusicToggle />}
           <BibleHandoff reference={track.verseReference} contentId={track.id} />
         </>
       ) : (
